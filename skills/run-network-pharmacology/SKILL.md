@@ -129,7 +129,7 @@ If the user requests the draft, use the existing frozen branch and the figure pr
 
 ### Complete
 
-Validate canonical files with `scripts/validate_np_completion.py`. Prepare the evidence bundle described in `auditor-handoff.md` when independent computational review is requested or when NP will be integrated with docking/manuscript audit. The final report must summarize inputs, broad and final counts, branch decisions, mapping corrections, PPI/hub stability, enrichment, evidence limitations, docking candidates and rationale, and generated files. State `DOCKING_NOT_STARTED`.
+Validate canonical files with `scripts/validate_np_completion.py`. Before creating any shareable or downloadable package, run `scripts/privacy_audit.py` and require a clean result. Prepare the evidence bundle described in `auditor-handoff.md` when independent computational review is requested or when NP will be integrated with docking/manuscript audit. The final report must summarize inputs, broad and final counts, branch decisions, mapping corrections, PPI/hub stability, enrichment, evidence limitations, docking candidates and rationale, and generated files. State `DOCKING_NOT_STARTED`.
 
 ### Preserve reproducibility and package outputs
 
