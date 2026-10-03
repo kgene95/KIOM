@@ -1,0 +1,13 @@
+interface:
+  display_name: Biomedical Research Assistant
+  short_description: 바이오·의학 논문 작성, 인용, 데이터 해석을 지원합니다
+  default_prompt: Use $biomedical-research-assistant to help with this biomedical research or manuscript task.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true

@@ -1,0 +1,5 @@
+# Receptor selection audit
+
+Query current RCSB PDB entry and primary structure mapping for each candidate; record access date, PDB ID, DOI/source, species, UniProt, wild-type/mutations, experimental method/resolution or map quality, chain, construct/truncation, biological assembly, modeled/missing binding-site residues, alternate conformations, occupancy, bound ligand and binding site. Inspect cofactors, metals, heme, phosphorylation and structural waters. Distinguish experimental atoms from model-built residues and engineered mutations.
+
+Compare co-crystal structures that support native-ligand redocking against alternate apo/liganded structures: pocket completeness and relevance outrank resolution alone. Record selection and rejection rationale. Check whether chain/assembly and known binding site match the biological hypothesis; identify pocket from native ligand when possible. Retain required cofactor/metal and justified structural waters consistently through redocking and test docking. If no suitable experimental receptor, document limitations and alternative protocol; do not quietly present predicted structures as co-crystals.

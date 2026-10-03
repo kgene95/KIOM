@@ -1,0 +1,13 @@
+interface:
+  display_name: Molecular Docking
+  short_description: Validated, reproducible ligand-target docking
+  default_prompt: Use $molecular-docking to validate and dock these ligand-target pairs, then prepare a reproducible manuscript and audit handoff.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true

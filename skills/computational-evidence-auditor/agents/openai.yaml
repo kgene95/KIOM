@@ -1,0 +1,3 @@
+interface:
+  display_name: "Computational Evidence Auditor"
+  short_description: "Audit NP/docking evidence and manuscript claims without inventing missing data"

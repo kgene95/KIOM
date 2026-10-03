@@ -1,0 +1,26 @@
+{
+  "root": "/mnt/data/computational-evidence-auditor",
+  "file_count": 7,
+  "extension_counts": {
+    ".md": 5,
+    ".yaml": 1,
+    ".py": 1
+  },
+  "categories": {
+    "methods": [],
+    "results": [],
+    "ppi": [],
+    "enrichment": [],
+    "docking": [
+      "references/docking-audit.md"
+    ],
+    "figure": []
+  },
+  "np_manifest": {
+    "status": "not_found"
+  },
+  "docking_manifest": {
+    "status": "not_found"
+  },
+  "note": "Field checks are structural hints only; scientific verification requires reading the underlying evidence."
+}

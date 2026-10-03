@@ -1,0 +1,15 @@
+interface:
+  display_name: Network Pharmacology 분석
+  short_description: 재현 가능한 NP 분석·SCI Figure·도킹 후보 추천
+  default_prompt: Use $run-network-pharmacology to run a source-traceable network
+    pharmacology analysis, recommend docking candidates without running docking, and
+    create an SCI figure when requested.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true

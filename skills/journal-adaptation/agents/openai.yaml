@@ -1,0 +1,13 @@
+interface:
+  display_name: Journal Adaptation
+  short_description: 완성 논문을 목표 저널의 최신 투고 규정에 맞게 변환합니다
+  default_prompt: Use $journal-adaptation to adapt this manuscript to the target journal's current requirements.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true

@@ -1,0 +1,13 @@
+interface:
+  display_name: Manuscript Audit
+  short_description: 완성 원고의 가설, 연구흐름, 근거, 일관성, 보고기준을 점검합니다
+  default_prompt: Use $manuscript-audit to audit this biomedical manuscript as a whole.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true
