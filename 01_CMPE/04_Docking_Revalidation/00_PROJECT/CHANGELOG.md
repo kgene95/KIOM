@@ -1,5 +1,12 @@
 # Change log
 
+## 2026-10-04 — 4KIK pose and interaction QC completed
+
+- Repaired the PLIP input route by generating Open Babel PDB complexes with preserved `UNL` ligand records.
+- Generated PLIP 3.0.1 XML interaction fingerprints for vitexin and naringenin top poses across all three neutral-state seeds.
+- Added all-ligand seedwise pose RMSD and clash/pocket QC. All six neutral top poses passed the heavy-atom clash screen; minimum protein distance was 2.471–2.726 Å.
+- Kept the interpretation conditional on the neutral protonation state; ligand strain remains unquantified and 5IKR remains blocked.
+
 ## 2026-10-04 — GitHub–OneDrive handoff instructions added
 
 - Added `00_PROJECT/GITHUB_ONEDRIVE_HANDOFF.md` with repository roles, synchronization rules, current scientific state, and a copy-ready prompt for a general ChatGPT conversation.

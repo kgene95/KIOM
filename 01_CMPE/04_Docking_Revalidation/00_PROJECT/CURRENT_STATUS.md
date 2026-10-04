@@ -12,20 +12,18 @@ Revalidate the manuscript Fig. 3(B) computational result using human IKKβ `4KIK
 | Native KSA redocking | PASS | symmetry-aware heavy-atom RMSD 0.3808 Å in `KSA_redocking_30A_symmetry_rmsd.csv` |
 | Locked Vina test docking | COMPLETE | neutral vitexin and naringenin, three seeds each |
 | Vitexin pose replicate consistency | PASS | direct-coordinate heavy-atom RMSD 0.0485–0.1088 Å |
-| Naringenin pose replicate consistency | NOT_ASSESSED | required if the comparator is reported quantitatively |
-| Interaction fingerprints | NOT_RUN | PLIP conversion route failed; 5 Å proximity is not a replacement |
-| Clash, strain, pocket-occupancy QC | NOT_ASSESSED | must be completed or explicitly limited before paper-level closure |
+| Naringenin pose replicate consistency | PASS | direct-coordinate heavy-atom RMSD 0.0201–0.0461 Å across three seeds |
+| Interaction fingerprints | PASS | PLIP 3.0.1 XML generated for top pose of each ligand and seed |
+| Clash, strain, pocket-occupancy QC | PASS for clash/pocket screen; strain not independently minimized | minimum protein distance 2.471–2.726 Å; zero heavy-atom contacts below 1.5 Å; 20/41 of 20/42 ligand heavy atoms within 5 Å |
 | Protonation sensitivity interpretation | LIMITED | neutral is conditional; vitexin anionic explorations are incomplete and naringenin sensitivity is absent |
 | Publication figure | PENDING | draft composition exists; no final export approved |
 
 ## Required next actions for paper-level 4KIK completion
 
-1. Produce versioned interaction analysis for the top pose of each pre-specified seed, or document a validated technical limitation without filling in contacts by inference.
-2. Evaluate naringenin seed consistency if it remains in a comparative result table.
-3. Record pocket occupancy, protein-ligand clashes, and ligand-geometry/strain QC for each interpreted complex.
-4. Define whether protonation sensitivity is needed for a comparative claim.  If it is, run the relevant pre-specified protomers with three seeds; otherwise restrict conclusions to conditional neutral-state results.
-5. Reconcile `receptor_selection.csv`, result tables, manifests, and checkpoints with the actual PASS/NOT_ASSESSED states.
-6. Obtain figure composition approval before publication-resolution export, then draft manuscript text only within the documented claim boundary.
+1. Decide whether the paper will report only the conditional neutral-state results or add three-seed charged-state sensitivity runs; do not generalize beyond the selected state.
+2. Perform an explicit ligand-strain/minimization check if a strain claim is needed; current QC is a clash and pocket-occupancy screen only.
+3. Reconcile `receptor_selection.csv`, result tables, manifests, and checkpoints with the actual PASS/LIMITED states.
+4. Obtain figure composition approval before publication-resolution export, then draft manuscript text only within the documented claim boundary.
 
 ## Separate COX-2 status
 

@@ -1,0 +1,7 @@
+ligand,seed,heavy_atoms,min_protein_distance_A,clash_count_lt_1_5A,contact_atoms_within_5A,qc_status
+naringenin,20261004,20,2.721,0,20,PASS
+naringenin,20261005,20,2.707,0,20,PASS
+naringenin,20261006,20,2.726,0,20,PASS
+vitexin-4″-O-glucoside,20261004,42,2.471,0,41,PASS
+vitexin-4″-O-glucoside,20261005,42,2.493,0,41,PASS
+vitexin-4″-O-glucoside,20261006,42,2.481,0,41,PASS

@@ -47,6 +47,10 @@ Recommend stronger reasoning at these points:
 9. Build a combined docking figure for review; export individual panels and publication-resolution files only after the user confirms composition. Once docking, QC and the approved figure are complete, summarize manuscript readiness and explicitly ask whether to draft Docking Methods, Docking Results and the docking figure legend. Never frame docking as proof of binding, engagement, inhibition or pathway regulation.
 10. When the user requests independent verification, peer-review-style checking, or provides a colleague's partial NP/docking package, create the auditor handoff defined in [auditor handoff](references/auditor-handoff.md). Do not rerun upstream NP unless explicitly requested in the NP skill; do not fill missing evidence by assumption.
 
+## Project storage and handoff
+
+When the workflow touches OneDrive, GitHub, or another shared project store, read [project storage and handoff](references/storage-handoff.md) before any external write. The live project root must be inventoried before creating or uploading anything; existing exact-match folders are reused, and archives are optional snapshots rather than active working directories. Verify each write at its exact destination and record the path or commit in the checkpoint.
+
 ## Reproducibility manifest and package handoff
 
 Create `docking_manifest.json` and a human-readable checkpoint before receptor preparation, then update both atomically after every stage. Record engine and version, environment, executable paths, receptor source/PDB ID and retrieval date, chain and preparation decisions, ligand identity/stereochemistry/protonation, grid coordinates and dimensions, search parameters, random seeds, validation control and redocking RMSD, failure/alternate-validation decisions, all result paths, score/pose-selection rules, interaction-analysis method, raw output paths, exact commands and file checksums where practical.

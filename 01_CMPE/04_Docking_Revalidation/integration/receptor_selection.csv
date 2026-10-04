@@ -1,0 +1,3 @@
+target,pdb_id,organism,uniprot,method,resolution_angstrom,mutation_status,native_ligand,native_ligand_instances,cofactor_or_special_component,role,chain_status,redocking_status
+IKBKB,4KIK,Homo sapiens,O14920,X-ray diffraction,2.83,none,KSA (K-252a),A:800; B:700,SEP phosphorylation present,primary candidate,B primary active-like phospho-protomer; A sensitivity chain,PASS_0.3808A
+PTGS2,5IKR,Homo sapiens,P35354,X-ray diffraction,2.34,none,ID8 (mefenamic acid),A:601; B:602,COH (Co-protoporphyrin IX containing Co) retained for first validation pass,primary candidate,A primary due to lower alternate-conformation burden; B sensitivity chain,BLOCKED_COH_PARAMETERIZATION

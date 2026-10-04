@@ -1,0 +1,6 @@
+target,pdb_id,chain,ligand,identity_state,run_class,seeds,best_affinity_kcal_per_mol,affinity_range_kcal_per_mol,pose_qc_status,interaction_qc_status,interpretation_status
+IKKbeta,4KIK,B,vitexin-4\"-O-glucoside,neutral_state8,primary,20261004|20261005|20261006,-10.458,-10.458 to -10.442,PASS,PASS,CONDITIONAL_PRIMARY
+IKKbeta,4KIK,B,naringenin,neutral_state8,comparator,20261004|20261005|20261006,-9.329,-9.329 to -9.289,PASS,PASS,EXPLORATORY_COMPARATOR
+IKKbeta,4KIK,B,vitexin-4\"-O-glucoside,monoanion_state4,sensitivity,20261007,-9.875,-9.875,NOT_ASSESSED,NOT_RUN,SENSITIVITY_ONLY
+IKKbeta,4KIK,B,vitexin-4\"-O-glucoside,monoanion_state6,sensitivity,20261007,-8.136,-8.136,NOT_ASSESSED,NOT_RUN,SENSITIVITY_ONLY
+IKKbeta,4KIK,B,vitexin-4\"-O-glucoside,monoanion_state7,sensitivity,20261007,-9.852,-9.852,NOT_ASSESSED,NOT_RUN,SENSITIVITY_ONLY

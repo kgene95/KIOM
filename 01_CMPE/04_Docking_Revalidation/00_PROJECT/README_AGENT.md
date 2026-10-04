@@ -22,7 +22,7 @@ This directory records an independent revalidation of the historical CMPE dockin
 
 ## What is complete and what is not
 
-The 4KIK native-ligand validation and Vina docking runs are complete.  The 4KIK job must still be described as `LIMITED` until pose-QC and interaction-analysis records are complete or a defensible inability to run them is documented.  See `CURRENT_STATUS.md`.
+The 4KIK native-ligand validation, Vina docking, pose consistency, clash/pocket screen, and PLIP interaction records are complete for the three neutral-state seeds of both ligands.  The job remains `LIMITED` because the reported test-ligand results are conditional on the neutral protonation state and ligand strain has not been independently quantified.  See `CURRENT_STATUS.md`.
 
 COX-2/5IKR is a separate blocked branch: its deposited COH cobalt metalloporphyrin must not be deleted simply to enable Vina.  Do not run 5IKR test-ligand docking until a reviewed COH template and Vina-compatible cobalt treatment exist.
 
