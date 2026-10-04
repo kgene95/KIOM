@@ -9,6 +9,10 @@ metadata:
 
 Use this skill when resuming, updating, or handing off a research analysis stored in GitHub and OneDrive.
 
+## OneDrive workspace discovery
+
+Treat the user's OneDrive workspace root as the stable entry point. Projects are subfolders beneath that root; do not hard-code one project's share URL into the skill. Read the workspace-level `PROJECT_INDEX.md` first when present, then select the requested project folder and its analysis-specific `00_PROJECT/` records. If the index is missing, inspect immediate child folders and create or update the index only when the user authorizes project organization.
+
 ## Canonical analysis layout
 
 Each analysis has one canonical folder. Its project records live in `00_PROJECT/`:
