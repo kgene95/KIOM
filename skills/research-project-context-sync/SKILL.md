@@ -70,3 +70,12 @@ After producing or revising analysis outputs:
 - Never let the skill's own records replace analysis records.
 - Preserve existing scientific conclusions and provenance; update them only when new evidence supports the change.
 - A successful local analysis remains valid even if a remote synchronization fails.
+
+## Naming and folder-creation rules
+
+- Keep these concepts distinct: project name, analysis/workflow name, material or compound name, target/receptor name, experiment group, and output type.
+- Before creating a folder, identify its parent project and its exact semantic level. Do not place an existing material name inside a newly requested material folder unless the user explicitly specifies that hierarchy.
+- Do not infer a new material, compound, or project name from a similar existing folder. Ask when the requested name or parent is ambiguous.
+- Preserve the user's spelling, punctuation, stereochemical marks, and capitalization for material names; use a separate stable machine identifier only when needed.
+- Check for an existing same-name folder at the intended level before creating one. If found, update it only when the user clearly requested an update; otherwise report the collision.
+- Record newly created project, analysis, or material folders in the appropriate `PROJECT_INDEX.md`, `README_AGENT.md`, or `CHANGELOG.md`.
