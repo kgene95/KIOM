@@ -1,0 +1,58 @@
+---
+name: research-project-context-sync
+description: Resume and synchronize research-analysis folders across Codex, GitHub, and OneDrive using existing project state files and minimal re-reading.
+metadata:
+  short-description: Sync research analysis context and outputs
+---
+
+# Research project context sync
+
+Use this skill when resuming, updating, or handing off a research analysis stored in GitHub and OneDrive.
+
+## Canonical analysis layout
+
+Each analysis has one canonical folder. Its project records live in `00_PROJECT/`:
+
+```text
+<analysis>/
+├── 00_PROJECT/
+│   ├── README_AGENT.md
+│   ├── CURRENT_STATUS.md
+│   ├── CHANGELOG.md
+│   ├── file_inventory.csv
+│   ├── manifest.json
+│   └── checkpoint.md
+├── scripts/
+├── raw/
+├── results/
+└── figures/
+```
+
+Existing analysis-specific names such as `docking_manifest.json` and `docking_checkpoint.md` remain valid during migration. Do not duplicate or rename them without recording the change.
+
+## Resume protocol
+
+1. Identify the canonical analysis folder from the repository structure.
+2. Read `00_PROJECT/README_AGENT.md`, then `CURRENT_STATUS.md` and `checkpoint.md` (or the analysis-specific checkpoint name).
+3. Inspect `manifest.json` and `file_inventory.csv` only as needed to answer the current request.
+4. Reuse completed outputs; do not rerun completed analyses unless the user requests a rerun or the checkpoint identifies invalid results.
+5. Treat OneDrive as the shared file workspace and GitHub as the versioned project record. Keep their relative paths identical.
+
+## Update and synchronization protocol
+
+After producing or revising analysis outputs:
+
+1. Update the relevant `CURRENT_STATUS.md`, checkpoint, manifest, and inventory.
+2. Append a concise entry to `CHANGELOG.md` with date, files changed, reason, and validation state.
+3. Synchronize only changed final outputs, scripts, figures, and project records by default. Exclude temporary files and large raw inputs unless explicitly requested.
+4. Compare remote files before replacing them. Do not overwrite a newer remote file or delete files automatically; record conflicts for review.
+5. Commit and push the GitHub changes with a descriptive message when authentication is available.
+6. Upload or update the same relative paths in OneDrive when access is available.
+7. Report synchronized files, skipped files, conflicts, and any failed destination separately.
+
+## State-file invariants
+
+- Never create a second `CURRENT_STATUS.md`, `CHANGELOG.md`, `manifest.json`, or inventory for the same analysis.
+- Never let the skill's own records replace analysis records.
+- Preserve existing scientific conclusions and provenance; update them only when new evidence supports the change.
+- A successful local analysis remains valid even if a remote synchronization fails.
