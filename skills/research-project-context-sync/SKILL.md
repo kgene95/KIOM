@@ -13,6 +13,16 @@ Use this skill when resuming, updating, or handing off a research analysis store
 
 Treat the user's OneDrive workspace root as the stable entry point. Projects are subfolders beneath that root; do not hard-code one project's share URL into the skill. Read the workspace-level `PROJECT_INDEX.md` first when present, then select the requested project folder and its analysis-specific `00_PROJECT/` records. If the index is missing, inspect immediate child folders and create or update the index only when the user authorizes project organization.
 
+## Storage locations for this workspace
+
+- OneDrive account: `chskim@office.ust.ac.kr`
+- OneDrive workspace root: `LG_노트북/`
+- Local OneDrive mirror: `C:\Users\LG\OneDrive - UST\LG_노트북\`
+- GitHub repository: `https://github.com/kgene95/KIOM`
+- GitHub project root: `01_CMPE/` (CMPE), with each analysis in its own subfolder
+
+Use the OneDrive workspace root for shared files and the GitHub repository for versioned records. Keep project-relative paths identical wherever possible.
+
 ## Canonical analysis layout
 
 Each analysis has one canonical folder. Its project records live in `00_PROJECT/`:

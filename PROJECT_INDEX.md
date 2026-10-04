@@ -2,6 +2,11 @@
 
 OneDrive workspace root: `LG_노트북/`
 
+- OneDrive account: `chskim@office.ust.ac.kr`
+- Local OneDrive mirror: `C:\Users\LG\OneDrive - UST\LG_노트북\`
+- GitHub repository: `https://github.com/kgene95/KIOM`
+- GitHub CMPE root: `01_CMPE/`
+
 Each project is a direct child folder of this workspace. Open the project's own `PROJECT_README.md` or `00_PROJECT/README_AGENT.md` before working inside it.
 
 | Project folder | Purpose | Project entry point |
