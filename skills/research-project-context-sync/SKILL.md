@@ -23,6 +23,13 @@ Treat the user's OneDrive workspace root as the stable entry point. Projects are
 
 Use the OneDrive workspace root for shared files and the GitHub repository for versioned records. Keep project-relative paths identical wherever possible.
 
+### Project-to-folder mapping
+
+- `01_CMPE/` is the only canonical location for CMPE files, including `01_CMPE/CMPE_Docking/` and its handoff packages.
+- `02_MGC/` is reserved for MGC files. Never place a CMPE archive, manuscript, docking result, or handoff package under `02_MGC/`.
+- A filename containing `CMPE`, `IKKβ`, `4KIK`, `COX-2`, or `5IKR` must be checked against the CMPE mapping before upload or move.
+- If the requested project and filename disagree, stop and resolve the project identity before creating or uploading anything.
+
 ## Canonical analysis layout
 
 Each analysis has one canonical folder. Its project records live in `00_PROJECT/`:
