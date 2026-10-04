@@ -20,10 +20,12 @@ Revalidate the manuscript Fig. 3(B) computational result using human IKKβ `4KIK
 
 ## Required next actions for paper-level 4KIK completion
 
-1. Decide whether the paper will report only the conditional neutral-state results or add three-seed charged-state sensitivity runs; do not generalize beyond the selected state.
-2. Perform an explicit ligand-strain/minimization check if a strain claim is needed; current QC is a clash and pocket-occupancy screen only.
-3. Reconcile `receptor_selection.csv`, result tables, manifests, and checkpoints with the actual PASS/LIMITED states.
-4. Obtain figure composition approval before publication-resolution export, then draft manuscript text only within the documented claim boundary.
+1. The 4KIK–vitexin neutral pose family is staged as the sole MD-preparation branch in `03_MD_4KIK_vitexin`; its starting-coordinate set and MD prerequisites are in `integration/md_readiness_4KIK_vitexin.md`.
+2. GROMACS 2025.4 is installed in the user's Ubuntu/WSL environment. The package is CPU-only; no simulation has started.
+3. During MD setup, review the biologically relevant vitexin protonation/tautomer state and choose a compatible ligand parameterization workflow. Do not generalize neutral-state docking results beyond this condition.
+4. Perform an explicit ligand-strain/minimization check if a strain claim is needed; current QC is a clash and pocket-occupancy screen only.
+5. Reconcile `receptor_selection.csv`, result tables, manifests, and checkpoints with the actual PASS/LIMITED states.
+6. Obtain figure composition approval before publication-resolution export, then draft manuscript text only within the documented claim boundary.
 
 ## Separate COX-2 status
 

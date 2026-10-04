@@ -1,9 +1,9 @@
-# Folder status — CMPE_Docking_Revalidation
+# Folder status — .
 
 - Material: `CMPE`
-- Project: `CMPE_Docking`
-- Folder: `CMPE_Docking_Revalidation`
-- Generated UTC: `2026-10-04T13:11:07.301274+00:00`
+- Project: `CMPE_Docking_Revalidation`
+- Folder: `.`
+- Generated UTC: `2026-10-04T15:07:33.186971+00:00`
 - This file is a continuation index; read it before opening raw structures or rerunning calculations.
 
 ## Immediate subfolders
@@ -12,6 +12,7 @@
 - `00_source/`
 - `01_ligand_qc/`
 - `02_IKBKB_4KIK/`
+- `03_MD_4KIK_vitexin/`
 - `03_PTGS2_5IKR/`
 - `integration/`
 - `scripts/`

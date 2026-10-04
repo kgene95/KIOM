@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "material": "CMPE",
+  "project": "CMPE_Docking_Revalidation",
+  "branch": "03_MD_4KIK_vitexin",
+  "status": "PREPARATION_ONLY",
+  "target": {"name": "IKKβ", "pdb_id": "4KIK", "chain": "B", "species": "Homo sapiens"},
+  "ligand": {"name": "vitexin-4″-O-glucoside", "pubchem_cid": "56776173", "inchi_key": "NDSUKTASTPEKBX-LXXMDOISSA-N", "docking_state": "neutral state-8", "warning": "Docking protonation is not yet an MD protonation decision."},
+  "docking_validation": {"native_ligand": "KSA", "symmetry_aware_heavy_atom_rmsd_angstrom": 0.3808, "vitexin_seed_pose_rmsd_angstrom": [0.0485, 0.1088], "claim_boundary": "MD would assess stability of this modelled complex; it cannot establish binding, inhibition, or in vivo mechanism."},
+  "starting_structures": [
+    {"seed": 20261004, "source": "02_IKBKB_4KIK/test_ligand_docking/visualization_pdb/4KIK_vitexin_pose1_complex.pdb", "role": "figure_representative"},
+    {"seed": 20261005, "source": "02_IKBKB_4KIK/interaction_qc/plip_v301/vitexin_4_double_prime_O_glucoside_neutral_seed20261005_complex.pdb", "role": "replicate_candidate"},
+    {"seed": 20261006, "source": "02_IKBKB_4KIK/interaction_qc/plip_v301/vitexin_4_double_prime_O_glucoside_neutral_seed20261006_complex.pdb", "role": "replicate_candidate"}
+  ],
+  "software": {"gromacs": "2025.4-Ubuntu_2025.4-1", "execution_environment": "Ubuntu on WSL", "gpu_support": "disabled"},
+  "blocking_decisions": ["Review ligand protonation/tautomer at intended solvent pH.", "Select and validate a compatible protein-ligand force-field workflow.", "Parameterize the ligand and review net charge, bonded terms, and topology compatibility."]
+}
