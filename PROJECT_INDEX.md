@@ -11,7 +11,8 @@ Each project is a direct child folder of this workspace. Open the project's own 
 
 | Project folder | Purpose | Project entry point |
 | --- | --- | --- |
-| `CMPE_Project/` | CMPE research materials and analysis outputs | `CMPE_Project/README.md` |
+| `01_CMPE/` | CMPE research materials and analysis outputs | `01_CMPE/README.md` |
+| `02_MGC/` | MGC research materials and analysis outputs | `02_MGC/README.md` |
 
 ## Rules
 
