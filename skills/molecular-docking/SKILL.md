@@ -51,6 +51,10 @@ Recommend stronger reasoning at these points:
 
 When the workflow touches OneDrive, GitHub, or another shared project store, read [project storage and handoff](references/storage-handoff.md) before any external write. The live project root must be inventoried before creating or uploading anything; existing exact-match folders are reused, and archives are optional snapshots rather than active working directories. Verify each write at its exact destination and record the path or commit in the checkpoint.
 
+## Project identity and continuation records
+
+Before any shared-folder operation, read [project identity and continuation records](references/project-continuation.md). Confirm the material, project root, analysis package, and analysis branch as separate names. Read the workspace index and the nearest project status file before using a path; never infer a material from a storage-category folder name. Keep `PROJECT_README.md`/`README_AGENT.md`, `CURRENT_STATUS.md`, `CHANGELOG.md`, `file_inventory.csv`, `GITHUB_ONEDRIVE_HANDOFF.md`, and branch-level `FOLDER_STATUS.md` current. New project-level or analysis-branch folders must receive a generated `FOLDER_STATUS.md` and a changelog/index entry in the same operation. A new account or agent must resume from these records and checkpoints instead of rerunning completed calculations.
+
 ## Reproducibility manifest and package handoff
 
 Create `docking_manifest.json` and a human-readable checkpoint before receptor preparation, then update both atomically after every stage. Record engine and version, environment, executable paths, receptor source/PDB ID and retrieval date, chain and preparation decisions, ligand identity/stereochemistry/protonation, grid coordinates and dimensions, search parameters, random seeds, validation control and redocking RMSD, failure/alternate-validation decisions, all result paths, score/pose-selection rules, interaction-analysis method, raw output paths, exact commands and file checksums where practical.
