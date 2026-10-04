@@ -1,0 +1,21 @@
+{
+  "schema_version": "1",
+  "project": "CMPE docking revalidation handoff index",
+  "generated_utc": "2026-10-04T00:00:00Z",
+  "receptor_jobs": [
+    {
+      "job_id": "IKBKB_4KIK_chainB_protocol30A",
+      "status": "CLOSED_LIMITED",
+      "manifest_path": "02_IKBKB_4KIK/docking_manifest.json",
+      "native_redocking": "PASS; symmetry-aware RMSD 0.3808 Å",
+      "scope": "Primary Fig. 3(B) revalidation"
+    },
+    {
+      "job_id": "PTGS2_5IKR",
+      "status": "BLOCKED_COH_PARAMETERIZATION",
+      "status_path": "03_PTGS2_5IKR/redocking/COH_handling_status.md",
+      "scope": "Separate COX-2 branch; no test-ligand docking"
+    }
+  ],
+  "handoff_entrypoint": "00_PROJECT/README_AGENT.md"
+}
