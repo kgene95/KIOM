@@ -1,3 +1,0 @@
-# Current status
-
-Status: initialized

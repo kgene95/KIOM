@@ -27,3 +27,7 @@ If the live structure and local inventory disagree, pause mutations and report t
 - GitHub is the versioned record for manifests, checkpoints, scripts, small CSV/Markdown tables, and reproducibility documentation. Confirm the repository and target path before committing or pushing.
 - Keep OneDrive and GitHub paths in the manifest or handoff document. Record the synchronization date and whether large binaries were excluded from GitHub.
 - After updating either store, verify the visible result and report the exact path or commit; do not claim synchronization from a local copy alone.
+
+## Canonical alignment and cleanup
+
+When the GitHub tree and OneDrive tree disagree, do not copy the GitHub tree blindly. Read the workspace index and the OneDrive project root, then make the GitHub control tree use the same material, project, package, and branch names. Keep raw and large files in OneDrive, and keep their paths and hashes in GitHub. Move valid small records and scripts to the canonical path with a Git move commit so history is preserved. Remove practice skeletons and duplicate project paths only in an explicit cleanup commit; never remove the reusable `skills/` directory. After cleanup, compare both trees again and update the project README, status, changelog, inventory, and handoff records.

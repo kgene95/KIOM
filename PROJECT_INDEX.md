@@ -1,22 +1,18 @@
 # Research workspace index
 
-OneDrive workspace root: `LG_노트북/`
-
-- OneDrive account: `chskim@office.ust.ac.kr`
-- Local OneDrive mirror: `C:\Users\LG\OneDrive - UST\LG_노트북\`
+- OneDrive workspace: `LG_노트북/`
+- OneDrive root: `C:\Users\LG\OneDrive - UST\LG_노트북\`
 - GitHub repository: `https://github.com/kgene95/KIOM`
-- GitHub CMPE root: `01_CMPE/`
 
-Each project is a direct child folder of this workspace. Open the project's own `PROJECT_README.md` or `00_PROJECT/README_AGENT.md` before working inside it.
+| Material | OneDrive project path | GitHub control path | Purpose |
+|---|---|---|---|
+| CMPE (참외껍질) | `01_CMPE/CMPE_Docking/` | `01_CMPE/CMPE_Docking/` | Docking revalidation and related records |
+| MGC | `02_MGC/MGC_Docking/` | `02_MGC/MGC_Docking/` | MGC analysis records |
 
-| Project folder | Purpose | Project entry point |
-| --- | --- | --- |
-| `01_CMPE/` | CMPE research materials and analysis outputs | `01_CMPE/README.md` |
-| `02_MGC/` | MGC research materials and analysis outputs | `02_MGC/README.md` |
+## Continuation rule
 
-## Rules
+Read this index and the project's `PROJECT_README.md`/`00_PROJECT/README_AGENT.md` before opening OneDrive data. Reconfirm material, project, analysis package, and branch names before any upload or update. Keep status, changelog, inventory, checkpoint, manifest, and handoff records current. Do not rerun completed work because a different account or AI opened the project.
 
-- Keep one project per top-level folder.
-- Do not mix files from different projects.
-- Each analysis folder owns its own `00_PROJECT/` state records.
-- Update this index only when a project is added, renamed, or removed.
+## Storage rule
+
+OneDrive is the source of truth for raw and large files, manuscript/PPT/figure binaries, logs, poses, and trajectories. GitHub is the source of truth for skills, scripts, text records, manifests, checkpoints, and small result tables. GitHub records the OneDrive path and hash for files it does not store.
