@@ -1,4 +1,4 @@
-# Folder status — 00_PROJECT
+# Folder status ? 00_PROJECT
 
 - Material: `CMPE`
 - Project: `CMPE_Docking`
@@ -16,4 +16,6 @@
 - `CURRENT_STATUS.md`
 - `file_inventory.csv`
 - `GITHUB_ONEDRIVE_HANDOFF.md`
+- `INSTALLATION_AND_ENVIRONMENT.md`
 - `README_AGENT.md`
+
