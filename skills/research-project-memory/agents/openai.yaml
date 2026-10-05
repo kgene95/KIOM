@@ -1,0 +1,15 @@
+interface:
+  display_name: Research Project Memory
+  short_description: Resume and synchronize research projects across chats, accounts,
+    GitHub, and the UST workspace
+  default_prompt: Use $research-project-memory to recall the minimum project context,
+    resume from the latest verified checkpoint, and synchronize meaningful state changes.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true
