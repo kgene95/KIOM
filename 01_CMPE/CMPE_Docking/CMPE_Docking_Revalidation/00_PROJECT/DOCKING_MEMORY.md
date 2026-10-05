@@ -51,3 +51,10 @@ Updated: 2026-10-05 (KST)
 - Read this file, `CURRENT_STATUS.md`, `docking_manifest.json`, and `docking_checkpoint.md` before resuming.
 - Preserve raw inputs and hashes; do not overwrite source material.
 - Do not claim docking or MD proves binding, inhibition, target engagement, or pathway regulation.
+
+## Deferred storage cleanup
+
+- Some large MD/preparation files are still local to the laptop or have not yet synchronized to OneDrive. Treat the laptop working copy as active until the current NPT and its QC finish.
+- After the active MD branch reaches a terminal state, perform a documented cleanup review before deleting anything: identify failed/abandoned preparation routes, duplicate solvated structures, oversized intermediate trajectories, and stale logs.
+- Preserve the final receptor/ligand inputs, topology, MDP files, checkpoints, final logs, QC summaries, hashes, and a short record of each removed or archived item.
+- Do not delete or archive active NPT files, the current WSL checkpoint, or any unsynchronized laptop output. The cleanup is a later task and must be recorded in `CURRENT_STATUS.md`, `CHANGELOG.md`, `file_inventory.csv`, and the OneDrive/GitHub handoff record.
