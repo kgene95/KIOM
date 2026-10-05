@@ -1,0 +1,3 @@
+interface:
+  display_name: "Molecular Dynamics"
+  short_description: "Run reproducible protein-ligand MD"

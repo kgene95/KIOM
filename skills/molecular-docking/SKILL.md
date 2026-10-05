@@ -32,6 +32,11 @@ Recommend stronger reasoning at these points:
 - Recommend disconnecting/closing Codex while the external program runs **only after confirming the process is independent of the Codex session** and no active reasoning is required. Do not keep Codex connected merely to watch a GUI or wait for a calculation.
 - If the calculation is a foreground or session-dependent process, **do not close Codex** because doing so may terminate the job. First detach it safely with a documented method or keep the controlling session open.
 - When the external calculation or GUI step finishes, reconnect Codex only when needed for result parsing, QC, scientific interpretation, or the next deterministic command, and resume from the saved checkpoint rather than restarting the workflow.
+- When the user asks for autonomous continuation or a completion alert for a genuine long-running calculation, create a lightweight heartbeat when the automation facility is available. Choose its interval from the recorded expected duration: 30 minutes for a roughly 20-minute–6-hour job, 2 hours for a roughly 6–24-hour job, and 6 hours for a multi-day job. Prefer a provider/job completion callback when one is available. Inspect only the PID/job state, designated log, and completion/error marker; remain silent while the job is healthy and progressing.
+- Before launching a calculation expected to take hours or days, state the estimated duration, whether the estimate is based on a prior local run or a rough assumption, the monitoring interval, and that only completion, failure, unexpected stop, or a required decision will trigger a user-facing alert.
+- Before waiting on a long calculation, inspect the checkpoint and identify two to four high-value tasks that are independent of the running process. Prioritize manuscript/result crosswalks, unresolved-issue memos, figure specifications, reproducibility/handoff records, and next-stage feasibility planning. Explain the concrete outputs and start the appropriate tasks when the user asks to continue autonomously; use parallel agents only when the user authorizes delegation and the tasks have separate files/resources.
+- Do not create busywork or touch the active job's input, output, terminal, GUI, or controller from a parallel task. Save each independent result in a distinct, documented file and report the completed outputs together with the calculation status.
+- Notify the user only on completion, failure, unexpected stop, or required action. Do not rerun calculations, reread outputs, or emit routine progress messages during a healthy run. Delete the heartbeat after its terminal event.
 
 
 
@@ -47,9 +52,13 @@ Recommend stronger reasoning at these points:
 9. Build a combined docking figure for review; export individual panels and publication-resolution files only after the user confirms composition. Once docking, QC and the approved figure are complete, summarize manuscript readiness and explicitly ask whether to draft Docking Methods, Docking Results and the docking figure legend. Never frame docking as proof of binding, engagement, inhibition or pathway regulation.
 10. When the user requests independent verification, peer-review-style checking, or provides a colleague's partial NP/docking package, create the auditor handoff defined in [auditor handoff](references/auditor-handoff.md). Do not rerun upstream NP unless explicitly requested in the NP skill; do not fill missing evidence by assumption.
 
+## Boundary with molecular dynamics
+
+The docking workflow ends after receptor/ligand QC, native-ligand redocking, test-ligand pose and interaction QC, reproducibility records, and docking/manuscript handoff. Candidate prioritization may identify a complex for downstream MD, but docking does not include solvation, minimization, NVT, NPT, production trajectories, or trajectory analysis. Those stages belong to the separate `molecular-dynamics` skill and require an explicit MD handoff. Do not start NVT/NPT merely to complete a docking result.
+
 ## Project storage and handoff
 
-When the workflow touches OneDrive, GitHub, or another shared project store, read [project storage and handoff](references/storage-handoff.md) before any external write. The live project root must be inventoried before creating or uploading anything; existing exact-match folders are reused, and archives are optional snapshots rather than active working directories. Verify each write at its exact destination and record the path or commit in the checkpoint.
+When the workflow touches OneDrive, GitHub, or another shared project store, read [project storage and handoff](references/storage-handoff.md) before any external write. When a local OneDrive-synchronized root exists, inventory and update that local root first; use the OneDrive web UI only when local synchronization is unavailable, broken, or needs a post-sync visibility check. The live project root must be inventoried before creating or uploading anything; existing exact-match folders are reused, and archives are optional snapshots rather than active working directories. Verify each write at its exact destination and record the path or commit in the checkpoint.
 
 ## Project identity and continuation records
 

@@ -24,6 +24,7 @@ If the live structure and local inventory disagree, pause mutations and report t
 ## OneDrive and GitHub roles
 
 - OneDrive is the source of record for large raw structures, PDB/PDBQT/SDF files, logs, figures, and active analysis outputs.
+- When a local OneDrive-synchronized folder is present, use it as the first write path. Determine the actual local root from the environment or user-provided path, inventory the existing project tree there, and let OneDrive synchronize in the background. Use the OneDrive web interface only as a fallback for a missing/broken local sync or to verify that a completed local sync is visible remotely.
 - GitHub is the versioned record for manifests, checkpoints, scripts, small CSV/Markdown tables, and reproducibility documentation. Confirm the repository and target path before committing or pushing.
 - Keep OneDrive and GitHub paths in the manifest or handoff document. Record the synchronization date and whether large binaries were excluded from GitHub.
 - After updating either store, verify the visible result and report the exact path or commit; do not claim synchronization from a local copy alone.

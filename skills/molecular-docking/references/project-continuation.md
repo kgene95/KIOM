@@ -12,6 +12,8 @@ Use this procedure before reading, creating, uploading, moving, or updating a do
    - analysis branch (for example, `CMPE_Docking_Revalidation`).
 3. Treat storage-category names such as `02_MGC/MGC_Docking` as different projects unless the index explicitly maps them to the current material.
 4. Reuse an existing exact-match directory. Never create a second project folder because a path was guessed from a storage category.
+5. Treat a path remembered from an earlier task as **unverified**. A prior material, similarly named folder, copied document, or conversation reference is never evidence that the path belongs to the active project.
+6. Before every external write, compare the four resolved names with every path segment. If the active material is `CMPE` and any destination segment contains `MGC` or `CMOE`, stop without writing, report the mismatch, and re-read the project index. Apply the equivalent hard stop for any other material-name mismatch.
 
 ## Required continuation records
 
@@ -31,6 +33,10 @@ The first page of every continuation record must state the material and project 
 Folder creation is a recorded event. The same operation that creates a new project-level or analysis-branch folder must generate its `FOLDER_STATUS.md`, add the folder to `PROJECT_INDEX.md` or the nearest project map, and append a dated `CHANGELOG.md` entry. File uploads and updates must append their destination, source, reason, and verification result to the handoff/changelog records.
 
 Use a deterministic record generator such as `scripts/update_project_records.py`; it must fail if the expected material/project identity does not match the existing index. Never silently rename, move, overwrite, or merge projects.
+
+## External-write guard
+
+For copying, synchronization, upload, Git initialization, or folder deletion, print and verify the source and destination canonical paths immediately before acting. The destination must be inside the recorded active project root. Do not rely on a broad parent directory, a recently used terminal location, or a guessed sibling folder. If the path check fails, make no partial copy and ask/inspect rather than selecting a plausible alternative.
 
 ## Continuation behavior
 
