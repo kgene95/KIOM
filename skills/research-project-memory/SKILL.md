@@ -150,6 +150,19 @@ Auto-save means update only the compact project state, decisions, manifest/check
 
 If OneDrive identity cannot be verified, never auto-save there. Prefer verified GitHub state updates or prepare a handoff artifact for later upload.
 
+
+### Scheduled consolidation reports
+
+Use `references/daily-reporting.md` when a scheduled or on-demand work report is requested.
+
+- Do not require the user to update memory in every conversation manually.
+- Preserve meaningful changes at the time they occur through normal checkpoints.
+- Use scheduled reports as a second layer that consolidates already-persisted project state; do not rely on the report job to rediscover every prior chat.
+- Default scheduled cadence for this workspace is 08:00 and 15:00 local time when the user has enabled the automation.
+- At each run, read only the compact memory/index/checkpoint files and repository changes since the previous report, then summarize completed work, important decisions, created/modified files, blocked items, `DO NOT REPEAT`, and next actions.
+- Save a dated report under the canonical GitHub memory area when write access is available, and update the shared activity/current-work index only when state changed.
+- If a relevant change exists only inside an inaccessible chat, attachment, or local environment, mark it as a memory gap instead of fabricating or silently omitting provenance.
+
 ### 5. Prepare handoff when switching environments
 
 When moving between ChatGPT chat, Work, Codex, terminal, another GPT account, or another AI system, create/update a compact handoff bundle.
