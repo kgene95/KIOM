@@ -37,3 +37,10 @@ Use a staged approach. Verify actual output/log evidence after each stage; do no
 Record stage status atomically in a machine-readable manifest and human-readable checkpoint. Preserve control files, exact commands, logs, checkpoints, trajectory files, analyses, and hashes where practical. Report the modeled condition, achieved simulation time, QC findings, limitations, and the precise claim boundary.
 
 For detailed GROMACS session handling, automatic completion monitoring, restart rules, and low-cost notification behavior, read [long-running-jobs.md](references/long-running-jobs.md).
+
+## Autonomous completion rule
+
+When the user authorizes a workflow, execute the skill's complete authorized scope through its defined completion gate without waiting for a separate confirmation at every intermediate step. Continue deterministic processing, QC, record updates, figure/document preparation, and reproducibility packaging until the skill's work is complete. Ask the user only when a genuinely consequential scientific judgment could change the conclusion, indispensable information or access is missing, an irreversible/destructive or external action requires authorization, or a critical error cannot be safely resolved. Do not ask merely because another defined step remains.
+
+For long-running calculations or retrievals, verify that the job started, record its command/configuration, output path, checkpoint, and expected duration, set a lightweight completion/failure monitor when available, and continue independent authorized work while it runs. Notify the user only for completion, failure, unexpected stop, or a required decision. Never claim completion from elapsed time alone; verify the final files and logs.
+

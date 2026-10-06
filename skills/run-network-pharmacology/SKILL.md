@@ -32,6 +32,11 @@ Recommend stronger reasoning at these points:
 - Recommend disconnecting/closing Codex while the external program runs **only after confirming the process is independent of the Codex session** and no active reasoning is required. Do not keep Codex connected merely to watch a GUI or wait for a calculation.
 - If the calculation is a foreground or session-dependent process, **do not close Codex** because doing so may terminate the job. First detach it safely with a documented method or keep the controlling session open.
 - When the external calculation or GUI step finishes, reconnect Codex only when needed for result parsing, QC, scientific interpretation, or the next deterministic command, and resume from the saved checkpoint rather than restarting the workflow.
+- When the user asks for autonomous continuation or a completion alert for a genuine long-running calculation, create a lightweight heartbeat when the automation facility is available. Choose its interval from the recorded expected duration: 30 minutes for a roughly 20-minute–6-hour job, 2 hours for a roughly 6–24-hour job, and 6 hours for a multi-day job. Prefer a provider/job completion callback when one is available. Inspect only the PID/job state, designated log, and completion/error marker; remain silent while the job is healthy and progressing.
+- Before launching a calculation expected to take hours or days, state the estimated duration, whether the estimate is based on a prior local run or a rough assumption, the monitoring interval, and that only completion, failure, unexpected stop, or a required decision will trigger a user-facing alert.
+- Before waiting on a long calculation or external retrieval, inspect the checkpoint and identify two to four high-value tasks that are independent of the running process. Prioritize evidence/methods crosswalks, unresolved-access memos, figure specifications, reproducibility/handoff records, and next-stage feasibility planning. Explain the concrete outputs and start the appropriate tasks when the user asks to continue autonomously; use parallel agents only when the user authorizes delegation and the tasks have separate files/resources.
+- Do not create busywork or touch the active job's input, output, terminal, GUI, or controller from a parallel task. Save each independent result in a distinct, documented file and report the completed outputs together with the calculation status.
+- Notify the user only on completion, failure, unexpected stop, or required action. Do not rerun calculations, reread outputs, or emit routine progress messages during a healthy run. Delete the heartbeat after its terminal event.
 
 
 
@@ -129,7 +134,7 @@ If the user requests the draft, use the existing frozen branch and the figure pr
 
 ### Complete
 
-Validate canonical files with `scripts/validate_np_completion.py`. Before creating any shareable or downloadable package, run `scripts/privacy_audit.py` and require a clean result. Prepare the evidence bundle described in `auditor-handoff.md` when independent computational review is requested or when NP will be integrated with docking/manuscript audit. The final report must summarize inputs, broad and final counts, branch decisions, mapping corrections, PPI/hub stability, enrichment, evidence limitations, docking candidates and rationale, and generated files. State `DOCKING_NOT_STARTED`.
+Validate canonical files with `scripts/validate_np_completion.py`. Prepare the evidence bundle described in `auditor-handoff.md` when independent computational review is requested or when NP will be integrated with docking/manuscript audit. The final report must summarize inputs, broad and final counts, branch decisions, mapping corrections, PPI/hub stability, enrichment, evidence limitations, docking candidates and rationale, and generated files. State `DOCKING_NOT_STARTED`.
 
 ### Preserve reproducibility and package outputs
 
@@ -140,3 +145,10 @@ Never store API keys, passwords, session cookies, personal email addresses, or o
 At handoff, ask the user to select one package profile: (1) `results_only` for final tables/figures/report, (2) `results_plus_manifest` for final outputs plus manifest/checkpoint, or (3) `results_manifest_raw` for final outputs, manifest/checkpoint, raw source exports, queries and deterministic scripts. Recommend profile 3 for manuscript submission, peer-review response, or reproducibility. Build packages with explicit branch labels; never merge historical/primary/supplementary branches into one unlabelled result set.
 
 After NP analysis, the optional pre-Cytoscape decision and any requested `REVIEW_DRAFT` are complete, deliver the docking-candidate recommendation and show a short manuscript-readiness summary. Explicitly ask whether to draft the NP Methods, NP Results, and NP figure legend. Do not write those manuscript sections before the user approves. If approved, write them from the frozen outputs without waiting for docking results; keep docking findings out of the NP Results. Then provide the docking handoff and stop. If the user requests independent verification, provide the auditor handoff from the same frozen branch without rerunning or mutating NP.
+
+## Autonomous completion rule
+
+When the user authorizes a workflow, execute the skill's complete authorized scope through its defined completion gate without waiting for a separate confirmation at every intermediate step. Continue deterministic processing, QC, record updates, figure/document preparation, and reproducibility packaging until the skill's work is complete. Ask the user only when a genuinely consequential scientific judgment could change the conclusion, indispensable information or access is missing, an irreversible/destructive or external action requires authorization, or a critical error cannot be safely resolved. Do not ask merely because another defined step remains.
+
+For long-running calculations or retrievals, verify that the job started, record its command/configuration, output path, checkpoint, and expected duration, set a lightweight completion/failure monitor when available, and continue independent authorized work while it runs. Notify the user only for completion, failure, unexpected stop, or a required decision. Never claim completion from elapsed time alone; verify the final files and logs.
+

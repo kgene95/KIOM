@@ -122,3 +122,10 @@ If the audit finds a calculation that must be redone:
 - receptor/ligand/preparation/grid/redocking/pose problem -> hand off to `molecular-docking` with the exact failed receptor job and required correction.
 
 After corrected outputs are returned, audit only the affected downstream claims plus any dependent tables/figures; do not restart the entire audit without reason.
+
+## Autonomous completion rule
+
+When the user authorizes a workflow, execute the skill's complete authorized scope through its defined completion gate without waiting for a separate confirmation at every intermediate step. Continue deterministic processing, QC, record updates, figure/document preparation, and reproducibility packaging until the skill's work is complete. Ask the user only when a genuinely consequential scientific judgment could change the conclusion, indispensable information or access is missing, an irreversible/destructive or external action requires authorization, or a critical error cannot be safely resolved. Do not ask merely because another defined step remains.
+
+For long-running calculations or retrievals, verify that the job started, record its command/configuration, output path, checkpoint, and expected duration, set a lightweight completion/failure monitor when available, and continue independent authorized work while it runs. Notify the user only for completion, failure, unexpected stop, or a required decision. Never claim completion from elapsed time alone; verify the final files and logs.
+

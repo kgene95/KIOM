@@ -3,7 +3,7 @@
 - Material: `CMPE`
 - Project: `CMPE_Docking_Revalidation`
 - Folder: `.`
-- Generated UTC: `2026-10-04T15:07:33.186971+00:00`
+- Generated UTC: `2026-10-06T12:21:48.799227+00:00`
 - This file is a continuation index; read it before opening raw structures or rerunning calculations.
 
 ## Immediate subfolders
@@ -21,3 +21,4 @@
 
 - `docking_checkpoint.md`
 - `docking_manifest.json`
+- `leap.log`
