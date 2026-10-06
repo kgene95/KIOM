@@ -54,7 +54,7 @@ Updated: 2026-10-06 (KST)
 
 ## Deferred storage cleanup
 
-- Some large MD/preparation files are still local to the laptop or have not yet synchronized to OneDrive. Treat the laptop working copy as active until the current NPT and its QC finish.
-- After the active MD branch reaches a terminal state, perform a documented cleanup review before deleting anything: identify failed/abandoned preparation routes, duplicate solvated structures, oversized intermediate trajectories, and stale logs.
-- Preserve the final receptor/ligand inputs, topology, MDP files, checkpoints, final logs, QC summaries, hashes, and a short record of each removed or archived item.
-- Do not delete or archive active NPT files, the current WSL checkpoint, or any unsynchronized laptop output. The cleanup is a later task and must be recorded in `CURRENT_STATUS.md`, `CHANGELOG.md`, `file_inventory.csv`, and the OneDrive/GitHub handoff record.
+- The active NPT branch is terminal and its final outputs are synchronized to OneDrive.
+- Cleanup completed: removed the superseded provisional-Gasteiger, complex-mapped, old GROMACS-solvated, and corrected-receptor-solvated routes from the local project and OneDrive copy.
+- Preserved the final loop-repaired receptor/ligand inputs, topology, MDP files, NVT/NPT trajectories, checkpoints, logs, QC summaries, environment export, and reproduction notes.
+- The cleanup is recorded in `CURRENT_STATUS.md`, `CHANGELOG.md`, and the refreshed `file_inventory.csv`.

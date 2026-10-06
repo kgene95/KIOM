@@ -76,3 +76,9 @@
 - Confirmed normal `Finished mdrun` termination with no fatal error, LINCS warning, or segmentation fault.
 - Exported temperature, pressure, and density summaries and copied the final equilibration records into the project `equilibration` directory.
 - Added `PRE_PRODUCTION_EQUILIBRATION_COMPLETE`. Production MD remains intentionally unstarted; large-file cleanup remains deferred until the retained outputs and hashes are inventoried.
+
+# 2026-10-06 — superseded MD route cleanup
+
+- After NVT/NPT reached a terminal state, removed four superseded preparation routes from the local project and synchronized OneDrive copy: provisional-Gasteiger solvated, complex-mapped Amber/ACPYPE, old GROMACS-solvated, and corrected-receptor-solvated branches.
+- Retained the loop-repaired final branch and all NVT/NPT outputs, checkpoints, logs, QC summaries, topology, environment export, and reproduction records.
+- Regenerated the hash-based file inventory after cleanup.

@@ -62,8 +62,9 @@ The clean-geometry AM1-BCC run completed and its charges were transferred to the
 
 ### Deferred storage cleanup
 
-- Large MD/preparation intermediates and any laptop-only unsynchronized outputs remain protected while the active NPT run and QC are pending.
-- After the active MD branch reaches a terminal state, review failed/abandoned routes, duplicate solvated structures, oversized intermediate trajectories, and stale logs. Archive or remove only after recording the decision, hashes, and retained final inputs/results in the inventory and handoff records.
+- The active NPT run and QC are terminal. The documented cleanup was completed after preserving final inputs, NVT/NPT outputs, logs, QC summaries, and environment records.
+- Removed from the local project and synchronized OneDrive copy: `system_provisional_gasteiger_solvated`, `pre_md_qc/complex_mapped_amber_bcc.amb2gmx`, `pre_md_qc/gmx_solvated`, and `pre_md_qc/receptor_rebuild_pdb4amber/gmx_solvated_corrected`.
+- The final `structure_repair/gmx_solvated_loop_repaired/equilibration` branch was retained. A refreshed `file_inventory.csv` records the post-cleanup state.
 
 ## 2026-10-06 NPT completion and pre-production QC
 
