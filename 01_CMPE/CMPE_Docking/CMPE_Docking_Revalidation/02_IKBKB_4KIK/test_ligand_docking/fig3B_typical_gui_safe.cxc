@@ -1,0 +1,19 @@
+close session
+set bgColor white
+open "C:/Users/LG/.codex/.chatgpt-projects/g-p-6a855ac803f88191af36611c6ec501f3/CMPE_Docking_Revalidation/02_IKBKB_4KIK/test_ligand_docking/visualization_pdb/4KIK_chain_B_rigid_for_view.pdb"
+open "C:/Users/LG/.codex/.chatgpt-projects/g-p-6a855ac803f88191af36611c6ec501f3/CMPE_Docking_Revalidation/02_IKBKB_4KIK/test_ligand_docking/visualization_pdb/vitexin_4_double_prime_O_glucoside_neutral_seed20261006_pose1_for_view.pdb"
+cartoon #1
+color #1 & helix red
+color #1 & strand gold
+color #1 & coil forest green
+style #2 stick
+color #2 magenta
+select zone #2 5
+style sel stick
+color sel yellow
+select clear
+lighting soft
+lighting shadows false
+view #1
+turn y 35
+turn x -20
