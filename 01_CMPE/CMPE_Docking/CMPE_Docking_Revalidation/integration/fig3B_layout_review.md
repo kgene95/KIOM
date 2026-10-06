@@ -26,3 +26,7 @@ The right-hand panel is deliberately a 3D pocket view with 5 Å local context.  
 ## 2026-10-06 helix-visibility revision
 
 `../02_IKBKB_4KIK/figure_drafts/Fig3B_4KIK_vitexin_COMPOSITION_BRIGHT_HELIX_v3.png` is the improved review draft. The molecular coordinates, ligand pose, pocket selection, and panel geometry were preserved; only the protein shading/contrast was adjusted to reduce black shadowing and make the α-helices read as continuous ribbons. It remains a composition review image until publication-resolution export is approved.
+
+## 2026-10-06 manuscript-style GUI setup
+
+`../02_IKBKB_4KIK/test_ligand_docking/fig3B_gui_manuscript_style.cxc` follows the original CMPE Fig. 3(B) visual grammar: white background, structure-based protein coloring with red helices, cyan ligand, yellow 5 Å pocket context, and a restrained cartoon width. The coordinates and pose are unchanged.

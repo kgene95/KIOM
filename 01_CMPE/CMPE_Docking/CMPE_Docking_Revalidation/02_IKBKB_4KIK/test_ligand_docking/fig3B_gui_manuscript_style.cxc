@@ -1,0 +1,16 @@
+close session
+open "C:/Users/LG/.codex/.chatgpt-projects/g-p-6a855ac803f88191af36611c6ec501f3/CMPE_Docking_Revalidation/02_IKBKB_4KIK/test_ligand_docking/visualization_pdb/4KIK_chain_B_rigid_for_view.pdb"
+open "C:/Users/LG/.codex/.chatgpt-projects/g-p-6a855ac803f88191af36611c6ec501f3/CMPE_Docking_Revalidation/02_IKBKB_4KIK/test_ligand_docking/visualization_pdb/vitexin_4_double_prime_O_glucoside_neutral_seed20261006_pose1_for_view.pdb"
+cartoon #1
+cartoon style #1 width 0.8 thickness 0.55 sides 8
+color bystructure #1
+style #2 stick
+color #2 cyan
+select zone #2 5
+style sel stick
+color sel yellow
+select clear
+set bgColor white
+lighting simple
+lighting shadows false
+view #1,2
