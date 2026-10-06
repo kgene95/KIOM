@@ -69,3 +69,10 @@
 
 - Recorded that laptop-only and unsynchronized MD/preparation outputs remain active until NPT and QC reach a terminal state.
 - Deferred review of failed routes, duplicate solvated structures, oversized intermediate trajectories, and stale logs. No active NPT file or unsynchronized output is to be deleted before the documented cleanup review.
+
+# 2026-10-06 — restrained NPT completed
+
+- Completed the 100 ps / 50,000-step restrained NPT stage in GROMACS 2025.4 after the checkpoint-resumed NVT stage.
+- Confirmed normal `Finished mdrun` termination with no fatal error, LINCS warning, or segmentation fault.
+- Exported temperature, pressure, and density summaries and copied the final equilibration records into the project `equilibration` directory.
+- Added `PRE_PRODUCTION_EQUILIBRATION_COMPLETE`. Production MD remains intentionally unstarted; large-file cleanup remains deferred until the retained outputs and hashes are inventoried.

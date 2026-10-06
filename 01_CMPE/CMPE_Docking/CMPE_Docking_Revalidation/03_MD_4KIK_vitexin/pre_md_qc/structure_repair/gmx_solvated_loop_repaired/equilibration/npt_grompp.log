@@ -1,0 +1,73 @@
+              :-) GROMACS - gmx grompp, 2025.4-Ubuntu_2025.4_1 (-:
+
+Executable:   /usr/bin/gmx
+Data prefix:  /usr
+Working dir:  /home/lg/cmpe_4kik_vitexin_equil_v2
+Command line:
+  gmx grompp -f npt_restrained.mdp -c nvt.gro -r em_loop_repaired_solvated.gro -t nvt.cpt -p topol_equil.top -n index.ndx -o npt.tpr -maxwarn 1
+
+Generating 1-4 interactions: fudge = 0.5
+Number of degrees of freedom in T-Coupling group Protein_Ligand is 27064.89
+Number of degrees of freedom in T-Coupling group Water_and_ions is 710487.12
+
+NOTE 1 [file npt_restrained.mdp]:
+  Removing center of mass motion in the presence of position restraints
+  might cause artifacts. When you are using position restraints to
+  equilibrate a macro-molecule, the artifacts are usually negligible.
+
+
+WARNING 1 [file npt_restrained.mdp]:
+  You are using pressure coupling with absolute position restraints, this
+  will give artifacts. Use the refcoord_scaling option.
+
+Last frame         -1 time  100.000   
+
+There was 1 NOTE
+
+There was 1 WARNING
+
+GROMACS reminds you: "Right Now My Job is Eating These Doughnuts" (Bodycount)
+
+Setting the LD random seed to -67635203
+
+Generated 1378 of the 1378 non-bonded parameter combinations
+
+Generated 1378 of the 1378 1-4 parameter combinations
+
+Excluding 3 bonded neighbours molecule type 'loop_repaired_v2'
+
+turning H bonds into constraints...
+
+Excluding 2 bonded neighbours molecule type 'SOL'
+
+turning H bonds into constraints...
+
+Excluding 1 bonded neighbours molecule type 'SOD'
+
+turning H bonds into constraints...
+
+Taking velocities from 'nvt.gro'
+
+The largest distance between excluded atoms is 0.430 nm between atom 8626 and 8633
+
+Determining Verlet buffer for a tolerance of 0.005 kJ/mol/ps at 300 K
+
+Calculated rlist for 1x1 atom pair-list as 1.295 nm, buffer size 0.095 nm
+
+Set rlist, assuming 4x4 atom pair-list, to 1.223 nm, buffer size 0.023 nm
+
+Note that mdrun will redetermine rlist based on the actual pair-list setup
+
+Reading Coordinates, Velocities and Box size from old trajectory
+
+Will read whole trajectory
+
+Using frame at t = 100 ps
+
+Starting time for run is 0 ps
+Calculating fourier grid dimensions for X Y Z
+Using a fourier grid of 160x160x160, spacing 0.109 0.109 0.109
+
+Estimate for the relative computational load of the PME mesh part: 0.16
+
+This run will generate roughly 205 Mb of data

@@ -65,6 +65,13 @@ The clean-geometry AM1-BCC run completed and its charges were transferred to the
 - Large MD/preparation intermediates and any laptop-only unsynchronized outputs remain protected while the active NPT run and QC are pending.
 - After the active MD branch reaches a terminal state, review failed/abandoned routes, duplicate solvated structures, oversized intermediate trajectories, and stale logs. Archive or remove only after recording the decision, hashes, and retained final inputs/results in the inventory and handoff records.
 
+## 2026-10-06 NPT completion and pre-production QC
+
+- Restrained NPT completed normally in GROMACS 2025.4 for 50,000 steps / 100 ps. The log ends with `Finished mdrun`; no fatal error, LINCS warning, or segmentation fault was detected.
+- Thermodynamic summaries were exported from the complete 100 ps records: NVT temperature average 300.035 K; NPT temperature average 300.035 K; NPT pressure average 12.9838 bar; NPT density average 986.93 kg m^-3.
+- NPT trajectory, checkpoint, final coordinate, TPR, energy, log, and exported XVG/summary files were copied to the project `equilibration` directory.
+- `PRE_PRODUCTION_EQUILIBRATION_COMPLETE` is present. Production MD has not been started. The next decision is whether to move this validated starting state to GPU/HPC production planning; do not claim dynamic stability or binding from equilibration alone.
+
 ## Separate COX-2 status
 
 `5IKR` is BLOCKED before native ID8 redocking because the deposited COH cobalt metalloporphyrin lacks a reviewed local template and defensible Vina atom/scoring treatment.  Keep it blocked pending original-researcher clarification or an independently reviewed parameterization plan.

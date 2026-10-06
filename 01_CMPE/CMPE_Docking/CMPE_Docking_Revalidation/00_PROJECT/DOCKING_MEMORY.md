@@ -1,6 +1,6 @@
 # CMPE docking revalidation memory
 
-Updated: 2026-10-05 (KST)
+Updated: 2026-10-06 (KST)
 
 ## Project identity
 
@@ -35,10 +35,10 @@ Updated: 2026-10-05 (KST)
 - MD branch: `03_MD_4KIK_vitexin`.
 - Loop-repaired chain-B receptor and GROMACS-native solvated minimization: PASS (`Fmax 969.362`, `emtol=1000`).
 - System: Amber14SB/phosaa14SB/GAFF2, TIP3P water, neutralized with 10 Na+, 366,069 atoms.
-- Restrained NVT was interrupted by loss of the WSL GROMACS process at about `93 ps`; no fatal/LINCS message was found in the final log segment.
-- NVT was resumed from `/home/lg/cmpe_4kik_vitexin_equil_v2/nvt.cpt` at step `46080` (`92.2 ps`) on 2026-10-05 23:18 KST.
-- The resumed command is detached in tmux session `cmpe_equil_resume`; after normal NVT completion, `await_nvt_then_npt.sh` starts restrained NPT automatically.
-- Production MD has not started and must remain gated until NVT/NPT QC is complete.
+- Restrained NVT was interrupted by loss of the WSL GROMACS process at about `93 ps` and was safely resumed from checkpoint; the final NVT log completed without a fatal/LINCS message.
+- Restrained NPT completed normally on 2026-10-06: 50,000 steps / 100 ps, GROMACS 2025.4, with `Finished mdrun` and no fatal/LINCS/segmentation-fault message.
+- Equilibration QC summaries: NVT temperature 300.035 K; NPT temperature 300.035 K; NPT pressure 12.9838 bar; NPT density 986.93 kg m^-3.
+- The final NVT/NPT records and `PRE_PRODUCTION_EQUILIBRATION_COMPLETE` are in the project `equilibration` directory. Production MD has not started; the next step is a separate GPU/HPC production decision.
 
 ## Separate blocked branch
 

@@ -1,0 +1,38 @@
+              :-) GROMACS - gmx mdrun, 2025.4-Ubuntu_2025.4_1 (-:
+
+Executable:   /usr/bin/gmx
+Data prefix:  /usr
+Working dir:  /home/lg/cmpe_4kik_vitexin_equil_v2
+Command line:
+  gmx mdrun -deffnm npt -ntomp 4 -pin on
+
+Compiled SIMD is SSE4.1, but AVX2_256 might be faster (see log).
+Reading file npt.tpr, VERSION 2025.4-Ubuntu_2025.4_1 (single precision)
+Changing nstlist from 20 to 80, rlist from 1.223 to 1.323
+
+Update groups can not be used for this system because atoms that are (in)directly constrained together are interdispersed with other atoms
+
+Using 4 MPI threads
+Using 4 OpenMP threads per tMPI thread
+
+starting mdrun 'loop_repaired_v2 in water'
+50000 steps,    100.0 ps.
+
+Writing final coordinates.
+
+
+Dynamic load balancing report:
+ DLB got disabled because it was unsuitable to use.
+ Average load imbalance: 3.5%.
+ The balanceable part of the MD step is 63%, load imbalance is computed from this.
+ Part of the total run time spent waiting due to load imbalance: 2.2%.
+
+
+               Core t (s)   Wall t (s)        (%)
+       Time:   581531.578    36345.745     1600.0
+                         10h05:45
+                 (ns/day)    (hour/ns)
+Performance:        0.238      100.958
+
+GROMACS reminds you: "This Puke Stinks Like Beer" (LIVE)
+
