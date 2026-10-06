@@ -82,3 +82,8 @@
 - After NVT/NPT reached a terminal state, removed four superseded preparation routes from the local project and synchronized OneDrive copy: provisional-Gasteiger solvated, complex-mapped Amber/ACPYPE, old GROMACS-solvated, and corrected-receptor-solvated branches.
 - Retained the loop-repaired final branch and all NVT/NPT outputs, checkpoints, logs, QC summaries, topology, environment export, and reproduction records.
 - Regenerated the hash-based file inventory after cleanup.
+
+# 2026-10-06 — Fig. 3(B) docking result handoff
+
+- Added `integration/FIG3B_DOCKING_RESULT_SUMMARY.md` with the fixed 4KIK chain-B protocol, KSA redocking validation, three-seed score/pose summary, interaction QC, and manuscript-safe claim boundary.
+- Kept the neutral vitexin result conditional on its protonation state; no new docking calculation was launched.
