@@ -2,6 +2,7 @@
 name: research-project-memory
 description: Maintain and synchronize a compact, portable research-project memory across ChatGPT chats, Work, Codex, terminal workflows, other GPT accounts, other AI systems, GitHub, and the canonical UST shared workspace. Use when the user asks to continue prior research work, recall previous decisions/results/files, hand off work between environments or accounts, avoid repeating completed analyses, create/update project checkpoints, or prepare a context package for another AI. Also use as a shared context layer before and after multi-skill research workflows such as literature review, network pharmacology, docking, MD, figure preparation, manuscript writing, manuscript review, or paper reproduction.
 ---
+
 # Research Project Memory and Sync
 
 Use this skill as the unified **cross-environment project context + synchronization layer**. It replaces the former `research-project-context-sync` role; do not maintain a separate sync skill for the same workspace.
@@ -149,7 +150,6 @@ Auto-save means update only the compact project state, decisions, manifest/check
 - unsupported speculation.
 
 If OneDrive identity cannot be verified, never auto-save there. Prefer verified GitHub state updates or prepare a handoff artifact for later upload.
-
 
 ### Scheduled consolidation reports
 
