@@ -12,7 +12,7 @@ Record supplied and preferred names, PubChem/ChEMBL/ChEBI identifiers when avail
 
 ### De novo source panel
 
-Select sources by current accessibility, reproducibility, identity safety, provenance preservation, and scientific suitability—not by a fixed database panel. Consider complementary predictors and resources such as SwissTargetPrediction, PharmMapper, SEA, Super-PRED, STITCH, ChEMBL, and other currently verifiable chemical-protein resources. None is automatically required or excluded merely because it was used historically.
+Use the run's frozen source registry as the required attempt list for de novo analysis. Attempt every registered source that can accept the study input, including the baseline sources defined in `SKILL.md`; do not stop collecting merely because another source has already produced sufficient targets. Then decide whether each retrieved source is eligible for the broad and primary branches using current accessibility, reproducibility, exact-identity safety, species suitability, provenance preservation, raw-export availability, and scientific suitability. A source may be excluded from a primary branch when access fails, CAPTCHA/login/terms block retrieval, the input is unsupported, identity or species QC fails, provenance cannot be preserved, or another prespecified scientific/QC criterion is not met; record the attempt and exact exclusion reason in `source_availability.csv`. Additional currently verifiable resources such as SwissTargetPrediction or ChEMBL may be added to the registry when scientifically useful, but additions must be frozen and documented before overlap/network analysis.
 
 Before retrieval, audit each compound-source pair in `source_availability.csv` with:
 
