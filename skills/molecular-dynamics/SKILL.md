@@ -30,11 +30,11 @@ For every external MD stage, record the PID/job ID, command, log, checkpoint, ex
 
 `validated complex → topology/parameter QC → solvation and ions → minimization → restrained NVT → restrained NPT → equilibration QC → production MD → trajectory QC/analysis → reproducibility and manuscript handoff`
 
-Use a staged approach. Verify actual output/log evidence after each stage; do not infer completion from a submitted command or a file name. Analyze replicate trajectories and sensitivity cases only when scientifically warranted and within the user-approved scope.
+Use a staged approach. Verify actual output/log evidence after each stage; do not infer completion from a submitted command or a file name. Analyze replicate trajectories and sensitivity cases only when scientifically warranted and within the user-approved scope. For production-trajectory interpretation, read [trajectory analysis and convergence QC](references/trajectory-analysis-qc.md). At minimum distinguish run-integrity QC from structural observables, define alignment/PBC handling, justify any equilibration window, and avoid declaring convergence or binding stability from RMSD alone.
 
 ## Completion and reporting
 
-Record stage status atomically in a machine-readable manifest and human-readable checkpoint. Preserve control files, exact commands, logs, checkpoints, trajectory files, analyses, and hashes where practical. Report the modeled condition, achieved simulation time, QC findings, limitations, and the precise claim boundary.
+Record stage status atomically in a machine-readable manifest and human-readable checkpoint. Preserve control files, exact commands, logs, checkpoints, trajectory files, analyses, and hashes where practical. For RMSD/RMSF/contact/hydrogen-bond or other trajectory outputs, also preserve the analyzed frame range, stride, selections, cutoffs, alignment/PBC policy, raw numeric tables, and software version. Report the modeled condition, achieved simulation time, QC findings, convergence/sampling limitations, replicate consistency when available, and the precise claim boundary.
 
 For detailed GROMACS session handling, automatic completion monitoring, restart rules, and low-cost notification behavior, read [long-running-jobs.md](references/long-running-jobs.md).
 
