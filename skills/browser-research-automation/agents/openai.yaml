@@ -1,0 +1,3 @@
+interface:
+  display_name: "Browser Research Automation"
+  short_description: "Debug and validate Chrome, localhost, and research web-app workflows"
