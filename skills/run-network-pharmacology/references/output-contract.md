@@ -7,8 +7,9 @@
 | `NP_checkpoint.md` and `.json` | stage, computation/save status, exact branch sets, corrections, jobs, raw locations, pending items, next action |
 | `job_ledger.csv` | service, URL/job ID, exact input, organism, submission/check times, parameters, status, retrieval, retries/failures |
 | `compound_identity.csv` | exact names, stable identifiers/structures, stereochemistry, confidence and ambiguity |
-| `source_availability.csv` | compound-source availability, source type, identity/species/export/score checks, union inclusion, branch, exclusion reason and access date |
-| `broad_target_pool.csv` | full compound-target harvest with source-native score/rank, evidence class/subtype, species, provenance and QC state |
+| `source_availability.csv` | one row per attempted source with retrieval status, identity/species/export/score checks, source URL/job ID, access date, version, raw/normalized paths, SHA-256 values, union inclusion, branch and exclusion reason |
+| `source_archive/` | immutable source-delivered CSV/TSV/ZIP/JSON/raw API responses when retrievable; never overwrite them with normalized analysis tables |
+| `broad_target_pool.csv` | full normalized compound-target harvest derived separately from the source archive, with source-native score/rank, evidence class/subtype, species, provenance and QC state |
 | `compound_targets.csv` | QC-normalized compound targets and branch membership without loss of broad provenance |
 | `disease_targets.csv` | disease ID, stable target ID, source/evidence, native score/rank, species and rule |
 | `overlap_primary.csv` | exact final-primary genes with compound and disease provenance |
