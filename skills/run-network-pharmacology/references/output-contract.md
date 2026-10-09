@@ -1,5 +1,7 @@
 # Output, recovery, and completion contract
 
+> New runs use `contract_version=7` and `source_archive_policy_version=2`; v3–v6 are checked only against their historical contracts. v7 adds `source_attempts.csv`, `source_archive_index.csv`, header-valid `data_adapter_ledger.csv`, and `data_lineage.csv`. Do not infer historical provenance. `source_attempts.csv` uses `subject_type`/`subject_id`, preserves each retry, separates retrieval/evidence status from job states, and records pagination completion. Native responses are archived before conversion; the archive index verifies one row per file and SHA-256. Adapter ledgers identify only adapters and paired JSON path/hash arrays. Lineage records each raw/normalized output once, actual parent/script hashes, and manual work as `NOT_APPLICABLE` script hashes plus a work record. `build_manifest.py` inventories run-relative files atomically and rejects symlinks; v7 completion invokes traceability validation.
+
 ## Canonical files
 
 | File | Minimum content |

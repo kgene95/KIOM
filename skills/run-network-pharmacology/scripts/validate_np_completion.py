@@ -6,6 +6,7 @@ import csv
 import json
 from datetime import datetime, timezone
 from pathlib import Path
+from traceability import validate_traceability
 
 
 REQUIRED = [
@@ -177,6 +178,10 @@ def main():
                     problems.append("contract v6 robustness run missing or empty: hub_robustness.csv")
                 elif "hub_robustness.csv" not in listed:
                     problems.append("contract v6 manifest files missing: hub_robustness.csv")
+        if contract_version >= 7:
+            if manifest.get("source_archive_policy_version") != 2:
+                problems.append("contract v7 requires source_archive_policy_version=2")
+            problems.extend(validate_traceability(root, manifest))
         branches = manifest.get("branches")
         if contract_version >= 3 and (not isinstance(branches, dict) or not branches):
             problems.append("contract v3 run requires a nonempty branches object")
