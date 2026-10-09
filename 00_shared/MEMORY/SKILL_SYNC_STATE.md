@@ -18,6 +18,7 @@ Status vocabulary:
 | Skill | Canonical | Last verified edit source | WEB_MOBILE | CODEX_LAPTOP | CODEX_KIOM | Notes |
 |---|---|---|---|---|---|---|
 | research-project-memory | GitHub current | current ChatGPT session -> GitHub | unknown | unknown | unknown | Canonical rules updated; installed copies have not yet been content-compared. |
+| browser-research-automation | GitHub current | current ChatGPT session -> GitHub | unknown | unknown | unknown | Newly created; installed copies not yet compared. |
 | run-network-pharmacology | GitHub | unknown | unknown | unknown | unknown | Compare before synchronization. |
 | molecular-docking | GitHub | unknown | unknown | unknown | unknown | Compare before synchronization. |
 | computational-evidence-auditor | GitHub | unknown | unknown | unknown | unknown | Compare before synchronization. |
