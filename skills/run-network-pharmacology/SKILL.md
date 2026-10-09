@@ -51,6 +51,8 @@ Recommend stronger reasoning at these points:
 - Read [figures-and-handoff.md](references/figures-and-handoff.md) when the user requests an SCI/publication/NP figure, Fig. 2, pre-Cytoscape review draft, or cross-environment handoff.
 - Read [cytoscape-automation.md](references/cytoscape-automation.md) before actual Cytoscape/cyREST execution.
 - Read [enrichment-qc.md](references/enrichment-qc.md) before accepting enrichment as final or using it in figures/candidate selection.
+- Read [advanced-enrichment.md](references/advanced-enrichment.md) when ORA/GSEA/ssGSEA/GSVA choice, background sensitivity, term redundancy, or enrichment robustness matters.
+- Read [database-adapters-and-chemistry-qc.md](references/database-adapters-and-chemistry-qc.md) when BioServices-style adapters or RDKit-assisted compound QC are used.
 - Read [auditor-handoff.md](references/auditor-handoff.md) when preparing independent computational review or manuscript audit.
 - Read [output-contract.md](references/output-contract.md) before checkpoints, completion, or final reporting.
 - Read [deterministic-scripts.md](references/deterministic-scripts.md) before running bundled scripts.
@@ -106,7 +108,7 @@ Freeze the question, compound scope, disease ontology, organism, analysis mode, 
 
 ### Analyze
 
-Preserve raw inputs before transformations. Use deterministic scripts for mechanical normalization, overlap, branch registration, narrowing audit, sensitivity matrices, checkpoints, manifests, and validation. Use scientific reasoning for identity ambiguity, evidence reconciliation, adaptive narrowing, mechanism interpretation, and final candidate assessment.
+Preserve raw inputs before transformations. Use deterministic scripts for mechanical normalization, overlap, branch registration, narrowing audit, sensitivity matrices, checkpoints, manifests, and validation. Use scientific reasoning for identity ambiguity, evidence reconciliation, adaptive narrowing, mechanism interpretation, and final candidate assessment. When BioServices or another programmatic adapter is used, record the underlying database separately from the adapter and do not double-count it as independent source support. When RDKit is available, use it for deterministic structure/identity QC without silently changing the compound state; follow `database-adapters-and-chemistry-qc.md`.
 
 ### Analyze with Cytoscape when available
 
@@ -118,7 +120,7 @@ When the user asks for STRING-derived topology, modules, or enrichment without a
 
 ### Validate enrichment and robustness
 
-Before mechanism interpretation or candidate selection, run `scripts/enrichment_qc.py` on frozen enrichment tables and record background, correction method, database/tool version, detected columns, and structural QC status. Review semantic/gene-set redundancy separately. When thresholds, graph settings, or hub methods materially affect conclusions, preserve the scenarios and generate `hub_robustness.csv` from actual ranks.
+Before mechanism interpretation or candidate selection, run `scripts/enrichment_qc.py` on frozen enrichment tables and record background, correction method, database/tool version, detected columns, and structural QC status. Review semantic/gene-set redundancy separately. Use ORA by default for selected overlap/hub gene lists. Use GSEA only with a valid ranked list, and ssGSEA/GSVA only with sample-level expression matrices; never substitute them simply to obtain stronger significance. Read `advanced-enrichment.md` when these methods, background sensitivity, or redundancy reduction materially affect the conclusion. When thresholds, graph settings, or hub methods materially affect conclusions, preserve the scenarios and generate `hub_robustness.csv` from actual ranks.
 
 ### Source intake addendum
 
