@@ -282,8 +282,7 @@ Treat GitHub `kgene95/KIOM/skills/` as the canonical master for reusable researc
 
 Track these execution environments separately:
 
-- `WEB` = ChatGPT web
-- `MOBILE` = ChatGPT mobile app
+- `WEB_MOBILE` = ChatGPT web and mobile app as one logical account-level environment
 - `CODEX_LAPTOP` = notebook Codex installation
 - `CODEX_KIOM` = KIOM/company-PC Codex installation
 - `GITHUB_CANONICAL` = authoritative repository copy
@@ -295,7 +294,7 @@ Whenever a skill is materially edited:
 3. Update the GitHub canonical copy.
 4. Record the canonical commit/SHA when available.
 5. Mark only environments that were actually compared with the canonical copy as `synced`.
-6. Mark unverified environments as `unknown`; do not assume Web and Mobile share the same installed skill version merely because they use the same account.
+6. Treat ChatGPT web and mobile as the single logical environment `WEB_MOBILE`; if either surface shows evidence of a mismatch, mark `WEB_MOBILE` as `unknown` or `outdated` until resolved.
 7. Mark a verified older copy as `outdated`.
 8. Compare content hashes or exact file contents when possible; do not rely only on filenames, ZIP names, timestamps, or chat memory.
 9. When synchronizing, update only skills that differ from the canonical copy instead of blindly replacing every installed skill.
