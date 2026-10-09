@@ -3,8 +3,7 @@
 Canonical skill source: `GITHUB_CANONICAL` = `kgene95/KIOM/skills/`
 
 Environment IDs:
-- `WEB` — ChatGPT web
-- `MOBILE` — ChatGPT mobile app
+- `WEB_MOBILE` — ChatGPT web + mobile app, tracked as one logical account-level environment
 - `CODEX_LAPTOP` — notebook Codex
 - `CODEX_KIOM` — KIOM/company-PC Codex
 
@@ -16,22 +15,22 @@ Status vocabulary:
 
 ## Current status
 
-| Skill | Canonical | Last verified edit source | WEB | MOBILE | CODEX_LAPTOP | CODEX_KIOM | Notes |
-|---|---|---|---|---|---|---|---|
-| research-project-memory | GitHub current | current ChatGPT session -> GitHub | unknown | unknown | unknown | unknown | Canonical rules updated; installed copies have not yet been content-compared. |
-| run-network-pharmacology | GitHub | unknown | unknown | unknown | unknown | unknown | Compare before synchronization. |
-| molecular-docking | GitHub | unknown | unknown | unknown | unknown | unknown | Compare before synchronization. |
-| computational-evidence-auditor | GitHub | unknown | unknown | unknown | unknown | unknown | Compare before synchronization. |
-| manuscript-audit | GitHub | unknown | unknown | unknown | unknown | unknown | Compare before synchronization. |
-| journal-adaptation | GitHub | unknown | unknown | unknown | unknown | unknown | Compare before synchronization. |
-| biomedical-research-assistant | GitHub | unknown | unknown | unknown | unknown | unknown | Compare before synchronization. |
+| Skill | Canonical | Last verified edit source | WEB_MOBILE | CODEX_LAPTOP | CODEX_KIOM | Notes |
+|---|---|---|---|---|---|---|
+| research-project-memory | GitHub current | current ChatGPT session -> GitHub | unknown | unknown | unknown | Canonical rules updated; installed copies have not yet been content-compared. |
+| run-network-pharmacology | GitHub | unknown | unknown | unknown | unknown | Compare before synchronization. |
+| molecular-docking | GitHub | unknown | unknown | unknown | unknown | Compare before synchronization. |
+| computational-evidence-auditor | GitHub | unknown | unknown | unknown | unknown | Compare before synchronization. |
+| manuscript-audit | GitHub | unknown | unknown | unknown | unknown | Compare before synchronization. |
+| journal-adaptation | GitHub | unknown | unknown | unknown | unknown | Compare before synchronization. |
+| biomedical-research-assistant | GitHub | unknown | unknown | unknown | unknown | Compare before synchronization. |
 
 ## Update rules
 
 - GitHub is the master after an edited skill is validated and committed.
 - Record where the edit was actually made; never infer the source environment.
 - Mark an environment `synced` only after exact content/hash comparison.
-- Do not assume WEB and MOBILE are identical because they use the same account.
+- Track ChatGPT web and mobile together as `WEB_MOBILE`; if either surface shows evidence of mismatch, downgrade the combined status until resolved.
 - Synchronize only skills that differ from GitHub canonical.
 - If a local/Codex skill cannot be inspected, leave it `unknown`.
 - Preserve commit/hash evidence in notes when available.
