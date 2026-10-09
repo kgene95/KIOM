@@ -263,13 +263,18 @@ When the user wants to continue work in another GPT account or another AI:
 
 ## Terminal-aware workflows
 
-When terminal work is required:
+When terminal or Codex work is required:
 
 - record command/script location, environment name, tool versions, and output path;
+- record the machine identity as `LAPTOP` or `WORKPC` when the work is performed on one of the user's two Codex computers;
+- record `environment` (for example `Codex`, `terminal`, or `Work`), `local_root`, and per-destination sync state when they are known;
+- never infer the machine from a path, hostname, or prior conversation. If machine identity is not verified, use `UNKNOWN_MACHINE` and surface it as a memory gap when relevant;
+- when the same workflow exists on both computers, prefer the newest authoritative validated checkpoint rather than the newest local timestamp alone;
+- treat unsynchronized local outputs as machine-local state until GitHub/UST synchronization is confirmed;
 - do not copy long terminal logs into project memory;
 - summarize failures, fixes, and reproducibility-critical commands only;
 - preserve generated manifests/checkpoints in the project structure;
-- if the work happened on one computer and will continue on another, ensure the next machine can reconstruct the environment or identify missing dependencies.
+- if work moves between the two computers, ensure the receiving machine can reconstruct the environment or identify missing dependencies before continuing.
 
 ## Memory maintenance
 
