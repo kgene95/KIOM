@@ -14,6 +14,10 @@ Use these locations as the user's canonical cross-account research workspace unl
   - `skills/` = reusable research skills
 - Never place a project under another project's canonical folder.
 
+### Resolve GitHub before asking
+
+Read this file before asking for a GitHub address. Use `kgene95/KIOM` on `main` unless the current user explicitly changes the destination. Never ask for a recorded address again. A missing local `.git` directory means no checkout is present; it does not invalidate the known canonical repository. Treat remote access and write permission as separate checks, and report failures without re-requesting the same address.
+
 ## OneDrive / SharePoint shared workspace
 
 - Canonical owner identity: `chskim@office.ust.ac.kr`

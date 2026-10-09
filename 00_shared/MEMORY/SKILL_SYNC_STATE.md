@@ -17,7 +17,7 @@ Status vocabulary:
 
 | Skill | Canonical | Last verified edit source | WEB_MOBILE | CODEX_LAPTOP | CODEX_KIOM | Notes |
 |---|---|---|---|---|---|---|
-| research-project-memory | GitHub current | current ChatGPT session -> GitHub | unknown | unknown | unknown | Canonical rules updated; installed copies have not yet been content-compared. |
+| research-project-memory | GitHub main | WEB_MOBILE / Work, 2026-10-09 | synced | unknown | unknown | Installed Work skill validated and saved (7f4d680); all bundled files content-compared with canonical. Display name updated; canonical-address/no-.git rules enforced; existing AI_CONTEXT template retained. Other Codex installations not inspected. |
 | browser-research-automation | GitHub current | current ChatGPT session -> GitHub | unknown | unknown | unknown | Newly created; installed copies not yet compared. |
 | run-network-pharmacology | GitHub | unknown | unknown | unknown | unknown | Compare before synchronization. |
 | molecular-docking | GitHub | unknown | unknown | unknown | unknown | Compare before synchronization. |

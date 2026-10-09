@@ -3,7 +3,7 @@ name: research-project-memory
 description: Maintain and synchronize a compact, portable research-project memory across ChatGPT chats, Work, Codex, terminal workflows, other GPT accounts, other AI systems, GitHub, and the canonical UST shared workspace. Use when the user asks to continue prior research work, recall previous decisions/results/files, hand off work between environments or accounts, avoid repeating completed analyses, create/update project checkpoints, or prepare a context package for another AI. Also use as a shared context layer before and after multi-skill research workflows such as literature review, network pharmacology, docking, MD, figure preparation, manuscript writing, manuscript review, or paper reproduction.
 ---
 
-# Research Project Memory and Sync
+# 업데이트 메모리 스킬
 
 Use this skill as the unified **cross-environment project context + synchronization layer**. It replaces the former `research-project-context-sync` role; do not maintain a separate sync skill for the same workspace.
 
@@ -13,7 +13,7 @@ Read `references/workspace-locations.md` before any persistent project-memory re
 
 The canonical cross-account workspace is:
 
-- GitHub: `kgene95/KIOM`
+- GitHub: `kgene95/KIOM`, branch `main`
 - UST OneDrive owner: `chskim@office.ust.ac.kr`
 - UST shared-folder URL: `https://o365ust-my.sharepoint.com/:f:/g/personal/chskim_office_ust_ac_kr/IgBVWdt-alSnSJwTACfivQyMAY-UWjaYqOdCoDwDMUASmjU?e=fpGsdu`
 - OneDrive workspace root: `LG_노트북/`
@@ -23,7 +23,7 @@ The canonical cross-account workspace is:
 
 Before asking the user for a GitHub repository or workspace address, read `references/workspace-locations.md` and use the recorded canonical destination. For this workspace the default GitHub repository is `kgene95/KIOM` at `https://github.com/kgene95/KIOM`, with `main` as the default branch. A missing local `.git` directory is not evidence that the repository address is unknown; use the canonical remote or verify it with a read-only remote check first.
 
-Ask for an address only when the memory file is missing or contradictory, the recorded remote is inaccessible, the current user explicitly names a different repository, or a write requires a repository that is not covered by the canonical mapping. Do not ask the user to repeat an address already recorded in memory.
+Do not ask the user to repeat an address already recorded in `workspace-locations.md` or the current instruction. If `.git` is absent, retain the canonical repository identity and use an available GitHub connector/API or a separate checkout as needed. Distinguish repository identity from local checkout state, remote access, and write permission: an access failure does not make a known address unknown. Report the actual access limitation without asking for the same address again. Ask for clarification only when the destination is genuinely missing or conflicting, or the task targets a different repository not covered by the canonical mapping.
 
 Do not treat another connected OneDrive as the canonical workspace. The UST workspace is accessed by its shared-folder URL because direct UST connector access may be unavailable. Verify the destination before any OneDrive/SharePoint access. The OneDrive account `kgene95@gmail.com` is explicitly prohibited for this skill: do not search, list, read, write, upload, move, rename, or otherwise access that drive for research-memory or project-sync work. Never create a substitute `LG_노트북` folder on the wrong account.
 
