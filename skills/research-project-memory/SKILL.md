@@ -318,12 +318,11 @@ Use `MEMORY_INDEX.md` as a directory of authoritative state files and major proj
 
 ## Initialization
 
-If a project has no memory structure and filesystem access is available, run:
+If a project has no memory structure and filesystem access is available:
 
-```bash
-python scripts/init_project_memory.py <project_root>
-```
-
-This creates only missing memory files and does not overwrite existing content.
+1. Create `00_PROJECT/` only after resolving the canonical project folder.
+2. Create missing `MEMORY_INDEX.md`, `PROJECT_STATE.md`, `DECISIONS.md`, and `HANDOFF.md` using `references/memory-schema.md`.
+3. Copy `assets/templates/AI_CONTEXT.md` to `00_PROJECT/AI_CONTEXT.md` only if that file does not already exist.
+4. Fill only verified facts; mark missing information as `UNVERIFIED` or an open issue. Preserve existing files and decisions.
 
 If filesystem access is unavailable, generate the equivalent markdown bundle in the current environment for the user to save into the project repository.

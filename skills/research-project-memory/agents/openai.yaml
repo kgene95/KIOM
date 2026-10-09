@@ -1,6 +1,6 @@
 interface:
-  display_name: "업데이트 메모리 스킬"
-  short_description: "Resume and sync projects using the recorded GitHub workspace"
+  display_name: 업데이트 메모리 스킬
+  short_description: Resume and sync projects using the recorded GitHub workspace
   default_prompt: Use $research-project-memory to recall the minimum project context,
     resume from the latest verified checkpoint, and synchronize meaningful state changes.
   icon_small: assets/icon.svg
