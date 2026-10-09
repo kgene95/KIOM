@@ -38,7 +38,7 @@ Use normalized base states `PENDING`, `FAILED`, and `COMPLETED`; an informative 
 
 Checkpoint immediately after external-result integration, compound/disease union change, overlap change, mapping correction, branch creation, narrowing decision, final-set selection, STRING/hub completion, enrichment completion, and docking-candidate selection. The checkpoint must allow another session to resume without reconstructing state from prose.
 
-The manifest must record analysis start/completion UTC, files and SHA-256 hashes, script hashes/versions, runtime, every used software/database version or explicit unavailability statement, access dates/releases, actual parameters/configuration, exact rules, branch gene lists/counts, mapping corrections, failed/unavailable sources, pending items, and `NP_COMPLETE_DOCKING_NOT_STARTED`.
+The manifest must record analysis start/completion UTC, files and SHA-256 hashes, script hashes/versions, runtime, every used software/database version or explicit unavailability statement, access dates/releases, actual parameters/configuration, exact rules, branch gene lists/counts, mapping corrections, failed/unavailable sources, pending items, and `NP_COMPLETE_DOCKING_NOT_STARTED`. Source-level provenance must also record source URL, job ID when applicable, collection/access date, source-native score/rank semantics, database/tool version, raw archive path, normalized derivative path, and hashes where practical. Use `UNVERIFIED` rather than guessing any expected URL, date, job, or version field that cannot be verified.
 
 ## Completion validation
 
