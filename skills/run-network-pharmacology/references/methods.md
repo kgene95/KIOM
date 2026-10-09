@@ -16,9 +16,9 @@ Use the run's frozen source registry as the required attempt list for de novo an
 
 Before retrieval, audit each compound-source pair in `source_availability.csv` with:
 
-`compound,source,source_type,accessible,exact_identity_verified,species_available,raw_export_available,native_score_available,included_in_broad,included_in_primary,branch,exclusion_reason,access_date`
+`compound,source,source_type,retrieval_status,accessible,exact_identity_verified,species_available,raw_export_available,native_score_available,source_url,job_id,access_date,database_tool_version,raw_archive_path,raw_sha256,normalized_path,normalized_sha256,included_in_broad,included_in_primary,branch,exclusion_reason`
 
-Use `source_type=target_prediction`, `integrated_association`, `measured_database`, or a documented equivalent. Confirm compound identity, current access, species, raw export, preservation of the source-native score/rank, and reproducibility before freezing the panel. Record failed and unavailable sources rather than omitting them silently.
+For the baseline registry, `retrieval_status` must be exactly one of `retrieved`, `not retrieved`, `unavailable`, `proxy`, or `broad_exploratory`. Use `UNVERIFIED` for an expected source URL, job ID, date, or version that cannot be verified; never infer missing provenance. Use `source_type=target_prediction`, `integrated_association`, `measured_database`, `disease_database`, or a documented equivalent. Confirm compound identity, current access, species, raw export, preservation of the source-native score/rank, and reproducibility before freezing the panel. Preserve source-delivered CSV, TSV, ZIP, JSON, or raw responses unchanged in a source archive and create normalized analysis CSVs separately. Record failed and unavailable sources rather than omitting them silently.
 
 ### Admission to the main compound-target union
 
@@ -30,7 +30,7 @@ Include a source in the primary or broad union only when all material conditions
 - the query, access date/release, source record, and target provenance can be recorded; and
 - gene/protein identities can be normalized safely.
 
-Otherwise do not auto-merge the result. Record it as `unavailable`, `proxy`, `broad_exploratory`, or `historical_only`, with the reason and permitted interpretation. Collect the broad useful output from admitted sources and preserve compound, source, source record, species, target identity, native score name/value/direction, rank, query structure, and evidence class.
+Otherwise do not auto-merge the result. Keep the source-level `retrieval_status` within the required five-state vocabulary (`retrieved`, `not retrieved`, `unavailable`, `proxy`, `broad_exploratory`) and record the reason and permitted interpretation separately. If historical-only evidence is retained, label that as evidence or branch interpretation rather than as an additional retrieval status. Collect the broad useful output from admitted sources and preserve compound, source, source record, species, target identity, native score name/value/direction, rank, query structure, and evidence class.
 
 ### Source-specific controls
 
