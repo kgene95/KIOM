@@ -1,0 +1,3 @@
+interface:
+  display_name: "Statistical Power"
+  short_description: "Plan sample size, MDE, and power for experiments"
