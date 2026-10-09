@@ -31,6 +31,23 @@ Existing workflow-specific names such as `NP_manifest.json`, `docking_manifest.j
 4. Reuse completed outputs. Do not rerun completed analyses unless the user requests it or the checkpoint identifies invalidation, changed inputs, changed methods, or failed QC.
 5. Load the smallest context sufficient for the next action.
 
+## Machine-aware Codex/terminal metadata
+
+For work performed from either of the user's two Codex computers, record machine provenance in the relevant checkpoint, handoff, or compact state entry:
+
+```text
+environment: Codex
+machine: LAPTOP | WORKPC | UNKNOWN_MACHINE
+local_root: <verified local project root, when known>
+timestamp: <local timestamp with timezone>
+sync_to_github: yes | no | pending | unknown
+sync_to_ust_onedrive: yes | no | pending | unknown
+```
+
+Use `LAPTOP` for the notebook and `WORKPC` for the company PC only when the current environment or user instruction verifies the identity. Never guess from path conventions. If a local result exists on only one machine and has not been synchronized, keep it machine-local and list that limitation in handoff/report memory gaps.
+
+When both machines contain copies of the same workflow, resolve conflicts using validated checkpoints, manifests, hashes, and changelog provenance; do not select a copy solely because its filesystem timestamp is newer.
+
 ## Update and synchronization protocol
 
 After meaningful work:
