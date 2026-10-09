@@ -32,7 +32,7 @@ Recommend stronger reasoning at these points:
 - Recommend disconnecting/closing Codex while the external program runs **only after confirming the process is independent of the Codex session** and no active reasoning is required. Do not keep Codex connected merely to watch a GUI or wait for a calculation.
 - If the calculation is a foreground or session-dependent process, **do not close Codex** because doing so may terminate the job. First detach it safely with a documented method or keep the controlling session open.
 - When the external calculation or GUI step finishes, reconnect Codex only when needed for result parsing, QC, scientific interpretation, or the next deterministic command, and resume from the saved checkpoint rather than restarting the workflow.
-- When the user asks for autonomous continuation or a completion alert for a genuine long-running calculation, create a lightweight heartbeat when the automation facility is available. Choose its interval from the recorded expected duration: 30 minutes for a roughly 20-minute–6-hour job, 2 hours for a roughly 6–24-hour job, and 6 hours for a multi-day job. Prefer a provider/job completion callback when one is available. Inspect only the PID/job state, designated log, and completion/error marker; remain silent while the job is healthy and progressing.
+- When the user asks for autonomous continuation or a completion alert for a genuine long-running calculation, create a lightweight heartbeat when the automation facility is available. Choose its interval from the recorded expected duration: 30 minutes for a roughly 20-minute-6-hour job, 2 hours for a roughly 6-24-hour job, and 6 hours for a multi-day job. Prefer a provider/job completion callback when one is available. Inspect only the PID/job state, designated log, and completion/error marker; remain silent while the job is healthy and progressing.
 - Before launching a calculation expected to take hours or days, state the estimated duration, whether the estimate is based on a prior local run or a rough assumption, the monitoring interval, and that only completion, failure, unexpected stop, or a required decision will trigger a user-facing alert.
 - Before waiting on a long calculation or external retrieval, inspect the checkpoint and identify two to four high-value tasks that are independent of the running process. Prioritize evidence/methods crosswalks, unresolved-access memos, figure specifications, reproducibility/handoff records, and next-stage feasibility planning. Explain the concrete outputs and start the appropriate tasks when the user asks to continue autonomously; use parallel agents only when the user authorizes delegation and the tasks have separate files/resources.
 - Do not create busywork or touch the active job's input, output, terminal, GUI, or controller from a parallel task. Save each independent result in a distinct, documented file and report the completed outputs together with the calculation status.
@@ -44,6 +44,7 @@ Recommend stronger reasoning at these points:
 ## Load only the needed references
 
 - Read [methods.md](references/methods.md) for every analysis.
+- Read [source-skill-routing.md](references/source-skill-routing.md) when installed life-science database skills or API adapters are available.
 - Read [execution-environments.md](references/execution-environments.md) before external retrieval, long-running jobs, or bulk local processing.
 - Read [branches-and-evidence.md](references/branches-and-evidence.md) for branch creation, narrowing, sensitivity, proxy, or reproduction.
 - Read [docking-candidate-selection.md](references/docking-candidate-selection.md) before recommending docking targets.
@@ -64,7 +65,7 @@ For de novo work, collect broadly first, preserve source-native scores and evide
 
 Treat source collection as comprehensive, not convenience-selected. At analysis start, freeze the source registry, identity rules, organism, and access plan. Before overlap or network analysis, attempt every source in the registry that can accept the study inputs. Do not omit an accessible source merely because another source has already returned sufficient records.
 
-Use the baseline registry below for small-molecule/extract constituent–disease analyses. Keep the registry in the run manifest so it can be expanded without embedding project-specific compounds, diseases, cutoffs, or prior results in this reusable Skill.
+Use the baseline registry below for small-molecule/extract constituent-disease analyses. Keep the registry in the run manifest so it can be expanded without embedding project-specific compounds, diseases, cutoffs, or prior results in this reusable Skill.
 
 1. Collect entity-target evidence from PharmMapper, SuperPred, SEA, PubChem bioactivity/target records, and STITCH chemical-protein associations.
 2. Collect disease-target evidence from GeneCards, OMIM, and TTD.
@@ -88,7 +89,7 @@ Do not choose targets or docking candidates until the source-panel ledger, mappi
 5. Register every analyzed gene set as `primary`, `sensitivity`, `broad_exploratory`, or `proxy`. Never present proxy data as the primary disease set.
 6. Do not tune thresholds to reproduce a historical count. Without the original raw data and methods, label the result `NOT INDEPENDENTLY REPRODUCED`.
 7. Use actual STRING edges, hub scores/ranks, and enrichment rows. Do not invent genes, edges, scores, pathways, or relative values.
-8. Base docking recommendations on integrated NP, experimental, and structural evidence—not hub degree alone—and cite the supporting frozen branch.
+8. Base docking recommendations on integrated NP, experimental, and structural evidence, not hub degree alone, and cite the supporting frozen branch.
 9. Never submit, calculate, or interpret molecular docking in this Skill. Provide a docking-ready handoff and stop.
 10. For every executed branch, record the actual databases, software, versions or releases, access dates, parameters, and raw-output locations. Record an unavailable version explicitly; never infer one from the date or a default.
 11. Keep project-specific compounds, disease, historical analyses, and comparison branches in the run configuration and manifest, not in this reusable Skill.
@@ -117,6 +118,13 @@ When the user asks for STRING-derived topology, modules, or enrichment without a
 ### Validate enrichment and robustness
 
 Before mechanism interpretation or candidate selection, run `scripts/enrichment_qc.py` on frozen enrichment tables and record background, correction method, database/tool version, detected columns, and structural QC status. Review semantic/gene-set redundancy separately. When thresholds, graph settings, or hub methods materially affect conclusions, preserve the scenarios and generate `hub_robustness.csv` from actual ranks.
+
+### Source intake addendum
+
+- Preserve one byte-identical original export per compound/source in a source archive; accept CSV, TSV, or ZIP and create a separate normalized analysis CSV without overwriting the original.
+- Record `provenance_status` for every source (`VERIFIED`, `PARTIALLY_VERIFIED`, or `UNVERIFIED`) together with retrieval date, native score/rank meaning, job ID/URL, and SHA-256 where practical.
+- When URL/date/confirmation are missing, an `UNVERIFIED` source may enter a clearly labelled broad exploratory branch only after an explicit user acknowledgement; never silently promote it to the publication-ready primary branch. URL/date/confirmation-complete uploads may proceed without that additional exploratory override.
+- Before overlap, require both compound-target and disease-target branches and explicit species/ID QC. Generate a deterministic `hub_topology_degree.csv` from the frozen STRING graph and retain term IDs, member genes, background, raw P values, and FDR/adjusted values for enrichment.
 
 ### Select candidates
 
@@ -151,4 +159,3 @@ After NP analysis, the optional pre-Cytoscape decision and any requested `REVIEW
 When the user authorizes a workflow, execute the skill's complete authorized scope through its defined completion gate without waiting for a separate confirmation at every intermediate step. Continue deterministic processing, QC, record updates, figure/document preparation, and reproducibility packaging until the skill's work is complete. Ask the user only when a genuinely consequential scientific judgment could change the conclusion, indispensable information or access is missing, an irreversible/destructive or external action requires authorization, or a critical error cannot be safely resolved. Do not ask merely because another defined step remains.
 
 For long-running calculations or retrievals, verify that the job started, record its command/configuration, output path, checkpoint, and expected duration, set a lightweight completion/failure monitor when available, and continue independent authorized work while it runs. Notify the user only for completion, failure, unexpected stop, or a required decision. Never claim completion from elapsed time alone; verify the final files and logs.
-
