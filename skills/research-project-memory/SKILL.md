@@ -19,6 +19,12 @@ The canonical cross-account workspace is:
 - OneDrive workspace root: `LG_노트북/`
 - Access mode: use the shared-folder URL; do not assume a direct UST OneDrive connector is available
 
+## Canonical-address rule
+
+Before asking the user for a GitHub repository or workspace address, read `references/workspace-locations.md` and use the recorded canonical destination. For this workspace the default GitHub repository is `kgene95/KIOM` at `https://github.com/kgene95/KIOM`, with `main` as the default branch. A missing local `.git` directory is not evidence that the repository address is unknown; use the canonical remote or verify it with a read-only remote check first.
+
+Ask for an address only when the memory file is missing or contradictory, the recorded remote is inaccessible, the current user explicitly names a different repository, or a write requires a repository that is not covered by the canonical mapping. Do not ask the user to repeat an address already recorded in memory.
+
 Do not treat another connected OneDrive as the canonical workspace. The UST workspace is accessed by its shared-folder URL because direct UST connector access may be unavailable. Verify the destination before any OneDrive/SharePoint access. The OneDrive account `kgene95@gmail.com` is explicitly prohibited for this skill: do not search, list, read, write, upload, move, rename, or otherwise access that drive for research-memory or project-sync work. Never create a substitute `LG_노트북` folder on the wrong account.
 
 ## Core principles
