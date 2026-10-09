@@ -276,6 +276,33 @@ When terminal or Codex work is required:
 - preserve generated manifests/checkpoints in the project structure;
 - if work moves between the two computers, ensure the receiving machine can reconstruct the environment or identify missing dependencies before continuing.
 
+## Skill provenance and synchronization
+
+Treat GitHub `kgene95/KIOM/skills/` as the canonical master for reusable research skills unless the user explicitly changes the authority.
+
+Track these execution environments separately:
+
+- `WEB` = ChatGPT web
+- `MOBILE` = ChatGPT mobile app
+- `CODEX_LAPTOP` = notebook Codex installation
+- `CODEX_KIOM` = KIOM/company-PC Codex installation
+- `GITHUB_CANONICAL` = authoritative repository copy
+
+Whenever a skill is materially edited:
+
+1. Record the verified source environment in the shared skill-sync state.
+2. Validate the edited skill before treating it as canonical.
+3. Update the GitHub canonical copy.
+4. Record the canonical commit/SHA when available.
+5. Mark only environments that were actually compared with the canonical copy as `synced`.
+6. Mark unverified environments as `unknown`; do not assume Web and Mobile share the same installed skill version merely because they use the same account.
+7. Mark a verified older copy as `outdated`.
+8. Compare content hashes or exact file contents when possible; do not rely only on filenames, ZIP names, timestamps, or chat memory.
+9. When synchronizing, update only skills that differ from the canonical copy instead of blindly replacing every installed skill.
+10. If an environment cannot be inspected, preserve that as a synchronization gap rather than claiming success.
+
+Use `00_shared/MEMORY/SKILL_SYNC_STATE.md` as the compact cross-environment status register when available. Skill synchronization state is operational provenance, not scientific evidence.
+
 ## Memory maintenance
 
 Periodically compact stale session logs into `PROJECT_STATE.md` and `DECISIONS.md`.
