@@ -25,6 +25,7 @@ interface:
     and integration. HTTP 200 HTML is not a dataset. Use file-native releases.
     Do not infer past attempts or publication readiness from other sources.
     At project intake, record a credential-free initial_access_approval for public sources, interactive sources, PharmMapper email registration, and job-ID-scoped Gmail completion checks. The local dashboard must offer a PharmMapper email field that holds the address only in the active browser/server session; manifests and logs may record only whether an email was provided. See references/initial-access-approval.md.
+    During active runs, report meaningful state transitions in Korean chat: run creation, dispatch groups, worker start/completion, approval or external waits, retries, QC, completion, and budget stops. Do not terminate the whole workflow because one branch is blocked; continue independent tasks and record the resume condition. Keep unchanged polling quiet.
   icon_small: assets/icon.svg
   icon_large: assets/icon.svg
 policy:

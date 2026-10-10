@@ -12,6 +12,7 @@
 8. Git·GitHub 완료 절차
 9. 상태와 기억
 10. 분야별 adapter
+11. 진행 보고와 중단 방지
 
 ## 목적과 범위
 
@@ -62,3 +63,7 @@ Skill trigger는 사용자 요청과 adapter의 작업 유형으로 결정한다
 ## 분야별 adapter
 
 adapter는 task 목록, 입력·출력 계약, 분야별 검증, 외부 connector와 완료 조건만 제공한다. 범용 lifecycle을 복사하지 않는다. 현재 NP는 `harness/NP_ADAPTER.md`와 `skills/run-network-pharmacology/`를 사용한다.
+
+## 진행 보고와 중단 방지
+
+채팅 보고와 상태 전이는 [PROGRESS_REPORTING.md](PROGRESS_REPORTING.md)를 따른다. 총괄은 run 생성, worker 시작·완료, 승인·외부 대기, 오류·재시도·QC, 완료·예산 중지 시 한국어로 현재 상태와 다음 행동을 보고한다. 한 task가 막혀도 독립 task를 계속 실행하며, 필수 task가 막힌 경우에만 최종 gate를 보류한다.

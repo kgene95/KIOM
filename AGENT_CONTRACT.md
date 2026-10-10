@@ -9,6 +9,7 @@
 5. Verifier
 6. Notifier
 7. 질문과 handoff
+8. 진행 보고
 
 ## Controller
 
@@ -37,3 +38,7 @@
 ## 질문과 handoff
 
 질문 전 `PROJECT_STATE.md`, `DECISIONS.md`, 승인 기록과 checkpoint를 검색한다. handoff는 채팅이 아니라 `run_id`, `task_id`, parent/child, 입력·출력 hash, branch, 검증 상태, next action을 가진 manifest다.
+
+## 진행 보고
+
+총괄은 의미 있는 상태 변화마다 한국어 채팅 보고를 남긴다. worker 하나의 실패·외부 대기·승인 대기가 전체 workflow 종료 사유가 되지 않도록 독립 task를 계속 dispatch하고, 재개 조건과 다음 행동을 기록한다. 변화 없는 polling은 반복 보고하지 않는다.
