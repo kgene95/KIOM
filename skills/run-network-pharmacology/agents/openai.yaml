@@ -17,6 +17,9 @@ interface:
     to reflect verified data or perform only necessary supplementation. Use the
     local dashboard, multi-run monitor, and Cytoscape worker when supported.
     Never claim SEA or PharmMapper new-job submission is automated until tested.
+    Tag every compound with a CID and structure SHA before SEA/PharmMapper jobs.
+    Record official job ID and immutable raw result provenance; do not assume a
+    previously saved result belongs to a compound without submission evidence.
   icon_small: assets/icon.svg
   icon_large: assets/icon.svg
 policy:
