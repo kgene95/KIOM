@@ -15,6 +15,41 @@
       "resource": "provider-and-cytoscape",
       "network": true,
       "requires_approval": true
+    },
+    "compound_identity": {
+      "module": "np_workers",
+      "function": "compound_identity",
+      "resource": "run-folder",
+      "network": false,
+      "requires_approval": false
+    },
+    "structure_qc": {
+      "module": "np_workers",
+      "function": "structure_qc",
+      "resource": "run-folder",
+      "network": false,
+      "requires_approval": false
+    },
+    "source_audit": {
+      "module": "np_workers",
+      "function": "source_audit",
+      "resource": "run-folder",
+      "network": false,
+      "requires_approval": false
+    },
+    "normalize_targets": {
+      "module": "np_workers",
+      "function": "normalize_targets",
+      "resource": "run-folder",
+      "network": false,
+      "requires_approval": false
+    },
+    "overlap_analysis": {
+      "module": "np_workers",
+      "function": "overlap_analysis",
+      "resource": "run-folder",
+      "network": false,
+      "requires_approval": false
     }
   },
   "roles": {
