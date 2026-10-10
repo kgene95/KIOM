@@ -5,6 +5,9 @@ description: "Run reproducible, source-traceable network pharmacology for compou
 
 # Run network pharmacology
 
+- **한국어 출력 필수:** 사용자 질문에 대한 답변, 진행상황, 질문, 승인 요청, 오류·완료 안내는 입력 언어와 무관하게 모두 한국어로 작성한다. 공식 DB/식별자 및 파일명만 원어 허용. 모든 총괄 및 세부 1~5 에이전트에 적용한다.
+- **역할 구조:** 총괄 0, NP/구조 1, SEA·PharmMapper 2, STRING·Cytoscape·GO/KEGG 3, 독립 QC/재실행 4, 실험 Methods/Results 원고 근거 검토 5. 3번은 검증된 선행 데이터가 생기는 즉시 예비 분석을 시작하고 새 데이터가 오면 4번이 영향 평가 후 재실행시킨다. [multi-agent-orchestration.md](references/multi-agent-orchestration.md)와 [np_agent_queue.py](scripts/np_agent_queue.py)를 사용한다.
+
 - For new projects with compound(s) and disease intake, use the overall controller and role-specific Agent 1 (NP collection and analysis), Agent 2 (SEA/PharmMapper structure submission and result retrieval), and Agent 3 (independent QC), as described in [multi-agent-orchestration.md](references/multi-agent-orchestration.md). Handoff by verified local structure manifests and job ledgers; email is optional authorized notification, NOT a presumed submission route.
 
 - Mandatory low-cost operation: use the local 30-minute non-LLM watchdog, batch validated Python tasks, preserve original source evidence, require approval before historical reuse/recollection, and never infer unverified SEA job assignments. Read [execution-controller.md](references/execution-controller.md). ChatGPT status alerts are separately scheduled at 09:00 and 18:00 Asia/Seoul and may use model capacity.
