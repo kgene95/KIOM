@@ -45,7 +45,8 @@ class Handler(BaseHTTPRequestHandler):
   try:
    if target=="/new":
     import np_agent_queue as q
-    q.initialize(WORKSPACE,data.get("compound",""),data.get("disease",""),data.get("species","Homo sapiens"))
+    home=q.initialize(WORKSPACE,data.get("compound",""),data.get("disease",""),data.get("species","Homo sapiens"))
+    m.review(home)
    else:
     id=data.get("run","")
     if not id or Path(id).name!=id:raise ValueError("유효하지 않은 작업")
