@@ -22,6 +22,16 @@ def app_index():
   bits.append('<section><h3>'+h(req.get("compound_input"))+' / '+h(req.get("disease_input"))+'</h3><div class="muted">'+h(run.name)+'</div>')
   bits.append('<p>기존 자료 후보 '+str(len(review.get("candidates",[])))+'건 · 파일명 일치만으로는 검증 완료가 아닙니다.</p>')
   bits.append(form("/scan",'<input type="hidden" name="run" value="'+h(run.name)+'">','기존 자료 다시 검색'))
+  approval=m.read(run/"initial_approval.json")
+  status="승인됨" if approval.get("user_approved") is True else "승인 필요"
+  bits.append('<div><h4>최초 통합 승인 · '+h(status)+'</h4><p class="muted">기존 자료 검증 후 필요한 작업만 실행합니다. 이메일 주소·암호·인증코드는 저장하지 않습니다.</p>')
+  fields='<input type="hidden" name="run" value="'+h(run.name)+'">'
+  fields+='<label>기존 자료 처리 <select name="reuse"><option value="REUSE_ONLY_VERIFIED">검증된 기존 자료만 반영</option><option value="REVIEW_EACH">자료별로 승인</option></select></label>'
+  fields+='<label><input type="checkbox" name="supplement" value="yes"> 검증 후 부족한 부분의 보완 분석 허용 (범위 변경 시 재확인)</label>'
+  fields+='<label><input type="checkbox" name="new_submit" value="yes"> 기존 검증 자료가 없을 때 SEA·PharmMapper 신규 제출 허용</label>'
+  fields+='<label><input type="checkbox" name="email_notify" value="yes"> PharmMapper 결과 알림 이메일 사용 (실제 주소는 별도 비공개 입력)</label>'
+  fields+='<label><input type="checkbox" name="remote_work" value="yes"> 승인된 원격 PC에서 작업 실행 요청 허용 (운영체제 승인 별개)</label>'
+  bits.append(form("/approve",fields,"최초 분석 범위 승인")+"</div>")
   for v in review.get("candidates",[]):
    bits.append('<div style="border-top:1px solid #ddd;margin-top:10px;padding-top:10px"><strong>'+h(v["source"])+'</strong> '+h(v["match"])+' / '+h(v["decision"])+'<p class="muted">'+h(v["source_file"])+'</p>')
    bits.append('<p>검증 근거: '+h(v.get("proof"))+'</p>')
@@ -53,6 +63,11 @@ class Handler(BaseHTTPRequestHandler):
     run=WORKSPACE/"runs"/id
     if not (run/"request.json").exists():raise ValueError("작업을 찾을 수 없음")
     if target=="/scan":m.review(run)
+    elif target=="/approve":
+     status=m.read(run/"existing_data_review.json")
+     # This high-level approval never lifts per-file scientific verification or OS security prompts.
+     approval={"user_approved":True,"approved_at_utc":m.now(),"reuse_policy":data.get("reuse","REVIEW_EACH"),"supplement_authorized":data.get("supplement")=="yes","new_submission_authorized":data.get("new_submit")=="yes","email_notification_authorized":data.get("email_notify")=="yes","remote_work_requested":data.get("remote_work")=="yes","reviewed_candidates":len(status.get("candidates",[])),"limitations":"Scientific QC, individual unverified source reuse, OS approval, CAPTCHA, logins and provider terms remain mandatory."}
+     m.save(run/"initial_approval.json",approval)
     elif target=="/decide":m.decision(run,data.get("sha",""),data.get("decision",""),data.get("proof",""))
     else:raise ValueError("알 수 없는 동작")
   except Exception as e:msg="처리하지 못했습니다: "+str(e)
