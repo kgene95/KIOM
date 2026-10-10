@@ -1,4 +1,4 @@
-"""Generic harness entrypoint.
+"""범용 하네스 진입점.
 
 Domain adapters own scientific task definitions. The generic runner owns the
 durable lifecycle and delegates a cycle to the selected adapter.
@@ -9,6 +9,8 @@ import argparse
 import json
 import sys
 from pathlib import Path
+
+from verifier import verify_run_contract
 
 
 def main() -> None:
@@ -23,7 +25,9 @@ def main() -> None:
         raise SystemExit(f"등록되지 않은 profile: {args.profile}")
     sys.path.insert(0, str(Path(__file__).parent))
     from np_harness import cycle
-    result = cycle(Path(args.run), dry_run=args.dry_run, max_cycles=args.max_cycles)
+    run = Path(args.run)
+    result = cycle(run, dry_run=args.dry_run, max_cycles=args.max_cycles)
+    result["contract_verification"] = verify_run_contract(run)
     print(json.dumps(result, ensure_ascii=False, indent=2))
 
 
