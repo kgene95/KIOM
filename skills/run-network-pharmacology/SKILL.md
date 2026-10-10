@@ -4,7 +4,17 @@ description: "Run reproducible, source-traceable network pharmacology for compou
 ---
 
 # Run network pharmacology
+
+- Mandatory low-cost operation: use the local 30-minute non-LLM watchdog, batch validated Python tasks, preserve original source evidence, require approval before historical reuse/recollection, and never infer unverified SEA job assignments. Read [execution-controller.md](references/execution-controller.md). ChatGPT status alerts are separately scheduled at 09:00 and 18:00 Asia/Seoul and may use model capacity.
+
+
+- When Remote Desktop Commander requests approval per call, prefer a validated local Python controller that batches deterministic stages into one remote terminal invocation, with persistent checkpoints, retries, QC gates and no permission bypass. See [execution-controller.md](references/execution-controller.md).
+
 ## Start here: lightweight start, model escalation, and execution handoff
+
+- Before any external submission, long-running retrieval, or final status report, read [execution-controller.md](references/execution-controller.md) and maintain a persistent execution state. Use its retry, email polling, dependency and completion gates.
+- Mandatory pre-submission gate: scan the authorized workspace for matching historical raw data, verify identity/provenance/integrity, notify the user and obtain explicit reuse-versus-recollection approval before using existing data or submitting replacement jobs. Follow [execution-controller.md](references/execution-controller.md); never overwrite historical raw files.
+
 
 - Start the workflow in ordinary Chat or a fast/lower-cost model unless the user has already chosen a stronger reasoning model. Early intake, file inventory, metadata checks, deterministic extraction, routine formatting, scripted calculations, and straightforward QC usually do not justify a model upgrade.
 - At the beginning of the run, tell the user once that the workflow can start in the current/lightweight model and that the Skill will explicitly recommend a stronger reasoning model when a listed scientific judgment checkpoint is reached. Do not repeatedly announce this during routine steps.
