@@ -87,3 +87,13 @@ Previously saved SEA job folders 41debffd05f4 and 47e4702598a2 exist, with their
 6. 로컬 검토 UI는 `scripts/np_local_dashboard.py` (127.0.0.1:8765)로 제공하며 외부 네트워크에 노출하지 않는다. `scripts/np_multi_run_monitor.py`는 `NP_Runs/runs/*`를 감시하고 30분 간격 Windows 작업 스케줄러로 실행할 수 있다. 기타 Windows/계정에서는 별도 설치가 필요하다.
 7. 자동 수집 구현 수준: 공식 완료 페이지가 확인된 PharmMapper의 이미 제출된 job 결과 HTML을 추가 보존할 수 있고, SEA는 *검증된* 결과 URL만 수집할 수 있다. 이 둘의 신규 작업 제출을 자동 완성하는 기능은 아직 연결되지 않았다. CAPTCHAs/계정 로그인·이메일 승인/지원되지 않는 API를 우회하지 않는다.
 8. Cytoscape 작업자 `np_cytoscape_worker.py`는 manifest에 명시된 검증된 입력 SHA와 브랜치가 준비된 경우에만 cyREST로 PPI/MCODE·degree 결과를 실행하며 미변경 입력은 재실행하지 않는다. 최종 브랜치는 세부 4의 선행 QC 확인을 요구한다.
+
+
+## 화합물 태그·직접 제출 원칙
+세부 1이 CID, isomeric SMILES, 구조파일 원본 SHA를 확인하면 세부 2용 `compound_tag`를 생성한다. 태그는 동일 분석 실행에 대해 결정적으로 생성되며, `NP-<CID>-<digest>` 형식이다. CID만 동일해도 구조 이성질체가 달라지면 구조 SHA를 반드시 다시 검증한다. SEA는 검증된 SMILES로, PharmMapper는 서버가 지원하는 SDF/MOL2로 **GPT 실행기 또는 승인된 브라우저 자동화**가 공식 웹 경로에서 직접 제출하도록 목표를 둔다. 이메일은 확인/결과 알림에 이용하고, 반드시 제출 요청을 별도 기록한다.
+
+서비스가 job metadata 필드에 태그를 직접 받지 않는다면 서버 결과에 태그가 들어 있다고 가장하지 않는다. 로컬 `submissions/<provider>_<compound_tag>.json`과 작업 ID, 입력 SHA, 제출 증거, 원본 SHA를 갖춘 sidecar로 결합한다. 원본은 수정하지 않는다. 세부 4는 이 대응 관계가 검증된 경우에만 compound-specific 분석에 사용한다.
+
+기존에 연구자가 직접 수령한 SEA·PharmMapper 자료는 검증 완료까지 `HISTORICAL_UNVERIFIED_ASSIGNMENT`로 격리한다. 구조 또는 제출 증거가 없으면 임의로 태그를 배정하지 않는다. 이미 분석된 같은 자료는 source/compound/parameter/input SHA 기준으로 건너뛰며, 부족한 결과는 사용자에게 보완 재수집 승인을 받는다.
+
+실제 외부 사이트 제출은 기능 미완성 상태이므로 새 작업을 제출했다고 보고하지 않는다. 실사용 웹 폼을 검증해 세부 2 제출·회수 루프가 성공해야 완료로 표시한다.
