@@ -23,6 +23,13 @@
       "network": false,
       "requires_approval": false
     },
+    "disease_target_collection": {
+      "module": "np_workers",
+      "function": "disease_target_collection",
+      "resource": "OpenTargets",
+      "network": true,
+      "requires_approval": false
+    },
     "structure_qc": {
       "module": "np_workers",
       "function": "structure_qc",

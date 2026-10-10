@@ -1,6 +1,7 @@
 __pycache__/
 *.py[cod]
 .pytest_cache/
+.runtime_deps/
 
 # 실행 결과와 비밀값은 GitHub에 올리지 않는다.
 **/runs/

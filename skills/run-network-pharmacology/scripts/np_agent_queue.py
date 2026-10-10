@@ -1,5 +1,5 @@
 from pathlib import Path
-import argparse,csv,hashlib,json,datetime,os,re,sys
+import argparse,csv,hashlib,json,datetime,os,re,sys,urllib.request
 def utc(): return datetime.datetime.now(datetime.timezone.utc).isoformat()
 def sha(p):
  h=hashlib.sha256()
@@ -79,9 +79,32 @@ def collect(root):
   if t["requires"] and t["status"]=="DONE" and any(next(x for x in q["tasks"] if x["id"]==dep)["status"]!="DONE" for dep in t["requires"]):t["status"]="QUEUED"
  q["updated_utc"]=utc();save(qpath,q)
  print(json.dumps({"run":str(root),"tasks":[{"id":t["id"],"status":t["status"]} for t in q["tasks"]]},ensure_ascii=False))
+def approve_new(run: Path):
+ request=load(run/"request.json",{})
+ if not request.get("run_id"):
+  raise ValueError("request.json 또는 run_id가 없습니다.")
+ approval={"run_id":request["run_id"],"user_approved":True,"new_submission_authorized":True,"reuse_existing":False,"recorded_utc":utc(),"scope":"새 입력·새 수집 경로의 로컬 준비; 외부 제출은 별도 provider gate"}
+ save(run/"initial_approval.json",approval)
+ return approval
+def resolve_identity(run: Path):
+ request=load(run/"request.json",{})
+ raw=str(request.get("compound_input", ""))
+ match=re.search(r"CID\s*([0-9]+)",raw,re.I)
+ if not match: raise ValueError("compound_input에 PubChem CID가 없습니다.")
+ cid=match.group(1); fields="Title,IUPACName,MolecularFormula,InChIKey,CanonicalSMILES,IsomericSMILES"
+ url=f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/{cid}/property/{fields}/JSON"
+ with urllib.request.urlopen(urllib.request.Request(url,headers={"User-Agent":"KIOM-NP-harness"}),timeout=30) as response:
+  rows=json.loads(response.read().decode("utf-8")).get("PropertyTable",{}).get("Properties",[])
+ if not rows: raise ValueError(f"PubChem CID {cid} 구조 정보를 찾지 못했습니다.")
+ row=rows[0]
+ request.update({"compound_cid":str(row.get("CID",cid)),"compound_title":row.get("Title") or row.get("IUPACName") or raw,"compound_iupac":row.get("IUPACName",""),"compound_formula":row.get("MolecularFormula",""),"compound_inchikey":row.get("InChIKey",""),"compound_smiles":row.get("SMILES") or row.get("IsomericSMILES") or row.get("CanonicalSMILES") or row.get("ConnectivitySMILES", ""),"identity_source":"PubChem PUG REST","identity_confirmed_utc":utc()})
+ save(run/"request.json",request)
+ return {"run_id":request.get("run_id"),"cid":request["compound_cid"],"title":request["compound_title"],"inchikey":request["compound_inchikey"]}
 def main():
- a=argparse.ArgumentParser();a.add_argument("--workspace",required=True);a.add_argument("--new",action="store_true");a.add_argument("--compound",default="");a.add_argument("--disease",default="");a.add_argument("--species",default="Homo sapiens");a.add_argument("--run",default="")
+ a=argparse.ArgumentParser();a.add_argument("--workspace",required=True);a.add_argument("--new",action="store_true");a.add_argument("--approve-new",action="store_true");a.add_argument("--resolve-identity",action="store_true");a.add_argument("--compound",default="");a.add_argument("--disease",default="");a.add_argument("--species",default="Homo sapiens");a.add_argument("--run",default="")
  x=a.parse_args();root=Path(x.workspace)
  if x.new:initialize(root,x.compound,x.disease,x.species)
+ elif x.approve_new: print(json.dumps(approve_new(Path(x.run)),ensure_ascii=False))
+ elif x.resolve_identity: print(json.dumps(resolve_identity(Path(x.run)),ensure_ascii=False))
  else:collect(Path(x.run) if x.run else root)
 if __name__=="__main__":main()

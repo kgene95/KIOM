@@ -61,6 +61,30 @@ def structure_qc(run: Path) -> dict[str, Any]:
     return _write(run, "structure_qc", "DONE", outputs=[str(structure)])
 
 
+def disease_target_collection(run: Path) -> dict[str, Any]:
+    """Open Targets 질환 표적 branch를 수집하고 입력 hash 전 단계 manifest를 남긴다."""
+    existing = _load(run, "disease_target_manifest.json", {}) or {}
+    if existing.get("verified") is True and existing.get("file") and Path(existing["file"]).is_file():
+        return _write(run, "disease_target_collection", "DONE", outputs=[existing["file"]])
+    request = _load(run, "request.json", {}) or {}
+    disease = request.get("disease_input")
+    species = request.get("species")
+    if not disease or species != "Homo sapiens":
+        return _write(run, "disease_target_collection", "WAITING_USER", next_action="질환명과 Homo sapiens 입력 확인")
+    try:
+        from providers import opentargets_disease_targets
+        rows, metadata = opentargets_disease_targets(disease)
+    except Exception as exc:
+        return _write(run, "disease_target_collection", "FAILED_RETRYABLE", next_action="Open Targets 조회를 bounded retry", reason=str(exc)[:220])
+    output = run / "source_archive" / "OpenTargets" / "disease_targets.json"
+    save_json_atomic(output, {"rows": rows, "metadata": metadata, "retrieved_utc": now_utc()})
+    manifest = {"verified": True, "ontology_id": metadata.get("disease_id"), "file": str(output),
+                "rows": len(rows), "species": species, "source": "Open Targets Platform GraphQL",
+                "retrieved_utc": now_utc()}
+    save_json_atomic(run / "disease_target_manifest.json", manifest)
+    return _write(run, "disease_target_collection", "DONE", outputs=["disease_target_manifest.json", str(output.relative_to(run))])
+
+
 def source_audit(run: Path) -> dict[str, Any]:
     choice = _load(run, "source_choice.json", {}) or {}
     if choice.get("decision") not in {"REUSE_VERIFIED", "RECOLLECT_NEW"} or choice.get("user_approved") is not True:
