@@ -5,6 +5,8 @@ description: "Run reproducible, source-traceable network pharmacology for compou
 
 # Run network pharmacology
 
+- **화합물별 작업 태그 필수:** Agent 1은 검증된 CID/SMILES/원본 3D 구조 SHA-256으로 `np_compound_tagging.py`를 사용해 재현 가능한 compound_tag를 제출 전에 생성한다. Agent 2는 SEA·PharmMapper에서 제출 작업 ID와 compound_tag·구조 SHA를 함께 기록하고 결과 원본에 별도 JSON sidecar로 연결하며, 매핑을 검증하지 못한 오래된 자료는 UNVERIFIED로 유지한다. 사용자가 직접 과거에 확보한 자료도 동일하게 검증한다. 서비스가 직접 태그 입력을 허용하지 않으면 로컬 job ledger로 연결한다.
+
 - **최우선 기존 자료 검증:** 화합물·질환·생물종 접수 직후 원본/메타데이터 검사 → 사용자 [반영 및 재분석] 또는 [부족한 자료 보완/새로 분석/제외] 선택 → 승인된 차등 실행. 입력 SHA 동일 시 재실행 금지. 신규 프로젝트 감시는 [np_multi_run_monitor.py](scripts/np_multi_run_monitor.py), 검토 화면은 [np_local_dashboard.py](scripts/np_local_dashboard.py), Cytoscape는 [np_cytoscape_worker.py](scripts/np_cytoscape_worker.py)로 처리. 실제 SEA·PharmMapper 신규 제출 자동화는 검증되기 전 완료로 주장하지 않는다.
 
 - **한국어 출력 필수:** 사용자 질문에 대한 답변, 진행상황, 질문, 승인 요청, 오류·완료 안내는 입력 언어와 무관하게 모두 한국어로 작성한다. 공식 DB/식별자 및 파일명만 원어 허용. 모든 총괄 및 세부 1~5 에이전트에 적용한다.
