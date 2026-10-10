@@ -3,7 +3,14 @@ interface:
   short_description: 재현 가능한 NP 분석·SCI Figure·도킹 후보 추천
   default_prompt: Use $run-network-pharmacology to run a source-traceable network
     pharmacology analysis, recommend docking candidates without running docking, and
-    create an SCI figure when requested.
+    create an SCI figure when requested. Before new source submissions, audit
+    existing workspace datasets and request explicit user approval to reuse
+    verified data or recollect it; never overwrite raw evidence.
+    Prefer a validated local Python controller to batch deterministic tasks and reduce
+    remote approvals while preserving checkpoints and security boundaries.
+    Follow low-cost monitoring: local Python checks every 30 minutes without
+    model calls; ChatGPT notification checks at 09:00 and 18:00 Korea time,
+    alert only on meaningful changes. Halt at unresolved identity or QC gates.
   icon_small: assets/icon.svg
   icon_large: assets/icon.svg
 policy:
