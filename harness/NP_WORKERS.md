@@ -38,7 +38,7 @@ Agent는 책임 영역을 조정하고, worker는 한 가지 검증 가능한 �
 이전 실행에서 제출·대기·다운로드가 완료된 사실은 새 run의 자동 완료 근거가 아니다. 새 run은 기존 자료 재사용 승인 없이는 과거 결과를 사용하지 않는다.
 
 - SEA: SMILES 입력 후 CAPTCHA가 표시되면 `CAPTCHA_CONFIRMATION_REQUIRED`; 행동 직전 확인 후 Agent 2가 사람 확인·제출·job ID 확인을 재개한다.
-- PharmMapper: 이메일은 현재 세션에서만 사용하고 파일·로그·manifest에 저장하지 않는다. 응답에 공식 job ID가 없으면 `SUBMITTED_RESPONSE_REVIEW_REQUIRED`로 중지한다.
+- PharmMapper: 이메일은 현재 세션에서만 사용하고 파일·로그·manifest에 저장하지 않는다. 응답에 공식 job ID가 없거나 공식 완료 메일이 없으면 `SUBMISSION_NOT_CONFIRMED`로 중지한다. 이 상태에서 자동 재전송하지 않는다.
 - 두 provider 모두 raw 결과와 SHA-256, CID/구조 identity 검증 전에는 `DONE`이나 downstream unblock을 선언하지 않는다.
 
 제출 책임은 Agent 2와 총괄 Controller에 있다. 정상적인 입력·CAPTCHA 확인·제출·작업 ID 확인·결과 회수는 에이전트가 직접 수행하며 사용자는 진행 중 매 단계마다 클릭하거나 명령을 입력하지 않는다. CAPTCHA 클릭 직전에는 `CAPTCHA_CONFIRMATION_REQUIRED`를 기록하고 행동 확인을 받은 뒤 즉시 같은 worker를 재개한다.
@@ -68,3 +68,15 @@ Agent는 책임 영역을 조정하고, worker는 한 가지 검증 가능한 �
 3. 모든 worker는 run 폴더, task ID, 입력 hash를 받는다.
 4. worker는 출력 manifest를 만들고, 최종 `DONE`은 verifier가 선언한다.
 5. 오류는 `WAITING_USER`, `WAITING_EXTERNAL`, `CORRECT_AND_RERUN`, `BUDGET_STOP` 중 하나로 기록한다.
+
+### 제출 실패 시 사용자 안내
+
+제출 실패가 발생하면 총괄은 사용자에게 같은 질문을 반복하지 않고 한 번에 다음 정보를 제공한다.
+
+- 공식 제출 사이트 주소
+- 화합물별 입력 파일의 절대 폴더 주소와 파일명
+- 복사·붙여넣기 가능한 job description
+- 사이트에서 수행할 단계(파일 선택, 이메일 입력, 설정, Submit)
+- 실패 시 캡처할 화면과 확인할 오류(job ID, 메일, 비활성화 버튼, CAPTCHA)
+
+사용자가 제출한 뒤 job ID를 전달하면 worker는 ID·provider·compound identity를 대조하고 ledger를 갱신한다. ID가 없으면 이전 ID나 historical evidence를 현재 run에 연결하지 않는다.

@@ -41,7 +41,7 @@
 1. 과거 job ID·결과 파일·SHA-256은 참고 후보로만 감사한다.
 2. 현재 run에는 새로운 제출 job ID와 새로운 raw archive가 있어야 한다.
 3. SEA가 CAPTCHA(현재 Altcha 포함)를 요구하면 제출 worker는 `CAPTCHA_CONFIRMATION_REQUIRED`를 기록하고, 행동 직전 확인 후 Agent 2가 브라우저에서 사람 확인을 수행한 뒤 재개한다.
-4. PharmMapper 응답에서 공식 작업 ID를 추출하지 못하면 `SUBMITTED_RESPONSE_REVIEW_REQUIRED`로 기록하며 성공·완료로 처리하지 않는다.
+4. PharmMapper 응답에서 공식 작업 ID를 추출하지 못하면 `SUBMISSION_NOT_CONFIRMED`로 기록하며 성공·완료로 처리하지 않는다. 공식 페이지의 JavaScript 오류, 비활성화된 Submit 버튼, 빈 응답, 접수 메일 부재가 있으면 같은 요청을 반복 전송하지 않는다.
 5. 공식 job ID, 결과 원본, SHA-256, 화합물 identity 검증이 모두 끝난 뒤에만 downstream 분석을 unblock한다.
 
 ### 외부 제출 책임
@@ -49,3 +49,14 @@
 SEA·PharmMapper 제출은 사용자가 매번 수동으로 수행하는 단계가 아니라 Controller/Agent 2가 맡는 실행 작업이다. 총괄은 검증된 구조와 승인 정보를 사용해 공식 제출 화면을 열고, 입력·CAPTCHA 확인·제출·작업 ID 기록·결과 회수까지 직접 수행한 뒤 다음 작업으로 연결한다. 사용자는 정상 실행 중간에 반복해서 개입하지 않는다. CAPTCHA 클릭처럼 외부 서비스에 직접 영향을 주는 순간에는 해당 행동 직전에만 확인을 받고, 확인 뒤 같은 실행 흐름에서 즉시 재개한다. 이를 일반 대기나 사용자 수행 작업으로 분류하지 않는다.
 
 같은 `SUBMITTED_RESPONSE_REVIEW_REQUIRED` 또는 `WAITING_USER` 상태를 반복 보고하거나 재제출하지 않는다. `run_id`, provider, 상태, next action의 fingerprint와 `action_notice_id`를 기록하고, 상태가 바뀌거나 사용자가 조치할 때만 새 보고를 만든다.
+
+### 제출 실패 재개 절차
+
+제출 실패는 다음 순서로 처리한다.
+
+1. 공식 브라우저 화면, HTTP/브라우저 콘솔 오류, 응답 본문, job ID 표시 여부를 보존한다.
+2. Gmail에서 해당 provider와 제출 시각에 일치하는 메일을 확인한다. 메일 본문과 주소는 저장하지 않고 job ID와 공식 결과 링크 metadata만 기록한다.
+3. job ID 또는 접수 메일이 없으면 상태를 `SUBMISSION_NOT_CONFIRMED`로 바꾸고, 재전송하지 않는다.
+4. 사용자가 직접 제출해야 하는 경우에는 공식 제출 URL과 복사 가능한 입력 파일 폴더 주소를 제공한다. 사용자는 파일 선택·필수 입력·CAPTCHA만 수행한다.
+5. 공식 job ID가 확인되면 `record_external_job` 경로로 ledger와 progress를 갱신하고 결과 회수 worker를 재개한다.
+6. 같은 오류가 재현되면 `CORRECT_AND_RERUN`으로 기록하고, 원인 수정·재현 테스트·통과 확인 후에만 다음 제출을 시도한다.
