@@ -27,7 +27,7 @@ Worker는 하나의 명확한 책임만 수행한다. 실행 전 입력 SHA와 �
 
 ## 실패
 
-일시 오류는 bounded retry, 입력/QC 오류는 `CORRECT_AND_RERUN`, 인증·CAPTCHA·사용자 승인 부족은 `WAITING_USER`, provider 지연은 `WAITING_EXTERNAL`로 반환한다. 오류 메시지와 재개 조건을 잃지 않는다.
+일시 오류는 bounded retry, 입력/QC 오류는 `CORRECT_AND_RERUN`, CAPTCHA는 `CAPTCHA_CONFIRMATION_REQUIRED`, 인증·사용자 승인 부족은 `WAITING_USER`, provider 지연은 `WAITING_EXTERNAL`로 반환한다. 오류 메시지와 재개 조건을 잃지 않는다.
 
 ## 병렬성
 

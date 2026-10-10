@@ -66,7 +66,7 @@ Audit authorized workspace for pre-existing SEA/PharmMapper and other outputs. S
 
 ## Fault and resource policy
 - Local Python scheduler polls pending work every 30 minutes without LLM calls, respecting providers' terms/rate limits; ChatGPT checks at 09:00 and 18:00 Korea time only for meaningful changes.
-- Retry transient network errors up to 3 times with bounded backoff, record alternative routes; auth/CAPTCHA/user reuse approval stops at NEEDS_USER.
+- Retry transient network errors up to 3 times with bounded backoff, record alternative routes; CAPTCHA uses `CAPTCHA_CONFIRMATION_REQUIRED` and is performed by Agent 2 after action-time confirmation; auth/user reuse approval uses `NEEDS_USER`.
 - Use one reviewed Python controller invocation for multiple deterministic subtasks and durable atomic checkpoints. Do not try to bypass tool permission requests.
 - Do not send raw research materials to a third-party email address without explicit authorization. Institutional privacy policies and terms of the destination service still apply.
 - Gmail recipient and OAuth credentials stay runtime-private. `email_notification_status` can be logged, not addresses/message bodies.

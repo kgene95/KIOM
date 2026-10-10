@@ -40,7 +40,7 @@
 
 1. 과거 job ID·결과 파일·SHA-256은 참고 후보로만 감사한다.
 2. 현재 run에는 새로운 제출 job ID와 새로운 raw archive가 있어야 한다.
-3. SEA가 CAPTCHA(현재 Altcha 포함)를 요구하면 제출 worker는 `WAITING_USER`로 전환하고, 사용자가 브라우저에서 사람 확인을 완료한 뒤 재개한다.
+3. SEA가 CAPTCHA(현재 Altcha 포함)를 요구하면 제출 worker는 `CAPTCHA_CONFIRMATION_REQUIRED`를 기록하고, 행동 직전 확인 후 Agent 2가 브라우저에서 사람 확인을 수행한 뒤 재개한다.
 4. PharmMapper 응답에서 공식 작업 ID를 추출하지 못하면 `SUBMITTED_RESPONSE_REVIEW_REQUIRED`로 기록하며 성공·완료로 처리하지 않는다.
 5. 공식 job ID, 결과 원본, SHA-256, 화합물 identity 검증이 모두 끝난 뒤에만 downstream 분석을 unblock한다.
 

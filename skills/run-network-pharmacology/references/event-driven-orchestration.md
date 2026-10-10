@@ -17,6 +17,6 @@
 
 - Gmail 감시는 실제 설치·확인된 heartbeat/connector에서만 수행한다. 상태가 변하지 않으면 사용자에게 통지하지 않는다.
 - 네트워크·일시 서비스 오류는 최대 3회 제한 재시도하고, 그 뒤 두 가지 문서화된 대안을 시도한다.
-- CAPTCHA, 로그인, 이용약관 동의, 사용자가 제공해야 하는 이메일 같은 외부 행동만 `WAITING_USER`로 둔다.
+- CAPTCHA는 `CAPTCHA_CONFIRMATION_REQUIRED`로 기록하고 Agent 2가 행동 직전 확인 후 직접 수행한다. 로그인, 이용약관 동의, 사용자가 제공해야 하는 이메일처럼 별도 정보·권한이 필요한 행동만 `WAITING_USER`로 둔다.
 - 보조 자료(예: PharmMapper) 지연은 이미 검증된 primary 입력의 STRING/PPI 진행을 막지 않는다. 단, 보조 자료 부재를 결과와 Methods에 명시한다.
 - 총괄은 각 이벤트 때 `work_queue.json`, `execution_state.json`, `job_ledger.json`을 함께 갱신한다. 단순 상태 점검만 하고 실행 가능한 후속 작업을 남겨 두지 않는다.
