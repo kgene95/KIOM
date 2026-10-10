@@ -77,3 +77,13 @@ Audit authorized workspace for pre-existing SEA/PharmMapper and other outputs. S
 
 ## Current project note
 Previously saved SEA job folders 41debffd05f4 and 47e4702598a2 exist, with their compound assignment unverified. They are historically archived and must not be classified as verified inputs. A fresh submission can solve this, provided input compound identity and provider route are recorded. This historical example is not a universal input template.
+
+## 기존 데이터 우선 운영 원칙 (2026-10-10 추가)
+1. 새 분석의 화합물명/CID, 질환명, 생물종을 등록하면 원본 자료를 새로 수집하기 전에 모든 접근 가능한 연구 작업 폴더의 기존 파일 및 메타데이터를 탐색한다.
+2. SEA, PharmMapper, SwissTargetPrediction, 질환 유전자, STRING, GO/KEGG, Cytoscape 등 **소스와 분석 결과 유형별**로 원본·제출 CID/SMILES/InChIKey·생물종·분석 파라미터·작업 ID·버전·수집 일자·SHA256을 대조한다.
+3. 파일명에 화합물명이 포함되어 있다는 사실만으로 재사용을 허용하지 않는다. 검증이 끝난 자료에만 [검증된 자료 반영 및 재분석] 선택을 허용한다. 원본을 수정하지 않으며 해당 입력 해시가 같다면 같은 네트워크를 다시 계산하지 않는다.
+4. 분석 누락·불완전 자료에는 [부족한 부분 보완], [새로 분석], [제외]와 검증 이유를 묻는 별도 승인 대화창을 표시한다. 사용자 승인 없는 새 제출과 불필요한 중복 분석을 금지한다.
+5. 승인·원본 SHA·적용 브랜치·추가된 파일·결과 영향 범위를 기록한다. 새 자료가 기존 입력을 변경하면 세부 4가 확인 후 세부 3의 영향을 받은 결과만 무효화/재실행하고, 독립 QC 이전에는 논문용 최종이라고 표시하지 않는다.
+6. 로컬 검토 UI는 `scripts/np_local_dashboard.py` (127.0.0.1:8765)로 제공하며 외부 네트워크에 노출하지 않는다. `scripts/np_multi_run_monitor.py`는 `NP_Runs/runs/*`를 감시하고 30분 간격 Windows 작업 스케줄러로 실행할 수 있다. 기타 Windows/계정에서는 별도 설치가 필요하다.
+7. 자동 수집 구현 수준: 공식 완료 페이지가 확인된 PharmMapper의 이미 제출된 job 결과 HTML을 추가 보존할 수 있고, SEA는 *검증된* 결과 URL만 수집할 수 있다. 이 둘의 신규 작업 제출을 자동 완성하는 기능은 아직 연결되지 않았다. CAPTCHAs/계정 로그인·이메일 승인/지원되지 않는 API를 우회하지 않는다.
+8. Cytoscape 작업자 `np_cytoscape_worker.py`는 manifest에 명시된 검증된 입력 SHA와 브랜치가 준비된 경우에만 cyREST로 PPI/MCODE·degree 결과를 실행하며 미변경 입력은 재실행하지 않는다. 최종 브랜치는 세부 4의 선행 QC 확인을 요구한다.
