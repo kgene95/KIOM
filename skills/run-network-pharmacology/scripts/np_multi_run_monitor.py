@@ -1,5 +1,5 @@
 from pathlib import Path
-import argparse,datetime,hashlib,json,os,csv,re,urllib.request,urllib.error,time
+import argparse,datetime,hashlib,json,os,csv,re,urllib.request,urllib.error,time,zipfile
 from urllib.parse import urlparse
 ROOT=Path(r"D:\GPT-CODECX\KIOM_NP_Projects")
 def now():return datetime.datetime.now(datetime.timezone.utc).isoformat()
@@ -133,13 +133,26 @@ def poll_sea(run):
   try:
    res=urllib.request.urlopen(urllib.request.Request(url,headers={"User-Agent":"Mozilla/5.0"}),timeout=15)
    data=res.read(4_000_000)
-   if len(data)<100 or b"Uniprot" not in data and b"Target_Chembl_ID" not in data:
-    summary.append({"job_id":row.get("job_id"),"state":"PENDING_OR_UNKNOWN_FORMAT"});continue
+   jid=str(row.get("job_id",""))
+   # Current SEA returns an HTML status page first. Only download after its
+   # explicit 100% completion marker is present.
+   html=data.decode("utf-8","replace")
+   completed=("Task completed successfully" in html and "100 %" in html)
+   if not completed:
+    summary.append({"job_id":jid,"state":"PENDING"});continue
+   download_url=f"https://sea.bkslab.org/api/download?taskId={jid}"
+   zres=urllib.request.urlopen(urllib.request.Request(download_url,headers={"User-Agent":"Mozilla/5.0"}),timeout=30)
+   zdata=zres.read(50_000_000)
+   if not zdata.startswith(b"PK"):
+    summary.append({"job_id":jid,"state":"DOWNLOAD_FORMAT_ERROR"});continue
    path=Path(run)/"source_archive"/"SEA";path.mkdir(parents=True,exist_ok=True)
-   target=path/(str(row["job_id"])+"_"+hashlib.sha256(data).hexdigest()[:12]+".tsv")
-   if not target.exists():target.write_bytes(data)
-   row.update({"status":"RETRIEVED_UNVERIFIED","raw_file":str(target),"sha256":digest(target)})
-   summary.append({"job_id":row.get("job_id"),"state":"RETRIEVED_UNVERIFIED"})
+   target=path/("SEA_"+jid+"_"+hashlib.sha256(zdata).hexdigest()[:12]+".zip")
+   if not target.exists():target.write_bytes(zdata)
+   extract_dir=path/("SEA_"+jid)
+   extract_dir.mkdir(parents=True,exist_ok=True)
+   with zipfile.ZipFile(target) as archive: archive.extractall(extract_dir)
+   row.update({"status":"RETRIEVED_UNVERIFIED","raw_file":str(target),"sha256":digest(target),"extracted_dir":str(extract_dir),"download_url":download_url,"retrieved_at_utc":now()})
+   summary.append({"job_id":jid,"state":"RETRIEVED_UNVERIFIED","raw_file":str(target)})
   except Exception as e:summary.append({"job_id":row.get("job_id"),"state":"NETWORK_ERROR","detail":str(e)[:130]})
  save(Path(run)/"job_ledger.json",ledger)
  return summary
