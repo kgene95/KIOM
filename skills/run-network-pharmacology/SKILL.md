@@ -5,6 +5,8 @@ description: "Run reproducible, source-traceable network pharmacology for compou
 
 # Run network pharmacology
 
+- **최우선 기존 자료 검증:** 화합물·질환·생물종 접수 직후 원본/메타데이터 검사 → 사용자 [반영 및 재분석] 또는 [부족한 자료 보완/새로 분석/제외] 선택 → 승인된 차등 실행. 입력 SHA 동일 시 재실행 금지. 신규 프로젝트 감시는 [np_multi_run_monitor.py](scripts/np_multi_run_monitor.py), 검토 화면은 [np_local_dashboard.py](scripts/np_local_dashboard.py), Cytoscape는 [np_cytoscape_worker.py](scripts/np_cytoscape_worker.py)로 처리. 실제 SEA·PharmMapper 신규 제출 자동화는 검증되기 전 완료로 주장하지 않는다.
+
 - **한국어 출력 필수:** 사용자 질문에 대한 답변, 진행상황, 질문, 승인 요청, 오류·완료 안내는 입력 언어와 무관하게 모두 한국어로 작성한다. 공식 DB/식별자 및 파일명만 원어 허용. 모든 총괄 및 세부 1~5 에이전트에 적용한다.
 - **역할 구조:** 총괄 0, NP/구조 1, SEA·PharmMapper 2, STRING·Cytoscape·GO/KEGG 3, 독립 QC/재실행 4, 실험 Methods/Results 원고 근거 검토 5. 3번은 검증된 선행 데이터가 생기는 즉시 예비 분석을 시작하고 새 데이터가 오면 4번이 영향 평가 후 재실행시킨다. [multi-agent-orchestration.md](references/multi-agent-orchestration.md)와 [np_agent_queue.py](scripts/np_agent_queue.py)를 사용한다.
 
