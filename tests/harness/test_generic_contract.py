@@ -29,6 +29,12 @@ class GenericContractTests(unittest.TestCase):
         self.assertIn("workflow와 worktree는 같은 의미가 아니다", workflow)
         self.assertIn("workflow와 worktree를 같은 개념으로 취급하지 않는다", worktree)
 
+    def test_np_worker_roles_are_declared_without_false_implementation(self):
+        registry = json.loads((ROOT / "harness/worker_registry.json").read_text(encoding="utf-8"))
+        self.assertIn("agent2", registry["roles"])
+        self.assertIn("sea_submit", registry["planned_workers"])
+        self.assertEqual(registry["planned_workers"]["sea_submit"]["status"], "planned")
+
 
 if __name__ == "__main__":
     unittest.main()

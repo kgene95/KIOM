@@ -16,5 +16,31 @@
       "network": true,
       "requires_approval": true
     }
+  },
+  "roles": {
+    "agent1": {"label": "입력·구조·자료 준비", "tasks": ["compound_identity", "disease_target_collection", "structure_qc", "source_audit"]},
+    "agent2": {"label": "SEA·PharmMapper·Gmail provider", "tasks": ["sea_submit", "pharmmapper_submit", "sea_collect", "pharmmapper_collect", "gmail_job_monitor"]},
+    "agent3": {"label": "정규화·PPI·enrichment·통합", "tasks": ["normalize_targets", "overlap_analysis", "ppi_analysis", "enrichment_analysis", "integration_analysis"]},
+    "agent4": {"label": "독립 QC", "tasks": ["independent_qc"]},
+    "agent5": {"label": "원고·결과 검토", "tasks": ["manuscript_review", "completion_packager"]}
+  },
+  "planned_workers": {
+    "compound_identity": {"owner": "agent1", "status": "planned"},
+    "disease_target_collection": {"owner": "agent1", "status": "planned"},
+    "structure_qc": {"owner": "agent1", "status": "planned"},
+    "source_audit": {"owner": "agent1", "status": "planned"},
+    "sea_submit": {"owner": "agent2", "status": "planned", "requires_approval": true},
+    "pharmmapper_submit": {"owner": "agent2", "status": "planned", "requires_approval": true},
+    "sea_collect": {"owner": "agent2", "status": "planned"},
+    "pharmmapper_collect": {"owner": "agent2", "status": "planned"},
+    "gmail_job_monitor": {"owner": "agent2", "status": "planned"},
+    "normalize_targets": {"owner": "agent3", "status": "planned"},
+    "overlap_analysis": {"owner": "agent3", "status": "planned"},
+    "ppi_analysis": {"owner": "agent3", "status": "planned"},
+    "enrichment_analysis": {"owner": "agent3", "status": "planned"},
+    "integration_analysis": {"owner": "agent3", "status": "planned"},
+    "independent_qc": {"owner": "agent4", "status": "planned"},
+    "manuscript_review": {"owner": "agent5", "status": "planned"},
+    "completion_packager": {"owner": "agent5", "status": "planned"}
   }
 }

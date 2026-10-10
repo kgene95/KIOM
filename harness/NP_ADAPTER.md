@@ -4,6 +4,10 @@
 
 이 문서는 범용 하네스를 현재 Network Pharmacology workflow에 연결하는 adapter 계약이다. NP의 과학 규칙은 `skills/run-network-pharmacology/`에 남기고, 이 파일은 task mapping·artifact contract·외부 provider event만 정의한다.
 
+영역별 worker와 구현 상태는 [NP_WORKERS.md](NP_WORKERS.md)와
+[worker_registry.json](worker_registry.json)을 기준으로 한다. 계획된 worker는
+모듈 연결과 contract test가 통과하기 전까지 dispatcher가 실행하지 않는다.
+
 ## 작업 매핑
 
 | 범용 단계 | NP 작업 |
