@@ -16,10 +16,15 @@ interface:
     Always scan existing source evidence before new analyses; request approval
     to reflect verified data or perform only necessary supplementation. Use the
     local dashboard, multi-run monitor, and Cytoscape worker when supported.
-    Never claim SEA or PharmMapper new-job submission is automated until tested.
+    SEA와 PharmMapper 신규 제출은 최초 승인 뒤 Agent 2의 검증된 직접 실행 책임이다: SEA는 공식 브라우저 자동화(SMILES·Altcha 확인·Submit), PharmMapper는 대시보드 세션 이메일과 검증 구조파일로 공식 양식을 실행한다. 사용자를 공급자 입력 화면으로 반복해서 되돌려 보내지 않는다. task/job ID·URL·입력 SHA·응답 SHA를 기록하고 일시 오류만 최대 3회 재시도하며 이메일 주소는 저장하지 않는다.
     Tag every compound with a CID and structure SHA before SEA/PharmMapper jobs.
     Record official job ID and immutable raw result provenance; do not assume a
     previously saved result belongs to a compound without submission evidence.
+    Follow references/public-disease-source-audit.md for public disease sources.
+    Check every source ledger; distinguish raw retrieval, UC extraction, ID QC,
+    and integration. HTTP 200 HTML is not a dataset. Use file-native releases.
+    Do not infer past attempts or publication readiness from other sources.
+    At project intake, record a credential-free initial_access_approval for public sources, interactive sources, PharmMapper email registration, and job-ID-scoped Gmail completion checks. The local dashboard must offer a PharmMapper email field that holds the address only in the active browser/server session; manifests and logs may record only whether an email was provided. See references/initial-access-approval.md.
   icon_small: assets/icon.svg
   icon_large: assets/icon.svg
 policy:

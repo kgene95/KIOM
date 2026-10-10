@@ -6,20 +6,20 @@
 ## 실제 역할 구성
 - 총괄 에이전트 0: 화합물명/CID(여러 개 가능), 질환명, 생물종(Homo sapiens 기본값), 기존 자료 재사용 승인 접수. 작업 큐, 재시도, 비용, 알림과 의존성 관리. 별도 Python 실행기에서 상태 유지.
 - 세부 에이전트 1, NP 자료·화학구조 담당: CID/SMILES/InChIKey/3D SDF·MOL2 구조 QC, 질환 유전자·화합물 표적 수집, 기존 데이터 탐색 및 비-SEA/PharmMapper 분석. 유효한 구조가 나오자마자 2번에 인계.
-- 세부 에이전트 2, SEA·PharmMapper 전담: 1번의 구조 인계 파일을 검증하고 기존 데이터 승인 상태를 확인한 후 서비스에서 지원하는 공식 경로로 제출, job ID/입력 SHA 저장, 결과 상태 조회·원본 수집·검증. 이메일은 서비스의 알림 또는 확인 용도로만 사용한다. 자동 제출 지원 여부는 서비스별로 실제 검증해야 하며 미검증이면 NEEDS_EXTERNAL_SUBMISSION으로 대기.
+- 세부 에이전트 2, SEA·PharmMapper 전담: 구조 인계 파일·기존 자료 승인 상태를 검증한 뒤 즉시 공식 경로로 제출하고 job ID·입력 SHA·결과 URL을 저장한다. SEA는 SMILES를 공식 양식에 채우고 Altcha 확인 및 Submit을 브라우저 자동화로 실행한다. PharmMapper는 사용자가 대시보드에 한 번 입력한 세션 이메일과 SDF/MOL2를 공식 양식으로 자동 제출한다. 이메일은 전송에만 쓰고 저장하지 않는다. 정상 제출 경로가 확인된 서비스는 NEEDS_EXTERNAL_SUBMISSION으로 되돌리지 않으며, 실제 응답·job ID가 없을 때만 최대 3회 재시도 후 상태를 남긴다.
 - 세부 에이전트 3, STRING·Cytoscape·네트워크/경로 분석: 1·2번이 진행 중이어도 검증된 독립 자료가 도착하면 예비 브랜치에서 즉시 시작. PPI, degree, cytoHubba(지원되는 공식 경로 또는 GUI), MCODE, GO BP/CC/MF, KEGG, Reactome, g:Profiler. 최종 네트워크는 모든 필수 표적과 mapping QC 후 별도 확정. 예비 자료와 확정 결과를 섞지 않음.
 - 세부 에이전트 4, 독립 QC·차등 재실행: 모든 새 데이터 도착 이벤트마다 화합물-작업 매핑, UniProt/HGNC/종, 원본 SHA, UC 질환 배경, STRING 매핑, PPI/경로 결과를 검토. 새 입력이 기존 결과를 바꾸는 경우 3번 작업을 invalidated로 표시하고 재실행 의뢰. PASS·REVISE·BLOCKED를 기록. 독립 QC 이전에 완결 선언 금지.
 - 세부 에이전트 5, 논문용 Methods·Results 근거 검토: 실험 원고, 동물·세포 데이터 및 NP 분석 결과가 들어오면 바로 문헌·원고 자료 목록과 문장 근거를 검토할 수 있음. 최종 통계·기전 결론 및 논문용 Figure legend는 4번의 PASS 후 확정. 실제 NP Methods/Results 초안 본문 작성은 기존 NP 스킬의 사용자 승인 조건을 지킨다.
 
 ## 작업 큐와 인계 구현
-`scripts/np_agent_queue.py`는 RUN_ID 기반 작업 큐를 생성하고 단일 실행으로 상태를 확인한다. `--new --compound <CID/name> --disease <name> --species <organism>`으로 새 분석을 만들고, `--run <run folder>`로 인계·결과 상태를 갱신한다. 모든 실행에는 `request.json`, `work_queue.json`, `execution_state.json` 사용.
+`scripts/np_agent_queue.py`는 RUN_ID 기반 작업 큐를 생성하고 단일 실행으로 상태를 확인한다. `--new --compound <CID/name> --disease <name> --species <organism>`으로 새 분석을 만들고, `--run <run folder>`로 인계·결과 상태를 갱신한다. 모든 실행에는 `request.json`, `work_queue.json`, `execution_state.json` 사용. 총괄은 새 구조·원본·QC·Gmail 결과 이벤트마다 의존 세부 작업을 즉시 실행하거나 정확한 재개 조건을 남긴다. 역할 표시는 실행을 대신하지 않는다. [event-driven-orchestration.md](event-driven-orchestration.md)의 이벤트 표를 따른다.
 1번은 `structure_manifest.json`에 CID, SMILES, structure_qc=PASS, 필요 시 structure_file 및 structure_sha256 입력. 실행기가 구조 검증 후 `handoff_to_agent2.json` 생성.
 2번은 `job_ledger.json`에 명시된 CID, 구조 SHA 및 작업 ID가 맞아야 제출 완료로 처리된다. `sea_result_manifest.json`과 `pharmmapper_result_manifest.json`에 각 job_id, CID, raw_file, SHA, verified=true가 모두 일치할 때만 수집 완료.
 3번은 질환 표적 데이터와 검증된 PPI 입력이 존재할 때 예비 분석 가능. 4번이 PASS 하지 않으면 최종 완결 금지.
 승인 및 검증 조건을 만족하지 않는 서비스 제출, 원고 최종화, 결과 병합은 자동 실행하지 않음.
 
-## 아직 연결되지 않은 서비스
-현재 실행기는 작업 생성/의존성/핸드오프 검증이며 SEA·PharmMapper 사이트의 실사용 자동 제출 API 또는 브라우저 자동화와 결합되지 않았다. 공식 제출·결과 API를 확인하고 CAPTCHA/로그인이 필요한 경우 사용자 개입이 필요하다. 로컬 감시기는 고정된 이전 UC 프로젝트 전용이므로 신규 RUN_ID의 감시를 위해 run registry 확장이 추가로 필요하다. ChatGPT 기반 세부 에이전트가 24시간 독립 실행된다고 주장하면 안 된다.
+## 검증된 제출 경로
+SEA와 PharmMapper는 작업 생성·의존성 검증 뒤 실제 공식 제출 경로까지 연결한다. SEA는 SMILES 입력 → Altcha 일반 확인 → Submit → task ID/결과 URL 기록 순서다. PharmMapper는 대시보드 세션 이메일 입력 → 검증 SDF V2000/MOL2 업로드 → 공식 양식 전송 → job ID/응답 SHA 기록 순서다. 원본은 덮어쓰지 않으며 이메일 주소는 산출물에 저장하지 않는다.
 
 ---
 # NP multi-agent orchestration (v1, 2026-10-10)
@@ -85,7 +85,7 @@ Previously saved SEA job folders 41debffd05f4 and 47e4702598a2 exist, with their
 4. 분석 누락·불완전 자료에는 [부족한 부분 보완], [새로 분석], [제외]와 검증 이유를 묻는 별도 승인 대화창을 표시한다. 사용자 승인 없는 새 제출과 불필요한 중복 분석을 금지한다.
 5. 승인·원본 SHA·적용 브랜치·추가된 파일·결과 영향 범위를 기록한다. 새 자료가 기존 입력을 변경하면 세부 4가 확인 후 세부 3의 영향을 받은 결과만 무효화/재실행하고, 독립 QC 이전에는 논문용 최종이라고 표시하지 않는다.
 6. 로컬 검토 UI는 `scripts/np_local_dashboard.py` (127.0.0.1:8765)로 제공하며 외부 네트워크에 노출하지 않는다. `scripts/np_multi_run_monitor.py`는 `NP_Runs/runs/*`를 감시하고 30분 간격 Windows 작업 스케줄러로 실행할 수 있다. 기타 Windows/계정에서는 별도 설치가 필요하다.
-7. 자동 수집 구현 수준: 공식 완료 페이지가 확인된 PharmMapper의 이미 제출된 job 결과 HTML을 추가 보존할 수 있고, SEA는 *검증된* 결과 URL만 수집할 수 있다. 이 둘의 신규 작업 제출을 자동 완성하는 기능은 아직 연결되지 않았다. CAPTCHAs/계정 로그인·이메일 승인/지원되지 않는 API를 우회하지 않는다.
+7. 자동 수집 구현 수준: 승인된 새 작업은 SEA 공식 웹 양식(SMILES → Altcha 일반 확인 → Submit)과 PharmMapper 공식 양식(세션 이메일 + 검증 구조파일)으로 직접 제출한다. task/job ID·URL·입력 SHA·응답 SHA를 기록한 뒤 결과를 수집한다. CAPTCHA 우회나 주소·인증정보 저장은 금지한다.
 8. Cytoscape 작업자 `np_cytoscape_worker.py`는 manifest에 명시된 검증된 입력 SHA와 브랜치가 준비된 경우에만 cyREST로 PPI/MCODE·degree 결과를 실행하며 미변경 입력은 재실행하지 않는다. 최종 브랜치는 세부 4의 선행 QC 확인을 요구한다.
 
 
@@ -100,3 +100,7 @@ Previously saved SEA job folders 41debffd05f4 and 47e4702598a2 exist, with their
 
 ## 최초 통합 승인(2026-10-10)
 화합물·질환·생물종 입력 직후 기존 자료를 탐색하고 사용자에게 단일 최초 승인 화면을 제공한다. 기존 자료의 과학적 검증 여부를 먼저 보여준 뒤 검증된 자료 반영/자료별 승인, 부족한 분석 보완 허용, SEA·PharmMapper 신규 제출 허용, PharmMapper 알림 이메일 사용 여부, 원격 작업 요청을 한 번에 받는다. 승인 기록은 `initial_approval.json`으로 남기며 주소, 비밀번호, 인증코드와 Gmail 메시지는 저장하지 않는다. 데이터가 검증되지 않은 경우 개별 재사용 승인과 구조·작업 ID 확인을 요구한다. 승인된 분석 범위를 벗어나거나 보안상 추가 동의가 필요한 경우에만 추가 질문한다. OS/Remote Desktop Commander 권한 팝업, 서비스 로그인, CAPTCHA, 실제 이메일 소유 확인은 이 최초 승인으로 면제되지 않는다.
+
+
+## 공개 질환 출처 누락 감사 추가 지침
+[public-disease-source-audit.md](public-disease-source-audit.md)의 역할별 기록·QC 규칙을 총괄 0 및 자료 1, 분석 3, QC 4, 원고 5에 적용한다. 공식 raw/출처/해시/질환/파일 버전이 확인되기 전 TTD 확보 또는 최종 완료를 선언하지 않는다.

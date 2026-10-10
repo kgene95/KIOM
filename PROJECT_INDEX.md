@@ -13,6 +13,10 @@
 
 Read this index and the project's `PROJECT_README.md`/`00_PROJECT/README_AGENT.md` before opening OneDrive data. Reconfirm material, project, analysis package, and branch names before any upload or update. Keep status, changelog, inventory, checkpoint, manifest, and handoff records current. Do not rerun completed work because a different account or AI opened the project.
 
+## Failure-learning and harness rule
+
+A repaired failure is not complete until the matching skill, Agent 0–5 instruction, executable controller, acceptance check, checkpoint, and manifest describe the corrected path. Search the affected documents for stale or contradictory wording from the prior behavior; delete or replace it and record a zero-match result. Record the original failure, root cause, corrective change, verification result, and the next monitored state. This applies to external submission through result download as one chain; do not label a successful submit as analysis completion.
+
 ## Storage rule
 
 OneDrive is the source of truth for raw and large files, manuscript/PPT/figure binaries, logs, poses, and trajectories. GitHub is the source of truth for skills, scripts, text records, manifests, checkpoints, and small result tables. GitHub records the OneDrive path and hash for files it does not store.

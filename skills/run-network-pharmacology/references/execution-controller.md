@@ -12,6 +12,8 @@ Transient error: retry up to three times with bounded backoff; then attempt two 
 ## Email-driven collection
 For a submitted SEA/PharmMapper job, store job ID, compound CID, submission fingerprint, source URL and status, but never recipient email address or message content. Check authorized Gmail for matching job completion. On arrival, retrieve raw results, archive them with SHA256, verify compound identity, then automatically unblock dependent stages. If no email arrives, use official job status or queue a future check; do not claim to keep monitoring without an actual scheduled worker/automation.
 
+When a heartbeat or scheduler is actually installed, Gmail/provider-result arrival is an execution event, not merely a notification. It must trigger result retrieval, immutable source archival, SHA-256, species/UniProt/HGNC QC and downstream-queue reconciliation in the same run. See [event-driven-orchestration.md](event-driven-orchestration.md).
+
 ## Scientific gates
 No final merging of SEA jobs without a verified job-to-compound mapping. Never interpret all background SEA rows as positive predictions. Freeze the UC disease universe, human HGNC/UniProt normalization, primary target branch, STRING and Cytoscape network before final GO/KEGG or docking recommendations. Run MCODE/cytoHubba or documented verified degree fallback, save outputs and independent QC.
 

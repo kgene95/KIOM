@@ -5,9 +5,15 @@ description: "Run reproducible, source-traceable network pharmacology for compou
 
 # Run network pharmacology
 
-- **초기 통합 승인:** 화합물명·질환명·생물종 입력 후 기존 자료를 검증하고 한 번의 한국어 승인 화면에서 검증된 자료 재사용, 부족한 부분 보완, 필요 시 SEA·PharmMapper 신규 제출, 비공개 이메일 알림 사용, 원격 작업 요청을 확인한다. 동의 범위는 `initial_approval.json`에 기록하지만 파일별 QC·제출 확인·OS/원격 보안 팝업·CAPTCHA/로그인을 우회하지 않는다. [multi-agent-orchestration.md](references/multi-agent-orchestration.md) 참조.
+## 이벤트 기반 총괄 실행
 
-- **화합물별 작업 태그 필수:** Agent 1은 검증된 CID/SMILES/원본 3D 구조 SHA-256으로 `np_compound_tagging.py`를 사용해 재현 가능한 compound_tag를 제출 전에 생성한다. Agent 2는 SEA·PharmMapper에서 제출 작업 ID와 compound_tag·구조 SHA를 함께 기록하고 결과 원본에 별도 JSON sidecar로 연결하며, 매핑을 검증하지 못한 오래된 자료는 UNVERIFIED로 유지한다. 사용자가 직접 과거에 확보한 자료도 동일하게 검증한다. 서비스가 직접 태그 입력을 허용하지 않으면 로컬 job ledger로 연결한다.
+총괄은 단순 대기·상태표시 역할이 아니다. 구조 QC, 외부 job ID, 결과 원본, Gmail 결과 수신, 종/ID QC, 질환 집합 고정은 각각 다음 세부 작업을 즉시 실행하는 이벤트다. 실제 설치된 Gmail heartbeat와 로컬 실행기가 있을 때만 감시를 주장하며, 결과 수신 뒤에는 원본 보존·SHA-256·QC·의존 큐 갱신을 같은 실행에서 수행한다. PharmMapper 같은 보조 축의 지연은 검증 완료된 primary 축의 분석을 막지 않는다. 자세한 역할·재시도·재개 규칙은 [event-driven-orchestration.md](references/event-driven-orchestration.md)를 따른다.
+
+- **공개 질환 출처 감사:** TTD 등 공식 공개 원본 수집, 누락 원인 확인 및 source 상태 보고 전에 [public-disease-source-audit.md](references/public-disease-source-audit.md)를 따른다. 원본 확보·UC 추출·stable-ID QC·분석 통합을 구분하고 HTML HTTP 200을 데이터 확보로 계산하지 않는다.
+
+- **초기 통합 승인:** 화합물명·질환명·생물종 입력 후 기존 자료를 검증하고 한 번의 한국어 승인 화면에서 재사용·보완·SEA·PharmMapper 신규 제출·PharmMapper 이메일 사용을 확인한다. 승인되면 Agent 2는 검증된 공식 제출 경로를 즉시 실행한다. SEA는 공식 위젯이 허용하는 일반 Altcha 확인과 제출을 브라우저 자동화로 수행하고 task ID를 검증한다. 이메일·비밀번호·토큰은 기록하지 않는다. [initial-access-approval.md](references/initial-access-approval.md)와 [multi-agent-orchestration.md](references/multi-agent-orchestration.md)를 따른다.
+
+- **검증된 외부 제출 자동 실행:** Agent 1은 CID·SMILES·구조 원본 SHA-256으로 compound_tag를 만든다. 최초 승인에서 SEA·PharmMapper 신규 제출이 허용되면 Agent 2는 공식 경로로 직접 제출한다. SEA는 공식 웹 양식에 검증 SMILES를 입력하고 Altcha 확인과 Submit을 실행해 task ID·결과 URL·구조 SHA를 기록한다. PharmMapper는 사용자가 대시보드 현재 세션 입력란에 한 번 넣은 이메일과 검증 SDF/MOL2를 공식 양식으로 전송하고 job ID·응답 SHA·구조 SHA만 기록한다. 이메일 주소는 저장하지 않는다. 네트워크 실패만 최대 3회 재시도하고, 실제 폼/응답 확인이 실패했을 때만 NEEDS_EXTERNAL_SUBMISSION으로 남긴다.
 
 - **최우선 기존 자료 검증:** 화합물·질환·생물종 접수 직후 원본/메타데이터 검사 → 사용자 [반영 및 재분석] 또는 [부족한 자료 보완/새로 분석/제외] 선택 → 승인된 차등 실행. 입력 SHA 동일 시 재실행 금지. 신규 프로젝트 감시는 [np_multi_run_monitor.py](scripts/np_multi_run_monitor.py), 검토 화면은 [np_local_dashboard.py](scripts/np_local_dashboard.py), Cytoscape는 [np_cytoscape_worker.py](scripts/np_cytoscape_worker.py)로 처리. 실제 SEA·PharmMapper 신규 제출 자동화는 검증되기 전 완료로 주장하지 않는다.
 
