@@ -13,6 +13,10 @@ interface:
     model calls; ChatGPT notification checks at 09:00 and 18:00 Korea time,
     alert only on meaningful changes. Halt at unresolved identity or QC gates.
     All user-facing messages must be in Korean, including progress and approvals.
+    Always scan existing source evidence before new analyses; request approval
+    to reflect verified data or perform only necessary supplementation. Use the
+    local dashboard, multi-run monitor, and Cytoscape worker when supported.
+    Never claim SEA or PharmMapper new-job submission is automated until tested.
   icon_small: assets/icon.svg
   icon_large: assets/icon.svg
 policy:
