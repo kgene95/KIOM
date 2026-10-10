@@ -2,7 +2,8 @@ interface:
   display_name: Network Pharmacology 분석
   short_description: 재현 가능한 NP 분석·SCI Figure·도킹 후보 추천
   default_prompt: Use $run-network-pharmacology to run a source-traceable network
-    pharmacology analysis, recommend docking candidates without running docking, and
+    pharmacology analysis, coordinate intake and agents 1/2/3 from
+    references/multi-agent-orchestration.md, and recommend docking candidates without running docking, and
     create an SCI figure when requested. Before new source submissions, audit
     existing workspace datasets and request explicit user approval to reuse
     verified data or recollect it; never overwrite raw evidence.
