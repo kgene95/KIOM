@@ -14,7 +14,13 @@ def form(action,fields,button):
  return '<form method="post" action="'+h(action)+'"'+confirm+'><input type="hidden" name="token" value="'+h(TOKEN)+'">'+fields+'<button type="submit">'+h(button)+'</button></form>'
 def app_index():
  bits=['<p class="muted">로컬 전용 화면 · 검증 안 된 자료는 자동 사용하거나 재제출하지 않습니다.</p>']
- bits.append('<section><h3>새 소재 등록</h3>'+form('/new','<label>화합물명 또는 CID <input name="compound" required></label><label>질환명 <input name="disease" required></label><label>생물종 <select name="species"><option>Homo sapiens</option><option>Mus musculus</option><option>Rattus norvegicus</option></select></label>','등록하고 기존 자료 탐색')+'</section>')
+ fields='<p class="muted">화합물을 한 줄에 하나씩 입력하세요. 추가 버튼으로 늘릴 수 있습니다. 쉼표 입력도 분리되지만 버튼을 권장합니다.</p>'
+ fields+='<div id="compounds"><label>화합물 1 <input name="compound" required placeholder="Naringenin 또는 CID 439246"></label></div>'
+ fields+='<button type="button" onclick="addCompound()">+ 화합물 추가</button>'
+ fields+='<label>질환명 <input name="disease" required placeholder="Ulcerative colitis"></label>'
+ fields+='<label>생물종 <select name="species"><option>Homo sapiens</option><option>Mus musculus</option><option>Rattus norvegicus</option></select></label>'
+ fields+='<script>function addCompound(){const root=document.getElementById("compounds");const n=root.querySelectorAll("input").length+1;const label=document.createElement("label");label.textContent="화합물 "+n+" ";const inp=document.createElement("input");inp.name="compound";inp.required=true;inp.placeholder="화합물명 또는 CID";const del=document.createElement("button");del.type="button";del.textContent="삭제";del.onclick=()=>label.remove();label.append(inp,del);root.append(label)}</script>'
+ bits.append('<section><h3>새 소재 등록</h3>'+form('/new',fields,'등록하고 기존 자료 탐색')+'</section>')
  for run in sorted((WORKSPACE/"runs").glob("*")) if (WORKSPACE/"runs").exists() else []:
   req=m.read(run/"request.json")
   if not req:continue
@@ -49,14 +55,27 @@ class Handler(BaseHTTPRequestHandler):
  def do_POST(self):
   n=int(self.headers.get("Content-Length","0"))
   if n>10000:self.send_error(413);return
-  data={k:v[0] for k,v in parse_qs(self.rfile.read(n).decode()).items()}
+  parsed=parse_qs(self.rfile.read(n).decode())
+  data={k:v[0] for k,v in parsed.items()}
   if data.get("token")!=TOKEN:self.send_error(403);return
   target=urlparse(self.path).path;msg="처리 완료"
   try:
    if target=="/new":
     import np_agent_queue as q
-    home=q.initialize(WORKSPACE,data.get("compound",""),data.get("disease",""),data.get("species","Homo sapiens"))
-    m.review(home)
+    import re
+    raw=parsed.get("compound",[])
+    names=[part.strip() for entry in raw for part in re.split(r"[,;\n]+",entry) if part.strip()]
+    names=list(dict.fromkeys(names))
+    if not names or len(names)>20:raise ValueError("화합물은 1~20개 입력하세요")
+    existing=[m.read(a/"request.json") for a in (WORKSPACE/"runs").glob("*")] if (WORKSPACE/"runs").exists() else []
+    created=[]
+    for name in names:
+     duplicate=next((x for x in existing if x.get("compound_input","").casefold()==name.casefold() and x.get("disease_input","").casefold()==data.get("disease","").casefold() and x.get("species")==data.get("species","Homo sapiens")),None)
+     if duplicate:continue
+     home=q.initialize(WORKSPACE,name,data.get("disease",""),data.get("species","Homo sapiens"))
+     m.review(home)
+     created.append(name)
+    msg="새 분석 생성: "+", ".join(created) if created else "동일한 화합물·질환·생물종 작업이 이미 등록돼 있습니다. 중복 생성하지 않았습니다."
    else:
     id=data.get("run","")
     if not id or Path(id).name!=id:raise ValueError("유효하지 않은 작업")
