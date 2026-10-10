@@ -302,6 +302,38 @@ def submit_pharmmapper(run, email):
     m.save(run/"analysis_progress.json",progress)
     return {"job_id":job_id,"status":progress["status"]}
 
+def record_external_job(run, provider, job_id, result_url=""):
+    """Record a provider job created outside the local form and resume polling.
+
+    This is deliberately a local bookkeeping action: it never resubmits a file.
+    The user may paste an ID obtained from the provider page or the provider email.
+    """
+    run=Path(run)
+    provider=str(provider or "").strip().lower()
+    job_id=str(job_id or "").strip()
+    if provider not in ("sea", "pharmmapper"):
+        raise ValueError("지원하지 않는 외부 provider입니다.")
+    if not re.fullmatch(r"[A-Za-z0-9._:/-]{3,160}", job_id):
+        raise ValueError("공식 작업 ID 형식을 확인하세요.")
+    ledger=m.read(run/"job_ledger.json")
+    key=provider+"_submission"
+    row=dict(ledger.get(key, {}))
+    row.update({"provider":"SEA" if provider=="sea" else "PharmMapper","status":"SUBMITTED","job_id":job_id,"job_id_source":"user_recorded_provider_or_email","recorded_at_utc":m.now()})
+    if result_url:
+        if not re.match(r"^https?://", result_url):
+            raise ValueError("결과 URL은 http 또는 https여야 합니다.")
+        row["result_url"]=result_url.strip()
+    ledger[key]=row
+    m.save(run/"job_ledger.json",ledger)
+    progress=m.read(run/"analysis_progress.json")
+    updates={"updated_at_utc":m.now(),"external_submission_performed":True}
+    if provider=="sea":
+        updates.update({"status":"SEA_SUBMITTED","sea_job_id":job_id,"next_action":"SEA 결과 원본 회수 및 독립 QC"})
+    else:
+        updates.update({"status":"PHARMMAPPER_SUBMITTED","pharmmapper_job_id":job_id,"next_action":"PharmMapper 결과 원본 회수 및 통합 QC"})
+    progress.update(updates); m.save(run/"analysis_progress.json",progress)
+    return row
+
 def sea_copy_control(label, value):
     safe_value=h(value)
     return '<label>'+h(label)+' <input readonly value="'+safe_value+'"> <button type="button" data-copy="'+safe_value+'" onclick="navigator.clipboard.writeText(this.dataset.copy).then(()=>this.textContent='+"'복사됨'"+').catch(()=>alert('+"'복사에 실패했습니다. 입력값을 직접 선택해 복사하세요.'"+'))">복사</button></label>'
@@ -393,10 +425,10 @@ def external_submission_panel(project):
         if sea_status=="RETRIEVED": sea+='<p class="ok">SEA 원본 회수 완료 · SHA-256 '+h(sea_ledger.get("sha256"))+' · 독립 QC 대기</p>'
         elif sea_ledger.get("status")=="SUBMITTED": sea+='<p class="ok">SEA 자동 제출 확인됨 · 작업 ID '+h(sea_ledger.get("job_id"))+' · 결과 원본 회수 대기</p>'+form("/retrieve_sea",'<input type="hidden" name="run" value="'+h(run_id)+'">',"SEA 결과 원본 자동 회수 재시도")+'<p><a href="'+h(sea_ledger.get("source_url","https://sea.bkslab.org/"))+'" target="_blank" rel="noopener">SEA 결과 상태 열기</a></p>'
         elif sea_ledger.get("status")=="NEEDS_ATTENTION_DOWNLOAD_FAILED": sea+='<p class="warn">SEA 결과 원본 자동 회수 실패 — 원본·SHA-256 없이 완료 처리하지 않습니다.</p>'+form("/retrieve_sea",'<input type="hidden" name="run" value="'+h(run_id)+'">',"SEA 결과 원본 자동 회수 재시도")
-        else: sea+='<p><a href="https://sea.bkslab.org/" target="_blank" rel="noopener">SEA 공식 제출 화면 열기</a></p>'+sea_copy_control("SEA SMILES",smiles)+sea_copy_control("PubChem CID",cid)+sea_copy_control("작업 태그",tag)+'<p class="warn">사람 확인(CAPTCHA)이 요구되면 완료 뒤에만 제출됩니다.</p>'
+        else: sea+='<p><a href="https://sea.bkslab.org/" target="_blank" rel="noopener">SEA 공식 제출 화면 열기</a></p>'+sea_copy_control("SEA SMILES",smiles)+sea_copy_control("PubChem CID",cid)+sea_copy_control("작업 태그",tag)+'<p class="warn">사람 확인(CAPTCHA)은 사용자가 사이트에서 직접 완료해야 합니다. 제출 후 발급된 작업 ID를 아래에 한 번 기록하면 재제출 없이 재개합니다.</p>'+form("/record_external_job",'<input type="hidden" name="run" value="'+h(run_id)+'"><input type="hidden" name="provider" value="sea"><label>SEA 공식 작업 ID <input name="job_id" required placeholder="provider job ID"></label><label>결과 URL(있을 때) <input name="result_url" type="url" placeholder="https://..."></label>',"SEA 작업 ID 기록 후 재개")
         pm='<h4>PharmMapper</h4>'
         if pharm.get("status")=="SUBMITTED": pm+='<p class="ok">PharmMapper 제출 확인 · 작업 ID '+h(pharm.get("job_id"))+" · 결과 대기</p>"
-        elif pharm.get("status")=="SUBMITTED_RESPONSE_REVIEW_REQUIRED": pm+='<p class="warn">PharmMapper 제출 기록은 보존되어 있습니다. 작업 ID가 응답에서 확인되지 않아 사용자 조치 1회가 필요합니다. 공식 응답 또는 완료 메일에서 작업 ID를 확인해 기록한 뒤 재개하세요. 재제출하지 않습니다.</p>'
+        elif pharm.get("status")=="SUBMITTED_RESPONSE_REVIEW_REQUIRED": pm+='<p class="warn">PharmMapper 제출 기록은 보존되어 있습니다. 공식 응답 또는 완료 메일에서 작업 ID를 확인해 아래에 한 번 기록하세요. 재제출하지 않습니다.</p>'+form("/record_external_job",'<input type="hidden" name="run" value="'+h(run_id)+'"><input type="hidden" name="provider" value="pharmmapper"><label>PharmMapper 공식 작업 ID <input name="job_id" required placeholder="12자리 작업 ID"></label><label>결과 URL(있을 때) <input name="result_url" type="url" placeholder="https://..."></label>',"PharmMapper 작업 ID 기록 후 재개")
         else:
             fields='<input type="hidden" name="run" value="'+h(run_id)+'"><label>프로젝트 공용 PharmMapper 제출·결과 수신 이메일 (현재 세션 전용) <input type="email" name="pharmmapper_email" autocomplete="email" required placeholder="name@example.org"></label><p class="muted">최초 한 번만 입력하며 파일·로그·보고서에는 저장하지 않습니다.</p>'
             pm+=form("/submit_pharmmapper",fields,"PharmMapper 공식 제출")
@@ -550,6 +582,19 @@ class Handler(BaseHTTPRequestHandler):
             project["updated_at_utc"]=m.now(); save_project(project)
             message="PharmMapper 공식 제출 완료: 작업 ID "+str(result["job_id"]) if result.get("job_id") else "PharmMapper 제출 응답을 받았으나 작업 ID 확인이 필요합니다."
             content=project_page(project["project_id"],notice=message).encode()
+            self.send_response(200); self.send_header("Content-Type","text/html; charset=utf-8"); self.end_headers(); self.wfile.write(content); return
+        if target=="/record_external_job":
+            run_id=data.get("run","")
+            if not run_id or Path(run_id).name!=run_id: raise ValueError("유효하지 않은 실행")
+            run=WORKSPACE/"runs"/run_id
+            if not (run/"request.json").exists(): raise ValueError("실행을 찾을 수 없습니다")
+            project=ensure_project_for_run(run)
+            try:
+                record_external_job(run,data.get("provider"),data.get("job_id"),data.get("result_url",""))
+                notice="외부 작업 ID를 기록했습니다. 재제출 없이 결과 회수·QC를 재개합니다."
+            except Exception as error:
+                notice="외부 작업 ID 기록 중단: "+str(error)
+            content=project_page(project["project_id"],notice=notice).encode()
             self.send_response(200); self.send_header("Content-Type","text/html; charset=utf-8"); self.end_headers(); self.wfile.write(content); return
         if target=="/approve_zero":
             project=read_project(data.get("project", ""))

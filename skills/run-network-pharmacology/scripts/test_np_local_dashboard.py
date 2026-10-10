@@ -157,5 +157,30 @@ class MultiCompoundInputTests(unittest.TestCase):
             self.assertTrue(result["already_recorded"])
             posted.assert_not_called()
 
+    def test_external_job_id_resume_updates_provider_without_resubmission(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            run = Path(temp_dir) / "CID75596314_20261010"
+            run.mkdir()
+            dashboard.m.save(run / "request.json", {"run_id": run.name})
+            dashboard.m.save(run / "job_ledger.json", {"pharmmapper_submission": {
+                "status": "SUBMITTED_RESPONSE_REVIEW_REQUIRED", "job_id": None,
+                "response_sha256": "abc"
+            }})
+            dashboard.m.save(run / "analysis_progress.json", {
+                "status": "PHARMMAPPER_SUBMISSION_RESPONSE_REVIEW_REQUIRED"
+            })
+            row = dashboard.record_external_job(run, "pharmmapper", "261010123456")
+            self.assertEqual(row["status"], "SUBMITTED")
+            self.assertEqual(row["job_id"], "261010123456")
+            progress = dashboard.m.read(run / "analysis_progress.json")
+            self.assertEqual(progress["status"], "PHARMMAPPER_SUBMITTED")
+
+    def test_external_job_id_resume_rejects_invalid_url(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            run = Path(temp_dir) / "CID75596314_20261010"
+            run.mkdir()
+            with self.assertRaises(ValueError):
+                dashboard.record_external_job(run, "sea", "sea-123", "javascript:alert(1)")
+
 if __name__ == "__main__":
     unittest.main()
