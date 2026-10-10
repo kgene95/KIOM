@@ -5,6 +5,8 @@ description: "Run reproducible, source-traceable network pharmacology for compou
 
 # Run network pharmacology
 
+- For new projects with compound(s) and disease intake, use the overall controller and role-specific Agent 1 (NP collection and analysis), Agent 2 (SEA/PharmMapper structure submission and result retrieval), and Agent 3 (independent QC), as described in [multi-agent-orchestration.md](references/multi-agent-orchestration.md). Handoff by verified local structure manifests and job ledgers; email is optional authorized notification, NOT a presumed submission route.
+
 - Mandatory low-cost operation: use the local 30-minute non-LLM watchdog, batch validated Python tasks, preserve original source evidence, require approval before historical reuse/recollection, and never infer unverified SEA job assignments. Read [execution-controller.md](references/execution-controller.md). ChatGPT status alerts are separately scheduled at 09:00 and 18:00 Asia/Seoul and may use model capacity.
 
 
