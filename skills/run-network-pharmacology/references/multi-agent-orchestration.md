@@ -97,3 +97,6 @@ Previously saved SEA job folders 41debffd05f4 and 47e4702598a2 exist, with their
 기존에 연구자가 직접 수령한 SEA·PharmMapper 자료는 검증 완료까지 `HISTORICAL_UNVERIFIED_ASSIGNMENT`로 격리한다. 구조 또는 제출 증거가 없으면 임의로 태그를 배정하지 않는다. 이미 분석된 같은 자료는 source/compound/parameter/input SHA 기준으로 건너뛰며, 부족한 결과는 사용자에게 보완 재수집 승인을 받는다.
 
 실제 외부 사이트 제출은 기능 미완성 상태이므로 새 작업을 제출했다고 보고하지 않는다. 실사용 웹 폼을 검증해 세부 2 제출·회수 루프가 성공해야 완료로 표시한다.
+
+## 최초 통합 승인(2026-10-10)
+화합물·질환·생물종 입력 직후 기존 자료를 탐색하고 사용자에게 단일 최초 승인 화면을 제공한다. 기존 자료의 과학적 검증 여부를 먼저 보여준 뒤 검증된 자료 반영/자료별 승인, 부족한 분석 보완 허용, SEA·PharmMapper 신규 제출 허용, PharmMapper 알림 이메일 사용 여부, 원격 작업 요청을 한 번에 받는다. 승인 기록은 `initial_approval.json`으로 남기며 주소, 비밀번호, 인증코드와 Gmail 메시지는 저장하지 않는다. 데이터가 검증되지 않은 경우 개별 재사용 승인과 구조·작업 ID 확인을 요구한다. 승인된 분석 범위를 벗어나거나 보안상 추가 동의가 필요한 경우에만 추가 질문한다. OS/Remote Desktop Commander 권한 팝업, 서비스 로그인, CAPTCHA, 실제 이메일 소유 확인은 이 최초 승인으로 면제되지 않는다.
