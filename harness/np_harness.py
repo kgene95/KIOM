@@ -69,6 +69,32 @@ def append_event(path: Path, event: dict[str, Any]) -> None:
     with path.open("a", encoding="utf-8") as handle:
         handle.write(json.dumps({"at_utc": now(), **event}, ensure_ascii=False) + "\n")
 
+def validate_run(run: Path) -> dict[str, Any]:
+    """NP 최종 게이트를 판정한다. 외부 provider를 호출하지 않는다."""
+    request = read(run / "request.json", {})
+    queue = read(run / "work_queue.json", {"tasks": []})
+    tasks = task_map(queue)
+    missing_input = [key for key in ("compound_input", "disease_input", "species") if not request.get(key)]
+    terminal_required = ["independent_qc", "manuscript_review"]
+    unfinished = [key for key in terminal_required if tasks.get(key, {}).get("status") != "DONE"]
+    waiting = [{"id": task.get("id"), "status": task.get("status"),
+                "detail": task.get("detail") or task.get("next_action")}
+               for task in queue.get("tasks", [])
+               if str(task.get("status", "")).startswith("WAITING")]
+    if missing_input:
+        status, next_action = "BLOCKED_NEEDS_USER", "필수 입력을 기록한 뒤 재실행"
+    elif waiting:
+        status, next_action = "WAITING", "대기 항목을 해결하거나 연결된 provider 상태를 확인"
+    elif unfinished:
+        status, next_action = "IN_PROGRESS", "미완료 task의 등록 worker를 dispatch"
+    else:
+        status, next_action = "PASS", "완료 manifest와 Git 상태를 확인"
+    result = {"status": status, "missing_input": missing_input,
+              "unfinished": unfinished, "waiting": waiting, "next_action": next_action}
+    write_atomic(run / "np_validation.json", result)
+    append_event(run / "event_log.jsonl", {"event": "np_validation", "status": status})
+    return result
+
 def cycle(run: Path, dry_run: bool = False, max_cycles: int = 1) -> dict[str, Any]:
     queue_path = run / "work_queue.json"
     queue = read(queue_path, {"tasks": []})
@@ -123,8 +149,11 @@ def main() -> None:
     command.add_argument("--run", required=True)
     command.add_argument("--dry-run", action="store_true")
     command.add_argument("--max-cycles", type=int, default=1)
+    validate = sub.add_parser("validate")
+    validate.add_argument("--run", required=True)
     args = parser.parse_args()
-    print(json.dumps(cycle(Path(args.run), dry_run=args.dry_run, max_cycles=args.max_cycles), ensure_ascii=False, indent=2))
+    result = validate_run(Path(args.run)) if args.command == "validate" else cycle(Path(args.run), dry_run=args.dry_run, max_cycles=args.max_cycles)
+    print(json.dumps(result, ensure_ascii=False, indent=2))
 
 if __name__ == "__main__":
     main()

@@ -3,7 +3,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from np_harness import build_plan, cycle
+from np_harness import build_plan, cycle, validate_run
 
 class HarnessTests(unittest.TestCase):
     def test_parallel_plan_keeps_independent_tasks_together(self):
@@ -39,6 +39,20 @@ class HarnessTests(unittest.TestCase):
             cycle(run, dry_run=True, max_cycles=1)
             state = cycle(run, dry_run=True, max_cycles=1)
             self.assertEqual(state["status"], "BUDGET_STOP")
+
+    def test_validate_reports_waiting_gate_without_claiming_completion(self):
+        with tempfile.TemporaryDirectory() as temp:
+            run = Path(temp)
+            (run / "request.json").write_text(json.dumps({
+                "compound_input": "CID 1", "disease_input": "colitis", "species": "Homo sapiens"
+            }), encoding="utf-8")
+            (run / "work_queue.json").write_text(json.dumps({"tasks": [
+                {"id": "independent_qc", "status": "WAITING_EXTERNAL"},
+                {"id": "manuscript_review", "status": "QUEUED"}
+            ]}), encoding="utf-8")
+            result = validate_run(run)
+            self.assertEqual(result["status"], "WAITING")
+            self.assertTrue((run / "np_validation.json").exists())
 
 if __name__ == "__main__":
     unittest.main()

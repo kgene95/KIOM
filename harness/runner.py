@@ -15,7 +15,7 @@ from verifier import verify_run_contract
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="KIOM generic research harness")
-    parser.add_argument("cycle", choices=["cycle"])
+    parser.add_argument("command", choices=["cycle", "validate"])
     parser.add_argument("--profile", required=True, help="domain adapter profile, e.g. np")
     parser.add_argument("--run", required=True)
     parser.add_argument("--dry-run", action="store_true")
@@ -24,9 +24,9 @@ def main() -> None:
     if args.profile != "np":
         raise SystemExit(f"등록되지 않은 profile: {args.profile}")
     sys.path.insert(0, str(Path(__file__).parent))
-    from np_harness import cycle
+    from np_harness import cycle, validate_run
     run = Path(args.run)
-    result = cycle(run, dry_run=args.dry_run, max_cycles=args.max_cycles)
+    result = validate_run(run) if args.command == "validate" else cycle(run, dry_run=args.dry_run, max_cycles=args.max_cycles)
     result["contract_verification"] = verify_run_contract(run)
     print(json.dumps(result, ensure_ascii=False, indent=2))
 
