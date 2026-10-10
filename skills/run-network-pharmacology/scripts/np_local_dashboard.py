@@ -291,14 +291,14 @@ def submit_pharmmapper(run, email):
     attempts=list(previous.get("attempts",[]))
     attempts.append({"attempt":len(attempts)+1,"submitted_at_utc":m.now(),"job_id":job_id,"response_sha256":hashlib.sha256(body.encode("utf-8","replace")).hexdigest(),"email_stored":False})
     response_sha=hashlib.sha256(body.encode("utf-8","replace")).hexdigest()
-    ledger["pharmmapper_submission"]={"provider":"PharmMapper","status":"SUBMITTED" if job_id else "SUBMITTED_RESPONSE_REVIEW_REQUIRED","job_id":job_id,"cid":structure.get("cid"),"input_sha256":structure.get("structure_sha256"),"compound_tag":tag,"submitted_at_utc":m.now(),"source_url":"https://www.lilab-ecust.cn/pharmmapper/submitjob.html","response_sha256":response_sha,"email_stored":False,"attempts":attempts,"next_action_code":None if job_id else "PROVIDER_JOB_ID_REQUIRED","action_notice_id":None if job_id else hashlib.sha256((str(run)+response_sha).encode()).hexdigest()[:16],"resubmission_allowed":False}
+    ledger["pharmmapper_submission"]={"provider":"PharmMapper","status":"SUBMITTED" if job_id else "SUBMISSION_NOT_CONFIRMED","job_id":job_id,"cid":structure.get("cid"),"input_sha256":structure.get("structure_sha256"),"compound_tag":tag,"submitted_at_utc":m.now(),"source_url":"https://www.lilab-ecust.cn/pharmmapper/submitfile.html","response_sha256":response_sha,"email_stored":False,"attempts":attempts,"next_action_code":None if job_id else "PROVIDER_BROWSER_SUBMIT_REQUIRED","reason_code":None if job_id else "PROVIDER_RESPONSE_NO_JOB_ID","action_notice_id":None if job_id else hashlib.sha256((str(run)+response_sha).encode()).hexdigest()[:16],"resubmission_allowed":False if job_id else True}
     m.save(run/"job_ledger.json",ledger)
-    tag_doc["submission_status"]="SUBMITTED" if job_id else "SUBMITTED_RESPONSE_REVIEW_REQUIRED"
+    tag_doc["submission_status"]="SUBMITTED" if job_id else "SUBMISSION_NOT_CONFIRMED"
     tag_doc["job_id"]=job_id
     tag_doc["submitted_at_utc"]=m.now()
     m.save(prepared[0],tag_doc)
     progress=m.read(run/"analysis_progress.json")
-    progress.update({"updated_at_utc":m.now(),"status":"PHARMMAPPER_SUBMITTED" if job_id else "PHARMMAPPER_SUBMISSION_RESPONSE_REVIEW_REQUIRED","pharmmapper_job_id":job_id,"pharmmapper_email_received_in_session":True,"external_submission_performed":True,"next_action":"SEA는 공식 사이트 CAPTCHA 완료 후 제출 필요" if job_id else "PharmMapper 응답에서 공식 작업 ID 확인 필요"})
+    progress.update({"updated_at_utc":m.now(),"status":"PHARMMAPPER_SUBMITTED" if job_id else "PHARMMAPPER_SUBMISSION_NOT_CONFIRMED","pharmmapper_job_id":job_id,"pharmmapper_email_received_in_session":True,"external_submission_performed":bool(job_id),"next_action":"SEA는 공식 사이트 CAPTCHA 완료 후 제출 필요" if job_id else "PharmMapper 공식 제출 화면에서 정상 접수 재시도 필요"})
     m.save(run/"analysis_progress.json",progress)
     return {"job_id":job_id,"status":progress["status"]}
 
@@ -429,6 +429,7 @@ def external_submission_panel(project):
         pm='<h4>PharmMapper</h4>'
         if pharm.get("status")=="SUBMITTED": pm+='<p class="ok">PharmMapper 제출 확인 · 작업 ID '+h(pharm.get("job_id"))+" · 결과 대기</p>"
         elif pharm.get("status")=="SUBMITTED_RESPONSE_REVIEW_REQUIRED": pm+='<p class="warn">PharmMapper 제출 기록은 보존되어 있습니다. 공식 응답 또는 완료 메일에서 작업 ID를 확인해 아래에 한 번 기록하세요. 재제출하지 않습니다.</p>'+form("/record_external_job",'<input type="hidden" name="run" value="'+h(run_id)+'"><input type="hidden" name="provider" value="pharmmapper"><label>PharmMapper 공식 작업 ID <input name="job_id" required placeholder="12자리 작업 ID"></label><label>결과 URL(있을 때) <input name="result_url" type="url" placeholder="https://..."></label>',"PharmMapper 작업 ID 기록 후 재개")
+        elif pharm.get("status")=="SUBMISSION_NOT_CONFIRMED": pm+='<p class="warn">PharmMapper 공식 작업 ID와 접수 메일이 없어 제출을 확인하지 못했습니다. 자동 재전송은 하지 않습니다. 공식 제출 화면에서 정상 접수한 뒤 작업 ID를 기록하세요.</p>'+form("/record_external_job",'<input type="hidden" name="run" value="'+h(run_id)+'"><input type="hidden" name="provider" value="pharmmapper"><label>PharmMapper 공식 작업 ID <input name="job_id" required placeholder="12자리 작업 ID"></label><label>결과 URL(있을 때) <input name="result_url" type="url" placeholder="https://..."></label>',"PharmMapper 접수 확인 후 재개")
         else:
             fields='<input type="hidden" name="run" value="'+h(run_id)+'"><label>프로젝트 공용 PharmMapper 제출·결과 수신 이메일 (현재 세션 전용) <input type="email" name="pharmmapper_email" autocomplete="email" required placeholder="name@example.org"></label><p class="muted">최초 한 번만 입력하며 파일·로그·보고서에는 저장하지 않습니다.</p>'
             pm+=form("/submit_pharmmapper",fields,"PharmMapper 공식 제출")

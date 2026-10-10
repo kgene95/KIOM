@@ -157,6 +157,25 @@ class MultiCompoundInputTests(unittest.TestCase):
             self.assertTrue(result["already_recorded"])
             posted.assert_not_called()
 
+    def test_pharmmapper_response_without_job_id_is_not_confirmed(self):
+        class Response:
+            text = "accepted"
+            def raise_for_status(self): pass
+        with tempfile.TemporaryDirectory() as temp_dir:
+            run = Path(temp_dir) / "CID75596314_20261010"
+            raw = run / "source_archive" / "PubChem" / "test.sdf"
+            raw.parent.mkdir(parents=True)
+            raw.write_bytes(b"test sdf\nV2000\n$$$$\n")
+            dashboard.m.save(run / "structure_manifest.json", {"cid":"75596314", "structure_file":str(raw), "structure_sha256":dashboard.sha256_file(raw)})
+            submissions = run / "submissions"; submissions.mkdir()
+            dashboard.m.save(submissions / "PharmMapper_test.json", {"submission_status":"PREPARED_NOT_SUBMITTED", "compound_tag":"NP-75596314-test"})
+            with mock.patch.object(dashboard.requests, "post", return_value=Response()):
+                result = dashboard.submit_pharmmapper(run, "person@example.org")
+            ledger = dashboard.m.read(run / "job_ledger.json")
+            self.assertIsNone(result["job_id"])
+            self.assertEqual(ledger["pharmmapper_submission"]["status"], "SUBMISSION_NOT_CONFIRMED")
+            self.assertEqual(ledger["pharmmapper_submission"]["next_action_code"], "PROVIDER_BROWSER_SUBMIT_REQUIRED")
+
     def test_external_job_id_resume_updates_provider_without_resubmission(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             run = Path(temp_dir) / "CID75596314_20261010"
