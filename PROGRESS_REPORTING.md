@@ -18,6 +18,8 @@ NP·연구·개발 작업 중 총괄은 다음 상태 변화가 생길 때 한�
 
 정상 polling이나 변화 없는 반복 상태는 매번 보고하지 않는다. 보고에는 현재 상태, 완료된 작업, 막힌 작업, 독립적으로 계속하는 작업, 다음 행동을 포함한다.
 
+같은 `run_id`·`task_id`·상태·next action 조합은 하나의 상태 fingerprint로 취급한다. fingerprint가 바뀌지 않으면 채팅 알림과 사용자 질문을 반복하지 않는다. 사용자 조치가 필요한 상태는 `action_notice_id`와 재개 조건을 한 번 기록하고, 사용자가 조치할 때까지 상태 카드로만 표시한다.
+
 ## 막힘 처리
 
 하나의 task가 `WAITING_USER`, `WAITING_EXTERNAL`, `FAILED_RETRYABLE`, `BLOCKED`가 되어도 의존성이 없는 task를 계속 실행한다. 총괄은 전체 workflow를 종료하지 않고 상태와 재개 조건을 기록한다.

@@ -43,3 +43,5 @@
 3. SEA가 CAPTCHA(현재 Altcha 포함)를 요구하면 제출 worker는 `WAITING_USER`로 전환하고, 사용자가 브라우저에서 사람 확인을 완료한 뒤 재개한다.
 4. PharmMapper 응답에서 공식 작업 ID를 추출하지 못하면 `SUBMITTED_RESPONSE_REVIEW_REQUIRED`로 기록하며 성공·완료로 처리하지 않는다.
 5. 공식 job ID, 결과 원본, SHA-256, 화합물 identity 검증이 모두 끝난 뒤에만 downstream 분석을 unblock한다.
+
+같은 `SUBMITTED_RESPONSE_REVIEW_REQUIRED` 또는 `WAITING_USER` 상태를 반복 보고하거나 재제출하지 않는다. `run_id`, provider, 상태, next action의 fingerprint와 `action_notice_id`를 기록하고, 상태가 바뀌거나 사용자가 조치할 때만 새 보고를 만든다.

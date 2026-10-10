@@ -146,5 +146,16 @@ class MultiCompoundInputTests(unittest.TestCase):
             self.assertFalse(ledger["pharmmapper_submission"]["email_stored"])
             self.assertNotIn("person@example.org", json.dumps(ledger))
 
+    def test_pharmmapper_response_review_is_idempotent_and_blocks_resubmission(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            run = Path(temp_dir) / "CID75596314_20261010"
+            dashboard.m.save(run / "job_ledger.json", {"pharmmapper_submission": {
+                "status": "SUBMITTED_RESPONSE_REVIEW_REQUIRED", "job_id": None, "response_sha256": "abc"
+            }})
+            with mock.patch.object(dashboard.requests, "post") as posted:
+                result = dashboard.submit_pharmmapper(run, "person@example.org")
+            self.assertTrue(result["already_recorded"])
+            posted.assert_not_called()
+
 if __name__ == "__main__":
     unittest.main()

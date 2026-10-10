@@ -258,6 +258,9 @@ def begin_run_analysis(run):
 def submit_pharmmapper(run, email):
     """Submit a prepared V2000 SDF to the official PharmMapper form without persisting email."""
     run=Path(run)
+    existing=m.read(run/"job_ledger.json").get("pharmmapper_submission", {})
+    if existing.get("status") in ("SUBMITTED", "SUBMITTED_RESPONSE_REVIEW_REQUIRED"):
+        return {"job_id": existing.get("job_id"), "status": existing.get("status"), "already_recorded": True}
     if not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", email or ""):
         raise ValueError("PharmMapper 제출에는 유효한 이메일 주소가 필요합니다.")
     structure=m.read(run/"structure_manifest.json")
@@ -287,7 +290,8 @@ def submit_pharmmapper(run, email):
     previous=ledger.get("pharmmapper_submission",{})
     attempts=list(previous.get("attempts",[]))
     attempts.append({"attempt":len(attempts)+1,"submitted_at_utc":m.now(),"job_id":job_id,"response_sha256":hashlib.sha256(body.encode("utf-8","replace")).hexdigest(),"email_stored":False})
-    ledger["pharmmapper_submission"]={"provider":"PharmMapper","status":"SUBMITTED" if job_id else "SUBMITTED_RESPONSE_REVIEW_REQUIRED","job_id":job_id,"cid":structure.get("cid"),"input_sha256":structure.get("structure_sha256"),"compound_tag":tag,"submitted_at_utc":m.now(),"source_url":"https://www.lilab-ecust.cn/pharmmapper/submitjob.html","response_sha256":hashlib.sha256(body.encode("utf-8","replace")).hexdigest(),"email_stored":False,"attempts":attempts}
+    response_sha=hashlib.sha256(body.encode("utf-8","replace")).hexdigest()
+    ledger["pharmmapper_submission"]={"provider":"PharmMapper","status":"SUBMITTED" if job_id else "SUBMITTED_RESPONSE_REVIEW_REQUIRED","job_id":job_id,"cid":structure.get("cid"),"input_sha256":structure.get("structure_sha256"),"compound_tag":tag,"submitted_at_utc":m.now(),"source_url":"https://www.lilab-ecust.cn/pharmmapper/submitjob.html","response_sha256":response_sha,"email_stored":False,"attempts":attempts,"next_action_code":None if job_id else "PROVIDER_JOB_ID_REQUIRED","action_notice_id":None if job_id else hashlib.sha256((str(run)+response_sha).encode()).hexdigest()[:16],"resubmission_allowed":False}
     m.save(run/"job_ledger.json",ledger)
     tag_doc["submission_status"]="SUBMITTED" if job_id else "SUBMITTED_RESPONSE_REVIEW_REQUIRED"
     tag_doc["job_id"]=job_id
@@ -391,7 +395,8 @@ def external_submission_panel(project):
         elif sea_ledger.get("status")=="NEEDS_ATTENTION_DOWNLOAD_FAILED": sea+='<p class="warn">SEA 결과 원본 자동 회수 실패 — 원본·SHA-256 없이 완료 처리하지 않습니다.</p>'+form("/retrieve_sea",'<input type="hidden" name="run" value="'+h(run_id)+'">',"SEA 결과 원본 자동 회수 재시도")
         else: sea+='<p><a href="https://sea.bkslab.org/" target="_blank" rel="noopener">SEA 공식 제출 화면 열기</a></p>'+sea_copy_control("SEA SMILES",smiles)+sea_copy_control("PubChem CID",cid)+sea_copy_control("작업 태그",tag)+'<p class="warn">사람 확인(CAPTCHA)이 요구되면 완료 뒤에만 제출됩니다.</p>'
         pm='<h4>PharmMapper</h4>'
-        if pharm.get("status") in ("SUBMITTED","SUBMITTED_RESPONSE_REVIEW_REQUIRED"): pm+='<p class="ok">PharmMapper 자동 제출 응답 확인됨'+(" · 작업 ID "+h(pharm.get("job_id")) if pharm.get("job_id") else " · 작업 ID 확인 대기")+' · 이메일 재입력 불필요</p>'
+        if pharm.get("status")=="SUBMITTED": pm+='<p class="ok">PharmMapper 제출 확인 · 작업 ID '+h(pharm.get("job_id"))+" · 결과 대기</p>"
+        elif pharm.get("status")=="SUBMITTED_RESPONSE_REVIEW_REQUIRED": pm+='<p class="warn">PharmMapper 제출 기록은 보존되어 있습니다. 작업 ID가 응답에서 확인되지 않아 사용자 조치 1회가 필요합니다. 공식 응답 또는 완료 메일에서 작업 ID를 확인해 기록한 뒤 재개하세요. 재제출하지 않습니다.</p>'
         else:
             fields='<input type="hidden" name="run" value="'+h(run_id)+'"><label>프로젝트 공용 PharmMapper 제출·결과 수신 이메일 (현재 세션 전용) <input type="email" name="pharmmapper_email" autocomplete="email" required placeholder="name@example.org"></label><p class="muted">최초 한 번만 입력하며 파일·로그·보고서에는 저장하지 않습니다.</p>'
             pm+=form("/submit_pharmmapper",fields,"PharmMapper 공식 제출")
@@ -534,7 +539,7 @@ class Handler(BaseHTTPRequestHandler):
             project=ensure_project_for_run(run)
             existing=m.read(run/"job_ledger.json").get("pharmmapper_submission", {})
             if existing.get("status") in ("SUBMITTED","SUBMITTED_RESPONSE_REVIEW_REQUIRED"):
-                content=project_page(project["project_id"],notice="PharmMapper 제출 응답이 이미 기록되어 이메일 재입력과 중복 제출을 건너뛰었습니다.").encode()
+                content=project_page(project["project_id"],notice="PharmMapper 제출 기록을 유지합니다. 재제출하지 않고 공식 작업 ID 확인을 기다립니다.").encode()
                 self.send_response(200); self.send_header("Content-Type","text/html; charset=utf-8"); self.end_headers(); self.wfile.write(content); return
             try:
                 result=submit_pharmmapper(run,data.get("pharmmapper_email","").strip())
