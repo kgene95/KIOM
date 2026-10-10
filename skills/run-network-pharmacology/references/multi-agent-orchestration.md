@@ -1,3 +1,27 @@
+# NP 다중 에이전트 운영 설계 — 한국어 기본 정책 (v2)
+
+## 한국어 의무
+사용자 질문, 답변, 진행상황, 승인 요청, 경고 및 최종 보고는 사용자의 입력 언어와 관계없이 **한국어**로 작성한다. DB 이름, 파일 경로, 프로그램명, 유전자명, 표준 생물학 명칭은 원어 병기가 허용된다. 구조화된 기계 출력의 key는 영어 가능하지만 사용자 표시용 설명은 한국어다. 이 규칙은 총괄 및 세부 에이전트 1~5 모두에 적용한다.
+
+## 실제 역할 구성
+- 총괄 에이전트 0: 화합물명/CID(여러 개 가능), 질환명, 생물종(Homo sapiens 기본값), 기존 자료 재사용 승인 접수. 작업 큐, 재시도, 비용, 알림과 의존성 관리. 별도 Python 실행기에서 상태 유지.
+- 세부 에이전트 1, NP 자료·화학구조 담당: CID/SMILES/InChIKey/3D SDF·MOL2 구조 QC, 질환 유전자·화합물 표적 수집, 기존 데이터 탐색 및 비-SEA/PharmMapper 분석. 유효한 구조가 나오자마자 2번에 인계.
+- 세부 에이전트 2, SEA·PharmMapper 전담: 1번의 구조 인계 파일을 검증하고 기존 데이터 승인 상태를 확인한 후 서비스에서 지원하는 공식 경로로 제출, job ID/입력 SHA 저장, 결과 상태 조회·원본 수집·검증. 이메일은 서비스의 알림 또는 확인 용도로만 사용한다. 자동 제출 지원 여부는 서비스별로 실제 검증해야 하며 미검증이면 NEEDS_EXTERNAL_SUBMISSION으로 대기.
+- 세부 에이전트 3, STRING·Cytoscape·네트워크/경로 분석: 1·2번이 진행 중이어도 검증된 독립 자료가 도착하면 예비 브랜치에서 즉시 시작. PPI, degree, cytoHubba(지원되는 공식 경로 또는 GUI), MCODE, GO BP/CC/MF, KEGG, Reactome, g:Profiler. 최종 네트워크는 모든 필수 표적과 mapping QC 후 별도 확정. 예비 자료와 확정 결과를 섞지 않음.
+- 세부 에이전트 4, 독립 QC·차등 재실행: 모든 새 데이터 도착 이벤트마다 화합물-작업 매핑, UniProt/HGNC/종, 원본 SHA, UC 질환 배경, STRING 매핑, PPI/경로 결과를 검토. 새 입력이 기존 결과를 바꾸는 경우 3번 작업을 invalidated로 표시하고 재실행 의뢰. PASS·REVISE·BLOCKED를 기록. 독립 QC 이전에 완결 선언 금지.
+- 세부 에이전트 5, 논문용 Methods·Results 근거 검토: 실험 원고, 동물·세포 데이터 및 NP 분석 결과가 들어오면 바로 문헌·원고 자료 목록과 문장 근거를 검토할 수 있음. 최종 통계·기전 결론 및 논문용 Figure legend는 4번의 PASS 후 확정. 실제 NP Methods/Results 초안 본문 작성은 기존 NP 스킬의 사용자 승인 조건을 지킨다.
+
+## 작업 큐와 인계 구현
+`scripts/np_agent_queue.py`는 RUN_ID 기반 작업 큐를 생성하고 단일 실행으로 상태를 확인한다. `--new --compound <CID/name> --disease <name> --species <organism>`으로 새 분석을 만들고, `--run <run folder>`로 인계·결과 상태를 갱신한다. 모든 실행에는 `request.json`, `work_queue.json`, `execution_state.json` 사용.
+1번은 `structure_manifest.json`에 CID, SMILES, structure_qc=PASS, 필요 시 structure_file 및 structure_sha256 입력. 실행기가 구조 검증 후 `handoff_to_agent2.json` 생성.
+2번은 `job_ledger.json`에 명시된 CID, 구조 SHA 및 작업 ID가 맞아야 제출 완료로 처리된다. `sea_result_manifest.json`과 `pharmmapper_result_manifest.json`에 각 job_id, CID, raw_file, SHA, verified=true가 모두 일치할 때만 수집 완료.
+3번은 질환 표적 데이터와 검증된 PPI 입력이 존재할 때 예비 분석 가능. 4번이 PASS 하지 않으면 최종 완결 금지.
+승인 및 검증 조건을 만족하지 않는 서비스 제출, 원고 최종화, 결과 병합은 자동 실행하지 않음.
+
+## 아직 연결되지 않은 서비스
+현재 실행기는 작업 생성/의존성/핸드오프 검증이며 SEA·PharmMapper 사이트의 실사용 자동 제출 API 또는 브라우저 자동화와 결합되지 않았다. 공식 제출·결과 API를 확인하고 CAPTCHA/로그인이 필요한 경우 사용자 개입이 필요하다. 로컬 감시기는 고정된 이전 UC 프로젝트 전용이므로 신규 RUN_ID의 감시를 위해 run registry 확장이 추가로 필요하다. ChatGPT 기반 세부 에이전트가 24시간 독립 실행된다고 주장하면 안 된다.
+
+---
 # NP multi-agent orchestration (v1, 2026-10-10)
 
 ## Purpose
