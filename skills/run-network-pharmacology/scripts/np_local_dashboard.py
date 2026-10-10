@@ -343,7 +343,20 @@ def role_status_panel(project):
     summary=' · '.join(k+' '+str(v) for k,v in counts.items())
     if not rows: summary='시행 전 1'
     table='<table><tr><th>담당</th><th>화합물</th><th>단계</th><th>상태</th><th>다음 작업·오류</th></tr>'+''.join(rows)+'</table>'
-    return '<section class="progress-overview"><details><summary><strong>전체 진행 상황</strong> · '+h(summary)+'</summary><p class="muted">총괄과 세부 에이전트의 현재 단계만 요약합니다. 오류·보류 항목은 상세·재작업 링크에서 다시 열 수 있습니다.</p><details><summary>상세 내역 표 보기</summary>'+table+'</details></details></section>'
+    events=[]
+    for run_id in project.get("run_ids",[]):
+        event_path=WORKSPACE/"runs"/run_id/"event_log.jsonl"
+        if event_path.exists():
+            try:
+                lines=event_path.read_text(encoding="utf-8").splitlines()[-8:]
+                events.extend((run_id, json.loads(line)) for line in lines)
+            except (OSError, json.JSONDecodeError):
+                pass
+    events=events[-12:]
+    event_rows=''.join('<tr><td>'+h(run_id)+'</td><td>'+h(item.get("at_utc", ""))+'</td><td>'+h(item.get("event", ""))+'</td><td>'+h(item.get("task_id", item.get("status", "")))+'</td></tr>' for run_id,item in events)
+    event_block='<p class="muted">아직 구조화 이벤트가 없습니다.</p>' if not event_rows else '<table><tr><th>실행</th><th>시각</th><th>이벤트</th><th>작업·상태</th></tr>'+event_rows+'</table>'
+    live='<label class="muted"><input type="checkbox" id="harness-live"> 10초마다 자동 새로고침</label><script>(function(){const k="kiom-harness-live";const x=document.getElementById("harness-live");x.checked=localStorage.getItem(k)==="1";x.onchange=()=>localStorage.setItem(k,x.checked?"1":"0");if(x.checked)setTimeout(()=>location.reload(),10000)})();</script>'
+    return '<section class="progress-overview"><details open><summary><strong>전체 진행 상황</strong> · '+h(summary)+'</summary><p class="muted">총괄·세부 에이전트·worker의 저장된 상태를 표시합니다. 오류·보류 항목은 상세·재작업 링크에서 다시 열 수 있습니다.</p>'+live+'<details><summary>상세 작업 표 보기</summary>'+table+'</details><details><summary>최근 실행 이벤트 보기</summary>'+event_block+'</details></details></section>'
 
 def sea_result_state(run):
     row=m.read(Path(run)/"job_ledger.json").get("sea_submission", {})
