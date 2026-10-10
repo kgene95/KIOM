@@ -31,3 +31,15 @@
 - 결과 QC 통과 또는 수정 요청
 
 연결 상태는 `connector_status`와 `verification_status`로 기록하며, 단순히 문서에 이름이 있다는 이유로 연결 완료라고 판정하지 않는다.
+
+## 신규 실행과 과거 실행의 구분
+
+과거 실행에서 SEA와 PharmMapper를 직접 제출하고, 작업 완료를 기다린 뒤 결과 원본을 다운로드한 기록이 있을 수 있다. 이 기록은 `historical evidence`로 보존하며, 새 run의 결과로 자동 승격하지 않는다.
+
+새 run이 `reuse_existing: false`로 시작되면 다음을 적용한다.
+
+1. 과거 job ID·결과 파일·SHA-256은 참고 후보로만 감사한다.
+2. 현재 run에는 새로운 제출 job ID와 새로운 raw archive가 있어야 한다.
+3. SEA가 CAPTCHA(현재 Altcha 포함)를 요구하면 제출 worker는 `WAITING_USER`로 전환하고, 사용자가 브라우저에서 사람 확인을 완료한 뒤 재개한다.
+4. PharmMapper 응답에서 공식 작업 ID를 추출하지 못하면 `SUBMITTED_RESPONSE_REVIEW_REQUIRED`로 기록하며 성공·완료로 처리하지 않는다.
+5. 공식 job ID, 결과 원본, SHA-256, 화합물 identity 검증이 모두 끝난 뒤에만 downstream 분석을 unblock한다.

@@ -26,6 +26,10 @@ Before submitting any new SEA, PharmMapper, SwissTargetPrediction, or other sour
 
 If a matching existing dataset is found, do NOT silently use it, overwrite it, or submit a replacement job. Notify the user of the candidate archive path, matching and mismatching properties, verification confidence, age, and consequences for reproducibility. Explicitly ask the user to choose: (A) reuse the verified historical data, or (B) collect a new dataset. Do not proceed past the source-selection gate until a choice is recorded. If the candidate fails verification, explain the failure and recommend new collection; never call it verified.
 
+### Historical submission records versus a new run
+
+An earlier execution may have completed direct SEA/PharmMapper submission, job waiting, and result download. Preserve that evidence as historical evidence, but do not treat it as the current run's submission or completion. When `reuse_existing: false`, the current run requires new provider job IDs and new raw archives. If the current SEA page presents Altcha or another CAPTCHA, the provider worker must persist `WAITING_USER` and resume only after the user completes the human check. If PharmMapper returns no official job ID, persist `SUBMITTED_RESPONSE_REVIEW_REQUIRED`; never infer success from an HTTP response alone. Downstream work unblocks only after job ID, raw result, SHA-256, and compound identity verification are all present.
+
 Reuse means reference or copy the immutable raw evidence into the new run with a distinct destination filename and recorded lineage; never replace the original. New collection also archives into a new unique filename. Log approval choice, timestamp, dataset hash, and source branch in source_attempts and the execution state; do not persist sensitive email or tokens. In the state machine, use WAITING_REUSE_APPROVAL, RESUME_ON_APPROVAL, or SOURCE_PENDING as appropriate. Waiting for user approval is a legitimate blocking gate, not an analysis failure; do not retry automatically.
 
 ## Low-token monitoring

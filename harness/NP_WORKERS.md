@@ -33,6 +33,14 @@ Agent는 책임 영역을 조정하고, worker는 한 가지 검증 가능한 �
 
 제출 worker는 최초 승인과 공식 경로를 확인한다. CAPTCHA·로그인·이메일 입력이 필요하면 `WAITING_USER`로 전환한다. Gmail worker는 메일 본문과 주소를 저장하지 않고 job ID 매칭과 공식 결과 링크만 기록한다.
 
+### 외부 제출 상태 규칙
+
+이전 실행에서 제출·대기·다운로드가 완료된 사실은 새 run의 자동 완료 근거가 아니다. 새 run은 기존 자료 재사용 승인 없이는 과거 결과를 사용하지 않는다.
+
+- SEA: SMILES 입력 후 CAPTCHA가 표시되면 `WAITING_USER`; 사람 확인 뒤 제출과 job ID 확인을 재개한다.
+- PharmMapper: 이메일은 현재 세션에서만 사용하고 파일·로그·manifest에 저장하지 않는다. 응답에 공식 job ID가 없으면 `SUBMITTED_RESPONSE_REVIEW_REQUIRED`로 중지한다.
+- 두 provider 모두 raw 결과와 SHA-256, CID/구조 identity 검증 전에는 `DONE`이나 downstream unblock을 선언하지 않는다.
+
 ## Agent 3: 계산·통합 분석
 
 | worker | 산출물 | 현재 상태 |
