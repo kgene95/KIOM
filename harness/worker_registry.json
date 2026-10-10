@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "policy": "Only explicitly registered workers may be dispatched. No arbitrary command strings.",
+  "workers": {
+    "np_queue_sync": {
+      "module": "np_agent_queue",
+      "function": "collect",
+      "resource": "run-folder",
+      "network": false,
+      "requires_approval": false
+    },
+    "provider_monitor": {
+      "module": "np_multi_run_monitor",
+      "function": "run_cycle",
+      "resource": "provider-and-cytoscape",
+      "network": true,
+      "requires_approval": true
+    }
+  }
+}

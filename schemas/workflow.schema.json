@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kiom/workflow.schema.json",
+  "type": "object",
+  "required": ["workflow_id", "goal", "success_criteria", "tasks", "state", "next_action"],
+  "properties": {
+    "workflow_id": {"type": "string", "minLength": 1},
+    "goal": {"type": "string", "minLength": 1},
+    "success_criteria": {"type": "array", "items": {"type": "string"}},
+    "tasks": {"type": "array", "items": {"$ref": "task.schema.json"}},
+    "state": {"type": "string"},
+    "next_action": {"type": "string"}
+  },
+  "additionalProperties": true
+}
