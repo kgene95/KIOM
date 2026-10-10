@@ -24,6 +24,7 @@ def initialize(root,compound,disease,species):
  save(home/"work_queue.json",{"run_id":runid,"updated_utc":utc(),"tasks":items,"version":1})
  save(home/"execution_state.json",{"state":"INTAKE","created_utc":utc(),"not_complete":True,"next_action":"화합물 CID/구조 검증과 기존 자료 감사"})
  print(json.dumps({"run":str(home),"tasks":len(items)},ensure_ascii=False))
+ return home
 def collect(root):
  qpath=root/"work_queue.json";q=load(qpath,{"tasks":[]})
  identity=load(root/"structure_manifest.json",{})
