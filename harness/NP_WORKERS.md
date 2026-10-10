@@ -41,6 +41,8 @@ Agent는 책임 영역을 조정하고, worker는 한 가지 검증 가능한 �
 - PharmMapper: 이메일은 현재 세션에서만 사용하고 파일·로그·manifest에 저장하지 않는다. 응답에 공식 job ID가 없으면 `SUBMITTED_RESPONSE_REVIEW_REQUIRED`로 중지한다.
 - 두 provider 모두 raw 결과와 SHA-256, CID/구조 identity 검증 전에는 `DONE`이나 downstream unblock을 선언하지 않는다.
 
+제출 책임은 Agent 2와 총괄 Controller에 있다. 정상적인 입력·제출·작업 ID 확인·결과 회수는 에이전트가 직접 수행하며 사용자는 진행 중 매 단계마다 클릭하거나 명령을 입력하지 않는다. CAPTCHA 등 provider가 사람 확인을 강제하는 경우에만 보안 우회 없이 `WAITING_USER`로 전환한다.
+
 ## Agent 3: 계산·통합 분석
 
 | worker | 산출물 | 현재 상태 |

@@ -44,4 +44,8 @@
 4. PharmMapper 응답에서 공식 작업 ID를 추출하지 못하면 `SUBMITTED_RESPONSE_REVIEW_REQUIRED`로 기록하며 성공·완료로 처리하지 않는다.
 5. 공식 job ID, 결과 원본, SHA-256, 화합물 identity 검증이 모두 끝난 뒤에만 downstream 분석을 unblock한다.
 
+### 외부 제출 책임
+
+SEA·PharmMapper 제출은 사용자가 매번 수동으로 수행하는 단계가 아니라 Controller/Agent 2가 맡는 실행 작업이다. 총괄은 검증된 구조와 승인 정보를 사용해 공식 제출 화면을 열고, 입력·제출·작업 ID 기록·결과 회수까지 직접 시도한 뒤 다음 작업으로 연결한다. 사용자는 정상 실행 중간에 반복해서 개입하지 않는다. 단, provider가 CAPTCHA·로그인·브라우저 권한 등 사람의 보안 확인을 강제하면 자동화 우회 없이 해당 지점만 `WAITING_USER`로 기록하고 정확한 재개 조건을 보고한다.
+
 같은 `SUBMITTED_RESPONSE_REVIEW_REQUIRED` 또는 `WAITING_USER` 상태를 반복 보고하거나 재제출하지 않는다. `run_id`, provider, 상태, next action의 fingerprint와 `action_notice_id`를 기록하고, 상태가 바뀌거나 사용자가 조치할 때만 새 보고를 만든다.
