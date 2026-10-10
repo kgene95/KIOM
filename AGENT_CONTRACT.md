@@ -10,6 +10,7 @@
 6. Notifier
 7. 질문과 handoff
 8. 진행 보고
+9. 사전 점검
 
 ## Controller
 
@@ -42,3 +43,7 @@
 ## 진행 보고
 
 총괄은 의미 있는 상태 변화마다 한국어 채팅 보고를 남긴다. worker 하나의 실패·외부 대기·승인 대기가 전체 workflow 종료 사유가 되지 않도록 독립 task를 계속 dispatch하고, 재개 조건과 다음 행동을 기록한다. 변화 없는 polling은 반복 보고하지 않는다.
+
+## 사전 점검
+
+Planner와 Controller는 실행 전 전체 workflow와 의존성을 파악하고 필요한 Skill, plugin, connector, 로컬 프로그램, 이메일·권한·승인을 조사한다. 사용자가 직접 처리해야 할 항목은 최우선순위 목록으로 한 번에 고지하고, 준비가 끝난 항목은 다시 묻지 않는다. `PREFLIGHT_READY` 전에는 장시간 worker를 시작하지 않는다.

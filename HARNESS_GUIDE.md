@@ -13,6 +13,7 @@
 9. 상태와 기억
 10. 분야별 adapter
 11. 진행 보고와 중단 방지
+12. 사전 점검
 
 ## 목적과 범위
 
@@ -67,3 +68,7 @@ adapter는 task 목록, 입력·출력 계약, 분야별 검증, 외부 connecto
 ## 진행 보고와 중단 방지
 
 채팅 보고와 상태 전이는 [PROGRESS_REPORTING.md](PROGRESS_REPORTING.md)를 따른다. 총괄은 run 생성, worker 시작·완료, 승인·외부 대기, 오류·재시도·QC, 완료·예산 중지 시 한국어로 현재 상태와 다음 행동을 보고한다. 한 task가 막혀도 독립 task를 계속 실행하며, 필수 task가 막힌 경우에만 최종 gate를 보류한다.
+
+## 사전 점검
+
+작업 시작 전 [PREFLIGHT_CHECKLIST.md](PREFLIGHT_CHECKLIST.md)를 읽고 전체 workflow, 필요한 Skill·plugin·connector·로컬 프로그램·이메일·권한과 사용자 선행 작업을 한 번에 확인한다. 사용자가 직접 해야 하는 항목은 최우선순위로 미리 고지하고 상태를 기록한다. 사전 점검이 끝나기 전에는 장시간 실행을 시작하지 않는다.

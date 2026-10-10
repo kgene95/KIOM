@@ -13,6 +13,10 @@ description: "Run reproducible, source-traceable network pharmacology for compou
 
 활성 NP 실행 중 총괄은 [PROGRESS_REPORTING.md](../../PROGRESS_REPORTING.md)의 한국어 채팅 보고 규칙을 따른다. run 생성, 병렬 계획, Agent 1~5 또는 worker의 시작·완료, 승인·외부 대기, 오류 복구, 독립 QC, 완료·예산 중지 시 보고한다. 하나의 provider 또는 worker가 막혀도 의존성이 없는 branch는 계속 실행하고, 필수 gate만 보류한다. 변화 없는 polling은 반복 보고하지 않는다.
 
+### NP 사전 점검
+
+실행 전 [PREFLIGHT_CHECKLIST.md](../../PREFLIGHT_CHECKLIST.md)를 사용해 전체 NP workflow와 의존성을 파악한다. 필요한 Skill·plugin·Gmail connector·SEA·PharmMapper 브라우저 세션·로컬 프로그램·이메일·권한·사용자 승인을 먼저 확인하고, 사용자가 직접 해야 할 준비를 최우선순위로 한 번에 고지한다. `PREFLIGHT_READY` 전에는 장시간 제출·수집·분석을 시작하지 않는다.
+
 - **공개 질환 출처 감사:** TTD 등 공식 공개 원본 수집, 누락 원인 확인 및 source 상태 보고 전에 [public-disease-source-audit.md](references/public-disease-source-audit.md)를 따른다. 원본 확보·UC 추출·stable-ID QC·분석 통합을 구분하고 HTML HTTP 200을 데이터 확보로 계산하지 않는다.
 
 - **초기 통합 승인:** 화합물명·질환명·생물종 입력 후 기존 자료를 검증하고 한 번의 한국어 승인 화면에서 재사용·보완·SEA·PharmMapper 신규 제출·PharmMapper 이메일 사용을 확인한다. 승인되면 Agent 2는 검증된 공식 제출 경로를 즉시 실행한다. SEA는 공식 위젯이 허용하는 일반 Altcha 확인과 제출을 브라우저 자동화로 수행하고 task ID를 검증한다. 이메일·비밀번호·토큰은 기록하지 않는다. [initial-access-approval.md](references/initial-access-approval.md)와 [multi-agent-orchestration.md](references/multi-agent-orchestration.md)를 따른다.
