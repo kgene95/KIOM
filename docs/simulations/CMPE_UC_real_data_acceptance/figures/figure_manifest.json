@@ -1,9 +1,0 @@
-{
-  "source": "simulation_summary.json, mcc_rank.csv, cmpe_union_string_enrichment.tsv",
-  "figures": [
-    "Figure_A_MCC_top20.svg",
-    "Figure_B_GO_KEGG_top7.svg",
-    "Figure_C_artifact_counts.svg"
-  ],
-  "note": "SVG figures are generated from simulation artifacts; they do not alter source calculations. GUI visual review remains pending."
-}
