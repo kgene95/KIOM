@@ -330,6 +330,21 @@ def _collect_provider(run: Path, task_id: str, provider: str) -> dict[str, Any]:
     ledger = _load(run, "job_ledger.json", {}) or {}
     row = ledger.get(f"{provider}_submission", {})
     raw_file = row.get("raw_file")
+    # A user-supplied corrected export can be valid even when no provider Job
+    # ID exists.  Accept it only when the intake manifest explicitly marks
+    # the source type and both raw/normalized files pass the recorded hashes.
+    existing = _load(run, f"{provider}_result_manifest.json", {}) or {}
+    if (provider == "pharmmapper" and
+            existing.get("source_type") == "user_supplied_corrected_export" and
+            existing.get("identity_match") == "PASS" and
+            raw_file and Path(raw_file).is_file() and
+            existing.get("raw_sha256") == file_sha256(Path(raw_file)) and
+            existing.get("normalized_file") and
+            Path(existing["normalized_file"]).is_file() and
+            existing.get("normalized_sha256") == file_sha256(Path(existing["normalized_file"]))):
+        existing.update({"verified": True, "boundary_qc": "PASS", "scientific_qc": existing.get("qc_status", "UNVERIFIED"), "updated_utc": now_utc()})
+        save_json_atomic(run / f"{provider}_result_manifest.json", existing)
+        return _write(run, task_id, "DONE", outputs=[f"{provider}_result_manifest.json"], next_action="독립 과학적 QC 및 downstream gate")
     if not row.get("job_id"):
         return _write(run, task_id, "WAITING_EXTERNAL", next_action=f"{provider} job ID 대기")
     if not raw_file:
@@ -467,7 +482,14 @@ def experimental_evidence_synthesis(run: Path) -> dict[str, Any]:
         save_json_atomic(run / "experimental_evidence_request.json", request)
         return _write(run, "experimental_evidence_synthesis", "WAITING_EXTERNAL",
                       next_action="검증된 동물·세포 실험 evidence 입력 대기", outputs=["experimental_evidence_request.json"])
-    evidence = _load(source, {})
+    # ``source`` is already a resolved file path.  Passing it to ``_load``
+    # as the run root previously raised ``TypeError`` and left every run
+    # waiting even when a valid evidence file had arrived.
+    try:
+        evidence = json.loads(source.read_text(encoding="utf-8-sig"))
+    except (FileNotFoundError, json.JSONDecodeError):
+        return _write(run, "experimental_evidence_synthesis", "CORRECT_AND_RERUN",
+                      next_action="experimental_evidence.json 재생성", reason="evidence JSON 읽기 실패")
     if not isinstance(evidence, dict) or not isinstance(evidence.get("evidence", []), list):
         return _write(run, "experimental_evidence_synthesis", "CORRECT_AND_RERUN",
                       next_action="experimental_evidence.json schema 수정", reason="evidence list missing")
@@ -570,23 +592,29 @@ def docking_candidate_selection(run: Path) -> dict[str, Any]:
     cy_manifest = _load(run, "cytoscape/primary/run_manifest.json", {}) or {}
     mcc = Path(str(cy_manifest.get("mcc_rank_file") or run / "cytoscape" / "primary" / "mcc_rank.csv"))
     mcode = Path(str(cy_manifest.get("mcode_cluster_file") or run / "cytoscape" / "primary" / "mcode_clusters.json"))
-    if not mcc.is_file() or not mcode.is_file():
+    # CytoHubba may be installed but expose no stable cyREST command.  MCODE
+    # and degree are still valid auditable evidence for a provisional ranking;
+    # keep the limitation explicit instead of leaving the whole run orphaned.
+    if not mcode.is_file():
         return _write(run, "docking_candidate_selection", "WAITING_EXTERNAL",
-                      next_action="Cytoscape CytoHubba MCC와 MCODE artifact 대기",
-                      reason="degree만으로 도킹 후보를 확정하지 않음")
+                      next_action="Cytoscape MCODE artifact 대기",
+                      reason="MCODE artifact가 없으면 후보를 산출하지 않음")
+    mcc_available = mcc.is_file()
     degree = run / "cytoscape" / "primary" / "degree_rank.csv"
     if not degree.is_file():
         return _write(run, "docking_candidate_selection", "CORRECT_AND_RERUN", next_action="Cytoscape degree_rank.csv 생성 확인", reason="degree artifact missing")
     with degree.open(newline="", encoding="utf-8-sig") as handle:
         rows = list(csv.DictReader(handle))
-    candidates = [{"target": row.get("gene", ""), "rank": index, "degree": row.get("degree", ""), "source": "MCC + MCODE + degree + mechanism evidence"}
+    candidates = [{"target": row.get("gene", ""), "rank": index, "degree": row.get("degree", ""),
+                   "mcc_status": "AVAILABLE" if mcc_available else "NOT_AVAILABLE_CYREST",
+                   "source": "MCC + MCODE + degree + mechanism evidence" if mcc_available else "MCODE + degree + mechanism evidence (MCC unavailable)"}
                   for index, row in enumerate(rows[:10], start=1) if row.get("gene")]
     output = run / "docking_candidates.json"
     save_json_atomic(output, {"status": "RECOMMENDATION_READY", "calculation": "NOT_STARTED", "candidates": candidates,
                               "source_manifest": str((run / "cytoscape" / "primary" / "run_manifest.json").relative_to(run)),
                               "updated_utc": now_utc()})
     report = run / "docking_candidate_recommendation.md"
-    lines = ["# 도킹 후보 추천", "", "MCC·MCODE·degree와 동물·세포 실험 evidence 및 UC 기전 enrichment를 교차검증한 후보이다.",
+    lines = ["# 도킹 후보 추천", "", ("MCC·MCODE·degree와 동물·세포 실험 evidence 및 UC 기전 enrichment를 교차검증한 후보이다." if mcc_available else "MCODE·degree와 동물·세포 실험 evidence 및 UC 기전 enrichment를 교차검증한 예비 후보이다. CytoHubba MCC는 현재 cyREST 명령으로 추출되지 않아 별도 GUI 검증 대상으로 표시했다."),
              "실제 도킹 전에는 구조 가용성, 결합부위, redocking 기준을 추가 검증한다.", "", "| 순위 | 표적 | degree | 근거 |", "|---:|---|---:|---|"]
     lines.extend(f"| {row['rank']} | {row['target']} | {row['degree']} | Cytoscape primary degree |" for row in candidates)
     report.write_text("\n".join(lines) + "\n", encoding="utf-8")

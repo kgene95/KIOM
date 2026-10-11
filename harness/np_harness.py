@@ -108,6 +108,36 @@ def reconcile_queue(run: Path, queue: dict[str, Any], expected_cid: str | None =
     tasks = task_map(queue)
     changes: list[dict[str, Any]] = []
 
+    # Worker results are durable events.  Older controller cycles only
+    # reconciled provider ledgers, so a worker could finish successfully while
+    # the queue still displayed QUEUED/WAITING_EXTERNAL.  Promote every
+    # verified worker result before dependency dispatch; this is idempotent
+    # and makes failures visible without requiring a user prompt.
+    for task_id, task in tasks.items():
+        result = read(run / "worker_results" / f"{task_id}.json", {})
+        result_status = str(result.get("status") or "")
+        if not result_status:
+            continue
+        allowed = {"DONE", "DONE_RAW_UNVERIFIED", "WAITING_EXTERNAL", "WAITING_USER",
+                   "WAITING_MAPPING_QC", "FAILED", "FAILED_RETRYABLE", "CORRECT_AND_RERUN",
+                   "BLOCKED", "IDENTITY_MISMATCH", "INVALIDATED"}
+        if result_status not in allowed:
+            continue
+        mapped = "FAILED" if result_status == "FAILED_RETRYABLE" else result_status
+        # A stale WAITING_EXTERNAL result must never downgrade a later DONE
+        # artifact (workers can be retried after their durable outputs exist).
+        if task.get("status") == "DONE" and mapped in {"WAITING_EXTERNAL", "WAITING_USER", "WAITING_MAPPING_QC"}:
+            continue
+        if task.get("status") != mapped or result.get("detail") or result.get("next_action"):
+            task["status"] = mapped
+            if result.get("reason"):
+                task["detail"] = result.get("reason")
+            if result.get("next_action"):
+                task["next_action"] = result.get("next_action")
+            if result.get("outputs"):
+                task["outputs"] = result.get("outputs")
+            changes.append({"task": task_id, "status": mapped, "event": "worker_result_reconciled"})
+
     # Wake external-wait tasks when the required local service is available.
     # A prior WAITING_EXTERNAL state must never become a silent terminal state.
     cytoscape_task = tasks.get("cytoscape_visualization")

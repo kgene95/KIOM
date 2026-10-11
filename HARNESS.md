@@ -175,3 +175,11 @@ python <workspace>\harness\runner.py cycle --profile <domain> --run <run-folder>
 이 파일과 `HARNESS_GUIDE.md`, `harness/EVALUATION_AND_IMPROVEMENT.md`는 범용 실행·평가 지침이다. 날짜나 평가 목적을 가진 문서는 실행 지시가 아니라 평가 기록으로 읽는다. 실제 작업에서는 선택한 domain adapter와 worker 계약을 추가 적용한다.
 
 
+
+## Review package at project root
+
+For every research or analysis project, the controller creates a collaborator review package directly under the project root. The package keeps five boundaries: 01_raw, 02_calculated, 03_external_analysis, 04_visual_qc, and 05_figures_reports. Raw inputs and collected provider results are never mixed with derived calculations. The package README lists every folder and file and records input -> analysis -> output filename and extension. Invalid, identity-mismatched, or discarded files are excluded.
+
+Review package README files must present the inventory as a table whenever possible. The minimum columns are: folder, file, input/source, analysis or transformation, output extension, and review purpose.
+
+A review package is review-complete only when its metadata records tool versions, provider/database release, parameters, execution dates, input/output hashes, and script revision. If any item is missing, label the package REVIEW_ONLY and do not claim publication-ready reproducibility.

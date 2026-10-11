@@ -63,3 +63,11 @@ NP 분석의 최종 목표는 통합 target/PPI/enrichment 산출에 그치지 �
 `figure_draft`는 통합 enrichment와 MCC/MCODE가 모두 검증되기 전에는 완료할 수 없다. `docking_candidate_selection`은 degree 단독 결과를 최종 후보로 승격하지 않으며, 실험 evidence·MCC·MCODE·pathway·구조 가용성의 교차검증을 요구한다. 각 handoff는 입력 hash, 산출물 경로, 수신 worker, 다음 action을 event log에 기록한다.
 
 도킹 후보를 최종 추천하기 전에는 화합물별 공동 target 매칭, 문헌·기전 감사, PDB/결합 포켓 적합성 감사를 병렬로 실행한다. 동물·세포 실험 자료가 연구 설계상 아직 없을 수 있으므로 실험 근거는 선택적 가점이며, 없으면 `미확인`으로 표시한다. 문헌·구조 근거가 부족한 표적은 순위표에 보류 사유를 남기고 최종 후보에서 제외한다. 후보 순위에는 MCC·MCODE·degree 숫자뿐 아니라 화합물 매칭, 기전, 문헌, 구조 적합성에 대한 짧은 사유를 포함한다.
+
+## NP review package contract
+
+After the raw-data validation gate, create the collaborator review package under the NP project root. Keep the sequence 01_raw -> 02_calculated -> 03_STRING -> 04_Cytoscape -> 05_figures_reports. 01_raw contains verified compound/disease inputs, PharmMapper and SEA source files, PubChem structures, compound-protein and disease-gene tables. 02_calculated contains stable-ID normalization, mapping QC and overlap. 03_STRING contains STRING PPI and GO BP/CC/MF/KEGG outputs. 04_Cytoscape contains network inputs, degree, MCC, MCODE and visual-QC artifacts. 05_figures_reports contains candidate rationale, figures, Methods/Results and the final report. The README must list every file and record input -> analysis -> output filename/extension. Invalid identity-mismatch files and superseded compounds are excluded.
+
+The NP review-package README must use a table for the inventory and data lineage. Required columns are folder, file, input/source, NP or STRING/Cytoscape operation, output extension, and manuscript/review use. The table must distinguish raw files from calculated and provider-generated files.
+
+NP completion packaging must include reproducibility metadata: Python/runtime, Cytoscape and app versions, STRING release and thresholds, PharmMapper/SEA job dates and IDs, parameters, hashes, and script revision. A package may be collaborator-review complete while still marked REVIEW_ONLY; Methods/Results and publication-ready status require the metadata gate to pass.

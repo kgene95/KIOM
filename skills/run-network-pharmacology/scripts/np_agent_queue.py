@@ -69,7 +69,11 @@ def collect(root):
   elif t["id"] in ("sea_submission","pharmmapper_submission"):
    doc=load(root/"job_ledger.json",{})
    row=doc.get(t["id"],{})
-   if row.get("status") in ("SUBMITTED","PENDING","RETRIEVED","RETRIEVED_UNVERIFIED","VERIFIED","RESULT_FILE_RECEIVED_UNVERIFIED") and row.get("job_id") and row.get("cid")==identity.get("cid") and (not row.get("input_sha256") or row.get("input_sha256")==identity.get("structure_sha256")):
+   corrected_manifest=load(root/"pharmmapper_result_manifest.json",{}) if t["id"]=="pharmmapper_submission" else {}
+   corrected_supplied=(t["id"]=="pharmmapper_submission" and corrected_manifest.get("source_type")=="user_supplied_corrected_export" and corrected_manifest.get("identity_match")=="PASS" and str(corrected_manifest.get("cid"))==str(identity.get("cid")))
+   if corrected_supplied:
+    t["status"]="DONE_RAW_UNVERIFIED";t["detail"]="사용자 제공 교정 PharmMapper 원본·정규화 파일 수용; provider Job ID 없음"
+   elif row.get("status") in ("SUBMITTED","PENDING","RETRIEVED","RETRIEVED_UNVERIFIED","VERIFIED","RESULT_FILE_RECEIVED_UNVERIFIED") and row.get("job_id") and row.get("cid")==identity.get("cid") and (not row.get("input_sha256") or row.get("input_sha256")==identity.get("structure_sha256")):
     t["status"]="DONE"
    elif all(next(x for x in q["tasks"] if x["id"]==dep)["status"]=="DONE" for dep in t["requires"]):
     t["status"]="NEEDS_EXTERNAL_SUBMISSION"
@@ -88,6 +92,10 @@ def collect(root):
     result.update({"verified":True,"boundary_qc":"PASS","scientific_qc":result.get("qc_status","PENDING")})
     save(root/(provider+"_result_manifest.json"),result)
     t["status"]="DONE";t["detail"]="원본·정규화 파일·SHA-256 경계 검증 완료; 과학적 QC는 별도 gate"
+   elif boundary_ok and provider=="pharmmapper" and result.get("source_type")=="user_supplied_corrected_export" and result.get("identity_match")=="PASS":
+    result.update({"verified":True,"boundary_qc":"PASS","scientific_qc":result.get("qc_status","UNVERIFIED")})
+    save(root/(provider+"_result_manifest.json"),result)
+    t["status"]="DONE";t["detail"]="사용자 제공 교정 PharmMapper 원본·정규화 파일·SHA-256 경계 검증 완료"
    elif provider=="sea" and not result.get("verified") and row.get("status") in ("RETRIEVED_UNVERIFIED","RESULT_FILE_RECEIVED_UNVERIFIED") and Path(row.get("raw_file","")).is_file() and sha(Path(row["raw_file"]))==row.get("sha256"):
     t["status"]="DONE_RAW_UNVERIFIED";t["detail"]="공식 원본·SHA-256 보존 완료; 독립 QC 대기"
    elif provider=="pharmmapper" and row.get("status")=="RESULT_FILE_RECEIVED_UNVERIFIED" and Path(row.get("result_file","")).is_file() and Path(row.get("normalized_file","")).is_file() and sha(Path(row["result_file"]))==row.get("sha256") and sha(Path(row["normalized_file"]))==row.get("normalized_sha256"):

@@ -155,3 +155,11 @@ adapter는 domain별 task 목록, 입력·출력 계약, 검증 방법, 외부 c
 분석 결과가 생성되었다고 최종 산출물을 바로 만들지 않는다. 총괄은 (1) 외부·실험·사용자 추가 자료 검수, (2) 원자료와 계산 결과의 증거 통합, (3) 시각화·요약 산출물 생성, (4) 의사결정 후보 추천, (5) 보고서 초안 작성의 순서를 정의하고 각 단계의 산출물과 검증 상태를 다음 담당자에게 전달한다.
 
 각 단계는 독립 worker로 분리할 수 있으며, 같은 영역의 여러 worker를 하나의 agent가 소유할 수 있다. 중요한 것은 agent 번호가 아니라 입력 계약, output manifest, handoff event, 재시도 조건이다. 수치·근거가 부족하면 시각화나 추천을 완료로 표시하지 않고 `WAITING_EXTERNAL` 또는 `CORRECT_AND_RERUN`으로 되돌린다. 전체 원자료와 전체 계산 결과는 보존하고, 본문 표시용 요약은 선택 규칙과 제외 이유를 기록한다.
+
+## Project-root review package
+
+At project setup, create a collaborator review package under the project root. Use five data boundaries: 01_raw (verified collected inputs), 02_calculated (normalization, mapping, overlap), 03_external_analysis (provider-generated PPI and enrichment), 04_visual_qc (Cytoscape inputs, topology, MCODE and visual checks), and 05_figures_reports (figures, candidate rationale, Methods/Results and reports). The package README must record the complete inventory and input -> analysis -> output extension for each file. Do not include invalid or superseded data.
+
+The review package README uses a table for the file inventory. Each row records folder, file, input/source, analysis or transformation, output extension, and collaborator-review purpose. A prose explanation may follow the table but does not replace it.
+
+Before Methods/Results are finalized, the review package must include a reproducibility metadata file with tool versions, provider/database release, parameters, dates, hashes, and script revision. Missing metadata must be reported as a limitation rather than guessed.
