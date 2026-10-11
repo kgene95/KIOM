@@ -229,6 +229,22 @@ elif st.session_state.page=="프로젝트":
     else:
         p=Path(st.session_state.project); manifest=load_json(p/"00_project/NP_manifest.json",{}); cp=load_json(p/"00_project/NP_checkpoint.json",{})
         st.header(p.name); st.caption(str(p)); st.info(f"{T('현재 단계','Current stage')}: {cp.get('stage','—')} · {T('상태','Status')}: {cp.get('status','—')}")
+        harness = harness_snapshot(p)
+        st.subheader(T("하네스 감독 상태","Harness supervision status"))
+        h1, h2, h3, h4 = st.columns(4)
+        h1.metric(T("상태","Status"), harness["status"])
+        h2.metric(T("현재 단계","Stage"), harness["stage"])
+        h3.metric(T("산출물 수","Artifacts"), harness["artifact_count"])
+        h4.metric(T("마지막 갱신","Updated"), str(harness["updated_utc"] or "—")[:19])
+        if harness["last_error"]:
+            st.error(T(f"오류 검토 필요: {harness['last_error']}",f"Review required: {harness['last_error']}"))
+        st.caption(T(f"다음 조치: {harness['next_action']}",f"Next action: {harness['next_action']}"))
+        with st.expander(T("최근 이벤트·로그","Recent events and logs"), expanded=False):
+            if harness["recent_log"]:
+                st.code("\n".join(harness["recent_log"]), language="text")
+            else:
+                st.info(T("아직 실행 로그가 없습니다.","No execution log yet."))
+        st.caption(T("상태·오류·산출물은 프로젝트 checkpoint와 로그에서 읽습니다. 화면 표시만으로 완료를 선언하지 않습니다.","Status, errors, and artifacts are read from the project checkpoint and logs. The UI never declares completion from display alone."))
         with st.expander(T("분석 흐름 / 수행 가능성","Workflow / implementation status"),expanded=False):
             st.markdown(T("""
 1. **입력 방식 선택 (현재 화면)**: 자동 수집 또는 원자료 입력을 선택합니다.

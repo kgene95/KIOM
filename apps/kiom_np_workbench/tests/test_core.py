@@ -1,7 +1,7 @@
 import sys, tempfile, unittest
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
-from core import create_project, validate_target_rows, overlap_rows, save_json, load_json, write_cytoscape_exports, analysis_review_findings, expand_source_upload, hub_metrics, source_panel_gate, normalized_upload_stem, source_result_status, upload_provenance_status, target_column_present
+from core import create_project, validate_target_rows, overlap_rows, save_json, load_json, write_cytoscape_exports, analysis_review_findings, expand_source_upload, hub_metrics, source_panel_gate, normalized_upload_stem, source_result_status, upload_provenance_status, target_column_present, harness_snapshot
 
 class CoreTests(unittest.TestCase):
  def test_species_qc_does_not_promote_missing_or_nonhuman(self):
@@ -19,6 +19,15 @@ class CoreTests(unittest.TestCase):
    p=create_project(Path(td),{"name":"X"},{"name":"Y"},"Publication")
    self.assertTrue((p/'00_project/NP_manifest.json').exists())
    self.assertEqual(load_json(p/'00_project/NP_manifest.json')['status'],'PROJECT_CREATED')
+ def test_harness_snapshot_reports_checkpoint_and_artifacts(self):
+  with tempfile.TemporaryDirectory() as td:
+   p=create_project(Path(td),{"name":"X"},{"name":"Y"},"Publication")
+   (p/'01_np'/'processed'/'artifact.json').write_text('{}',encoding='utf-8')
+   save_json(p/'00_project/NP_checkpoint.json',{"stage":"TESTING","status":"RUNNING","updated_utc":"2026-10-11T00:00:00Z","next_action":"verify"})
+   snap=harness_snapshot(p)
+   self.assertEqual(snap['stage'],'TESTING')
+   self.assertEqual(snap['artifact_count'],1)
+   self.assertEqual(snap['next_action'],'verify')
  def test_project_preserves_multiple_compounds(self):
   with tempfile.TemporaryDirectory() as td:
    p=create_project(Path(td),[{"name":"A","pubchem_cid":1},{"name":"B","pubchem_cid":2}],{"name":"Y"},"Publication")

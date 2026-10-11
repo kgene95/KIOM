@@ -18,6 +18,29 @@ def log(project: Path, msg: str):
     p=project/"logs/analysis_log.txt"; p.parent.mkdir(parents=True,exist_ok=True)
     with p.open("a",encoding="utf-8") as f: f.write(f"[{now()}] {msg}\n")
 
+def harness_snapshot(project: Path):
+    """Return a read-only, UI-safe view of the generic harness state."""
+    checkpoint = load_json(project / "00_project" / "NP_checkpoint.json", {}) or {}
+    manifest = load_json(project / "00_project" / "NP_manifest.json", {}) or {}
+    log_path = project / "logs" / "analysis_log.txt"
+    lines = log_path.read_text(encoding="utf-8").splitlines() if log_path.exists() else []
+    artifacts = []
+    for base in (project / "01_np", project / "03_cytoscape", project / "reports", project / "export"):
+        if base.exists():
+            artifacts.extend(str(x.relative_to(project)) for x in base.rglob("*") if x.is_file())
+    status = str(checkpoint.get("status") or manifest.get("status") or "UNKNOWN")
+    if status == "RUNNING" and lines and any("FAILED" in line or "ERROR" in line for line in lines[-10:]):
+        status = "FAILED_REVIEW_REQUIRED"
+    return {
+        "status": status,
+        "stage": checkpoint.get("stage", "—"),
+        "updated_utc": checkpoint.get("updated_utc") or manifest.get("analysis_updated_utc"),
+        "next_action": checkpoint.get("next_action", "—"),
+        "last_error": checkpoint.get("error") or checkpoint.get("error_type"),
+        "artifact_count": len(artifacts),
+        "recent_log": lines[-12:],
+    }
+
 def file_sha(path):
     h=hashlib.sha256()
     with path.open("rb") as f:
