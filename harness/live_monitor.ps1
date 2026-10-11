@@ -42,6 +42,17 @@ while ($true) {
         foreach ($task in $queue.tasks) { Write-Host ("task {0}: {1}" -f $task.id, $task.status) }
       } catch { Write-Host 'queue: reading' }
     }
+
+    $heartbeatPath = Join-Path $run 'controller_heartbeat.json'
+    if (Test-Path $heartbeatPath) {
+      try {
+        $heartbeat = Get-Content $heartbeatPath -Raw | ConvertFrom-Json
+        Write-Host "controller: $($heartbeat.controller_status)  heartbeat=$($heartbeat.updated_utc)  next=$($heartbeat.next_action)"
+        if ($heartbeat.last_error) { Write-Host "controller error: $($heartbeat.last_error)" -ForegroundColor Red }
+      } catch { Write-Host 'controller: heartbeat reading' }
+    } else {
+      Write-Host 'controller: NOT_STARTED' -ForegroundColor DarkYellow
+    }
   }
 
   Start-Sleep -Seconds $IntervalSeconds

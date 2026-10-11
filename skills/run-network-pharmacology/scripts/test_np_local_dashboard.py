@@ -8,6 +8,25 @@ sys.path.insert(0, r"D:\GPT-CODECX\KIOM\skills\run-network-pharmacology\scripts"
 import np_local_dashboard as dashboard
 
 class MultiCompoundInputTests(unittest.TestCase):
+    def test_progress_panel_exposes_controller_heartbeat_and_default_auto_refresh(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            old_workspace = dashboard.WORKSPACE
+            try:
+                dashboard.WORKSPACE = Path(temp_dir)
+                run_id = "run-a"
+                run = dashboard.WORKSPACE / "runs" / run_id
+                run.mkdir(parents=True)
+                dashboard.m.save(run / "request.json", {"compound_input": "Naringenin"})
+                dashboard.m.save(run / "work_queue.json", {"tasks": [{"agent": "agent2", "id": "pharmmapper_collect", "status": "DONE_RAW_UNVERIFIED"}]})
+                dashboard.m.save(run / "controller_heartbeat.json", {"controller_status": "WAITING", "heartbeat_at_utc": "2026-10-11T00:00:00Z", "next_action": "mapping QC 대기"})
+                page = dashboard.role_status_panel({"run_ids": [run_id], "project_id": "p"})
+            finally:
+                dashboard.WORKSPACE = old_workspace
+        self.assertIn("controller_heartbeat", page)
+        self.assertIn("mapping QC 대기", page)
+        self.assertIn('localStorage.getItem(k)!=="0"', page)
+        self.assertIn("총괄 heartbeat와 워커 이벤트", page)
+
     def test_compound_queries_keeps_each_nonempty_line_once(self):
         self.assertEqual(dashboard.compound_queries("Naringenin\n\nVitexin 4-O-glucoside\nNaringenin"), ["Naringenin", "Vitexin 4-O-glucoside"])
 

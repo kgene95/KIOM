@@ -19,7 +19,7 @@
 승인 및 검증 조건을 만족하지 않는 서비스 제출, 원고 최종화, 결과 병합은 자동 실행하지 않음.
 
 ## 검증된 제출 경로
-SEA와 PharmMapper는 작업 생성·의존성 검증 뒤 실제 공식 제출 경로까지 연결한다. SEA는 SMILES 입력 → Altcha 일반 확인 → Submit → task ID/결과 URL 기록 순서다. PharmMapper는 대시보드 세션 이메일 입력 → 검증 SDF V2000/MOL2 업로드 → 공식 양식 전송 → job ID/응답 SHA 기록 순서다. 원본은 덮어쓰지 않으며 이메일 주소는 산출물에 저장하지 않는다.
+SEA와 PharmMapper는 작업 생성·의존성 검증 뒤 실제 공식 제출 경로까지 연결한다. SEA는 SMILES 입력 → Altcha 일반 확인 → Submit → task ID/결과 URL 기록 순서다. PharmMapper는 검증 SDF V2000/MOL2 업로드 → 공식 양식 전송 → 제출 응답의 Job ID/응답 SHA 기록 → 공식 Check Job 조회 → 완료 Job의 공식 결과 다운로드 순서다. 이메일은 제출 화면에서 요구될 때만 세션에서 사용하며, 완료 메일을 기다리지 않고 주소를 산출물에 저장하지 않는다.
 
 ---
 # NP multi-agent orchestration (v1, 2026-10-10)

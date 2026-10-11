@@ -13,7 +13,7 @@ Use the available authorized tool that best matches the work; do not tie the Ski
 
 Immediately record service, URL, job ID, compound, exact input or checksum, organism, submission time, conformer and parameters, status, last check, retrieval route, retry, and failure reason. Use `PENDING`, `FAILED`, or `COMPLETED`. Keep retries and conformers as separate ledger rows. Do not fabricate missing timestamps or imply monitoring without a successfully configured mechanism.
 
-Continue independent work while a job waits. Poll at the service's recommended interval or use an authorized completion notification. Validate the official output before integration.
+Continue independent work while a job waits. Poll the provider's official status page at its recommended interval; for PharmMapper, use **Check Job with the recorded Job ID** as the primary route. An authorized completion notification may be used only as an optional accelerator and never replaces provider-status verification. Validate the official output before integration.
 
 ## Deterministic and recoverable execution
 

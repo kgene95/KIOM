@@ -10,9 +10,11 @@
 4. Agent 2: 외부 수집
 5. Agent 3: 네트워크·경로
 6. Agent 4: 독립 QC
-7. Agent 5: 원고 근거
-8. 에이전트 간 handoff
-9. 금지 사항
+7. Agent 5: 원고 근거·초안
+8. Agent 6: 계획 밖 이벤트
+9. Agent 7: 도킹 후보 handoff
+10. 에이전트 간 handoff
+11. 금지 사항
 
 ## 공통 실행 계약
 
@@ -36,6 +38,10 @@ CID, isomeric SMILES, InChIKey, 구조 파일 SHA, 질환 ontology와 stable ID�
 
 검증된 handoff와 명시적 승인이 없으면 제출하지 않는다. job ID, input SHA, result URL과 raw SHA를 대응시키며, 결과 수신 시 즉시 원본 보존·검증·downstream unblock을 요청한다. Gmail 확인은 연결된 connector가 실제로 동작할 때만 수행한다.
 
+### PharmMapper 전용 제출·조회 절차
+
+PharmMapper는 이메일 수신을 완료 조건으로 사용하지 않는다. Agent 2는 제출 응답에서 발급된 **Job ID**를 즉시 기록하고, 공식 **Check Job** 화면에서 그 Job ID를 조회한다. `PENDING/RUNNING`이면 다음 조회 시각과 재개 조건을 ledger에 남긴 뒤 독립 task를 계속한다. `COMPLETED` 또는 다운로드 가능 상태가 되면 같은 Job의 공식 결과를 다운로드하고 Job ID·CID·입력 구조 SHA-256을 대조한 뒤 downstream을 해제한다. Gmail은 선택적 보조 알림일 뿐이며 메일 미수신으로 멈추지 않는다. Job ID가 없거나 구조 identity가 불일치하면 `BLOCKED`/`INVALIDATED`로 기록하고 다른 Job 결과를 재사용하지 않는다.
+
 ## Agent 3: 네트워크·경로
 
 검증된 입력만 사용한다. 질환 자료나 외부 provider 하나가 지연되어도 독립적으로 검증 가능한 branch는 병렬 실행한다. STRING functional PPI와 OmniPath overlay, topology, enrichment를 구분하고 결과마다 branch와 입력 hash를 기록한다.
@@ -46,7 +52,15 @@ Agent 3 결과를 그대로 승인하지 않는다. identity, species, mapping, 
 
 ## Agent 5: 원고 근거
 
-frozen output과 검토된 문헌만 사용한다. Agent 4 PASS 전에는 최종 Methods/Results나 figure legend를 확정하지 않는다. 주장마다 근거와 한계를 연결한다.
+frozen output과 검토된 문헌만 사용한다. Agent 4 PASS와 도킹 후보 확정 전에는 Methods/Results나 figure legend를 확정하지 않는다. 주장마다 근거와 한계를 연결하며 실제 도킹 계산 결과를 NP 초안에 섞지 않는다.
+
+## Agent 6: 계획 밖 이벤트
+
+외부 업로드·추가 자료·사용자 추가 업무를 검수하고 원본 보존, 재맵핑, 담당 worker handoff, 총괄 보고를 수행한다. 원래 task를 조용히 변경하지 않고 별도 event/task로 기록한다.
+
+## Agent 7: 도킹 후보 handoff
+
+Cytoscape와 독립 QC가 통과한 frozen branch에서만 도킹 후보를 선정한다. 후보·표적·근거·입력 SHA를 `docking_candidates.json`에 기록하고 실제 AutoDock/Vina 계산은 별도 도킹 workflow에 넘긴다.
 
 ## 에이전트 간 handoff
 

@@ -16,7 +16,7 @@ interface:
     Always scan existing source evidence before new analyses; request approval
     to reflect verified data or perform only necessary supplementation. Use the
     local dashboard, multi-run monitor, and Cytoscape worker when supported.
-    SEA와 PharmMapper 신규 제출은 최초 승인 뒤 Agent 2의 검증된 직접 실행 책임이다: SEA는 공식 브라우저 자동화(SMILES·Altcha 확인·Submit), PharmMapper는 대시보드 세션 이메일과 검증 구조파일로 공식 양식을 실행한다. 사용자를 공급자 입력 화면으로 반복해서 되돌려 보내지 않는다. task/job ID·URL·입력 SHA·응답 SHA를 기록하고 일시 오류만 최대 3회 재시도하며 이메일 주소는 저장하지 않는다.
+    SEA와 PharmMapper 신규 제출은 최초 승인 뒤 Agent 2의 검증된 직접 실행 책임이다: SEA는 공식 브라우저 자동화(SMILES·Altcha 확인·Submit), PharmMapper는 검증 구조파일로 공식 양식을 실행하고 제출 응답의 Job ID를 즉시 기록한다. PharmMapper는 이메일 수신을 기다리지 않고 공식 Check Job 화면에서 Job ID를 조회해 완료 시 같은 Job의 결과를 다운로드한다. 사용자를 공급자 입력 화면으로 반복해서 되돌려 보내지 않는다. task/job ID·URL·입력 SHA·응답 SHA를 기록하고 일시 오류만 최대 3회 재시도하며 이메일 주소는 저장하지 않는다.
     Tag every compound with a CID and structure SHA before SEA/PharmMapper jobs.
     Record official job ID and immutable raw result provenance; do not assume a
     previously saved result belongs to a compound without submission evidence.
@@ -24,7 +24,7 @@ interface:
     Check every source ledger; distinguish raw retrieval, UC extraction, ID QC,
     and integration. HTTP 200 HTML is not a dataset. Use file-native releases.
     Do not infer past attempts or publication readiness from other sources.
-    At project intake, record a credential-free initial_access_approval for public sources, interactive sources, PharmMapper email registration, and job-ID-scoped Gmail completion checks. The local dashboard must offer a PharmMapper email field that holds the address only in the active browser/server session; manifests and logs may record only whether an email was provided. See references/initial-access-approval.md.
+    At project intake, record a credential-free initial_access_approval for public sources and interactive sources. If PharmMapper requires an email field for submission, hold it only in the active browser/server session; manifests and logs may record only whether an email was provided. Completion is verified by Check Job and Job ID; Gmail is optional and never a required wait gate. See references/initial-access-approval.md.
     During active runs, report meaningful state transitions in Korean chat: run creation, dispatch groups, worker start/completion, approval or external waits, retries, QC, completion, and budget stops. Do not terminate the whole workflow because one branch is blocked; continue independent tasks and record the resume condition. Keep unchanged polling quiet.
   icon_small: assets/icon.svg
   icon_large: assets/icon.svg

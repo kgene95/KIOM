@@ -21,7 +21,9 @@ def run(run,branch):
  prior=load(out/"run_manifest.json")
  if prior.get("input_sha256")==sha(f) and prior.get("status")=="COMPLETED":return {"status":"SKIP_UNCHANGED","branch":branch}
  with f.open(encoding="utf-8-sig",newline="") as h:
-  items=list(csv.DictReader(h))
+  sample=h.read(4096); h.seek(0)
+  delimiter="\t" if "\t" in sample else ","
+  items=list(csv.DictReader(h, delimiter=delimiter))
  if not items:return {"status":"BLOCKED_EMPTY_PPI","branch":branch}
  edges=[];degree=collections.Counter()
  for row in items:

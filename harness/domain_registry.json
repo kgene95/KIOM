@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "purpose": "범용 총괄이 문제를 분야별 adapter와 worker로 라우팅하기 위한 등록부",
+  "domains": {
+    "np": {
+      "label": "Network Pharmacology",
+      "adapter": "harness/NP_ADAPTER.md",
+      "worker_contract": "harness/NP_WORKERS.md",
+      "skill": "skills/run-network-pharmacology/SKILL.md",
+      "webapp": "apps/kiom_np_workbench 또는 skills/run-network-pharmacology/scripts/np_local_dashboard.py",
+      "tests": [
+        "harness/test_np_controller.py",
+        "skills/run-network-pharmacology/scripts/test_np_local_dashboard.py"
+      ],
+      "external_event_contract": "harness/NP_EXTERNAL_DATA.md"
+    },
+    "docking": {
+      "label": "Molecular Docking",
+      "adapter": "skills/molecular-docking/SKILL.md",
+      "worker_contract": "skills/molecular-docking/SKILL.md",
+      "tests": []
+    },
+    "md": {
+      "label": "Molecular Dynamics",
+      "adapter": "skills/molecular-dynamics/SKILL.md",
+      "worker_contract": "skills/molecular-dynamics/SKILL.md",
+      "tests": []
+    },
+    "literature": {
+      "label": "Literature Review",
+      "adapter": "skills/literature-review/SKILL.md",
+      "worker_contract": "skills/literature-review/SKILL.md",
+      "tests": []
+    },
+    "webapp": {
+      "label": "Web App",
+      "adapter": "skills/browser-research-automation/SKILL.md",
+      "worker_contract": "harness/WORKER_CONTRACT.md",
+      "tests": []
+    }
+  },
+  "routing_rule": "문제를 감지하면 범용 HARNESS 규칙을 먼저 적용한 뒤 domain 등록부의 adapter·worker·skill·tests를 읽고 재현-수정-검증-재개를 수행한다."
+}

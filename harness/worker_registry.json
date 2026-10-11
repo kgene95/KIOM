@@ -2,6 +2,20 @@
   "version": 1,
   "policy": "Only explicitly registered workers may be dispatched. No arbitrary command strings.",
   "workers": {
+    "event_agent_router": {
+      "module": "event_agent",
+      "function": "route_external_events",
+      "resource": "run-folder",
+      "network": false,
+      "requires_approval": false
+    },
+    "external_data_intake": {
+      "module": "np_workers",
+      "function": "external_data_intake",
+      "resource": "run-folder",
+      "network": false,
+      "requires_approval": false
+    },
     "np_queue_sync": {
       "module": "np_agent_queue",
       "function": "collect",
@@ -65,6 +79,13 @@
       "network": false,
       "requires_approval": false
     },
+    "pharmmapper_check_job": {
+      "module": "np_workers",
+      "function": "pharmmapper_check_job",
+      "resource": "PharmMapper",
+      "network": true,
+      "requires_approval": false
+    },
     "pharmmapper_collect": {
       "module": "np_workers",
       "function": "pharmmapper_collect",
@@ -107,38 +128,287 @@
       "network": false,
       "requires_approval": false
     },
+    "cytoscape_visualization": {
+      "module": "np_workers",
+      "function": "cytoscape_visualization",
+      "resource": "Cytoscape-and-run-folder",
+      "network": true,
+      "requires_approval": false
+    },
+    "docking_candidate_selection": {
+      "module": "np_workers",
+      "function": "docking_candidate_selection",
+      "resource": "run-folder",
+      "network": false,
+      "requires_approval": false
+    },
+    "figure_draft": {
+      "module": "np_workers",
+      "function": "figure_draft",
+      "resource": "run-folder",
+      "network": false,
+      "requires_approval": false
+    },
+    "methods_results_draft": {
+      "module": "np_workers",
+      "function": "methods_results_draft",
+      "resource": "run-folder",
+      "network": false,
+      "requires_approval": false
+    },
     "completion_packager": {
       "module": "np_workers",
       "function": "completion_packager",
       "resource": "run-folder",
       "network": false,
       "requires_approval": false
+    },
+    "initial_ppi": {
+      "module": "np_workers",
+      "function": "initial_ppi",
+      "resource": "UniProt-and-run-folder",
+      "network": true,
+      "requires_approval": false
+    },
+    "experimental_evidence_synthesis": {
+      "module": "np_workers",
+      "function": "experimental_evidence_synthesis",
+      "resource": "run-folder",
+      "network": false,
+      "requires_approval": false
+    },
+    "mechanism_enrichment_synthesis": {
+      "module": "np_workers",
+      "function": "mechanism_enrichment_synthesis",
+      "resource": "run-folder",
+      "network": false,
+      "requires_approval": false
+    },
+    "compound_target_match_audit": {
+      "module": "candidate_validation",
+      "function": "compound_target_match_audit",
+      "resource": "run-folder",
+      "network": false,
+      "requires_approval": false
+    },
+    "target_mechanism_literature_audit": {
+      "module": "candidate_validation",
+      "function": "target_mechanism_literature_audit",
+      "resource": "run-folder",
+      "network": true,
+      "requires_approval": false
+    },
+    "target_structure_docking_audit": {
+      "module": "candidate_validation",
+      "function": "target_structure_docking_audit",
+      "resource": "run-folder",
+      "network": true,
+      "requires_approval": false
+    },
+    "docking_candidate_ranker": {
+      "module": "candidate_validation",
+      "function": "docking_candidate_ranker",
+      "resource": "run-folder",
+      "network": true,
+      "requires_approval": false
     }
   },
   "roles": {
-    "agent1": {"label": "입력·구조·자료 준비", "tasks": ["compound_identity", "disease_target_collection", "structure_qc", "source_audit"]},
-    "agent2": {"label": "SEA·PharmMapper·Gmail provider", "tasks": ["sea_submit", "pharmmapper_submit", "sea_collect", "pharmmapper_collect", "gmail_job_monitor"]},
-    "agent3": {"label": "정규화·PPI·enrichment·통합", "tasks": ["normalize_targets", "overlap_analysis", "ppi_analysis", "enrichment_analysis", "integration_analysis"]},
-    "agent4": {"label": "독립 QC", "tasks": ["independent_qc"]},
-    "agent5": {"label": "원고·결과 검토", "tasks": ["manuscript_review", "completion_packager"]}
+    "agent6": {
+      "label": "계획 밖 이벤트·외부자료 라우팅",
+      "tasks": [
+        "event_agent_router",
+        "external_data_intake",
+        "user_additional_task_intake"
+      ]
+    },
+    "agent1": {
+      "label": "입력·구조·자료 준비",
+      "tasks": [
+        "compound_identity",
+        "disease_target_collection",
+        "structure_qc",
+        "source_audit"
+      ]
+    },
+    "agent2": {
+      "label": "SEA·PharmMapper provider",
+      "tasks": [
+        "sea_submit",
+        "pharmmapper_submit",
+        "pharmmapper_check_job",
+        "sea_collect",
+        "pharmmapper_collect",
+        "gmail_job_monitor"
+      ]
+    },
+    "agent3": {
+      "label": "정규화·PPI·enrichment·통합",
+      "tasks": [
+        "initial_ppi",
+        "normalize_targets",
+        "overlap_analysis",
+        "ppi_analysis",
+        "enrichment_analysis",
+        "integration_analysis",
+        "cytoscape_visualization"
+      ]
+    },
+    "agent4": {
+      "label": "독립 QC·실험근거·기전 통합",
+      "tasks": [
+        "independent_qc",
+        "experimental_evidence_synthesis",
+        "mechanism_enrichment_synthesis"
+      ]
+    },
+    "agent5": {
+      "label": "원고·결과 검토",
+      "tasks": [
+        "figure_draft",
+        "methods_results_draft",
+        "manuscript_review",
+        "completion_packager"
+      ]
+    },
+    "agent7": {
+      "label": "도킹 후보 선정·handoff",
+      "tasks": [
+        "compound_target_match_audit",
+        "target_mechanism_literature_audit",
+        "target_structure_docking_audit",
+        "docking_candidate_ranker",
+        "docking_candidate_selection"
+      ]
+    }
   },
   "planned_workers": {
-    "compound_identity": {"owner": "agent1", "status": "planned"},
-    "disease_target_collection": {"owner": "agent1", "status": "planned"},
-    "structure_qc": {"owner": "agent1", "status": "planned"},
-    "source_audit": {"owner": "agent1", "status": "planned"},
-    "sea_submit": {"owner": "agent2", "status": "planned", "requires_approval": true},
-    "pharmmapper_submit": {"owner": "agent2", "status": "planned", "requires_approval": true},
-    "sea_collect": {"owner": "agent2", "status": "implemented"},
-    "pharmmapper_collect": {"owner": "agent2", "status": "implemented"},
-    "gmail_job_monitor": {"owner": "agent2", "status": "planned"},
-    "normalize_targets": {"owner": "agent3", "status": "planned"},
-    "overlap_analysis": {"owner": "agent3", "status": "planned"},
-    "ppi_analysis": {"owner": "agent3", "status": "implemented"},
-    "enrichment_analysis": {"owner": "agent3", "status": "implemented"},
-    "integration_analysis": {"owner": "agent3", "status": "implemented"},
-    "independent_qc": {"owner": "agent4", "status": "implemented"},
-    "manuscript_review": {"owner": "agent5", "status": "implemented"},
-    "completion_packager": {"owner": "agent5", "status": "implemented"}
+    "event_agent_router": {
+      "owner": "agent6",
+      "status": "implemented"
+    },
+    "external_data_intake": {
+      "owner": "controller",
+      "status": "implemented"
+    },
+    "compound_identity": {
+      "owner": "agent1",
+      "status": "planned"
+    },
+    "disease_target_collection": {
+      "owner": "agent1",
+      "status": "planned"
+    },
+    "structure_qc": {
+      "owner": "agent1",
+      "status": "planned"
+    },
+    "source_audit": {
+      "owner": "agent1",
+      "status": "planned"
+    },
+    "sea_submit": {
+      "owner": "agent2",
+      "status": "planned",
+      "requires_approval": true
+    },
+    "pharmmapper_submit": {
+      "owner": "agent2",
+      "status": "planned",
+      "requires_approval": true
+    },
+    "sea_collect": {
+      "owner": "agent2",
+      "status": "implemented"
+    },
+    "pharmmapper_check_job": {
+      "owner": "agent2",
+      "status": "planned",
+      "requires_approval": false
+    },
+    "pharmmapper_collect": {
+      "owner": "agent2",
+      "status": "implemented"
+    },
+    "gmail_job_monitor": {
+      "owner": "agent2",
+      "status": "planned"
+    },
+    "normalize_targets": {
+      "owner": "agent3",
+      "status": "planned"
+    },
+    "overlap_analysis": {
+      "owner": "agent3",
+      "status": "implemented"
+    },
+    "ppi_analysis": {
+      "owner": "agent3",
+      "status": "implemented"
+    },
+    "enrichment_analysis": {
+      "owner": "agent3",
+      "status": "implemented"
+    },
+    "integration_analysis": {
+      "owner": "agent3",
+      "status": "implemented"
+    },
+    "cytoscape_visualization": {
+      "owner": "agent3",
+      "status": "implemented"
+    },
+    "docking_candidate_selection": {
+      "owner": "agent7",
+      "status": "implemented"
+    },
+    "figure_draft": {
+      "owner": "agent5",
+      "status": "implemented"
+    },
+    "methods_results_draft": {
+      "owner": "agent5",
+      "status": "implemented"
+    },
+    "independent_qc": {
+      "owner": "agent4",
+      "status": "implemented"
+    },
+    "manuscript_review": {
+      "owner": "agent5",
+      "status": "implemented"
+    },
+    "completion_packager": {
+      "owner": "agent5",
+      "status": "implemented"
+    },
+    "initial_ppi": {
+      "owner": "agent3",
+      "status": "implemented"
+    },
+    "experimental_evidence_synthesis": {
+      "owner": "agent4",
+      "status": "implemented"
+    },
+    "mechanism_enrichment_synthesis": {
+      "owner": "agent4",
+      "status": "implemented"
+    },
+    "compound_target_match_audit": {
+      "owner": "agent7",
+      "status": "planned"
+    },
+    "target_mechanism_literature_audit": {
+      "owner": "agent7",
+      "status": "planned"
+    },
+    "target_structure_docking_audit": {
+      "owner": "agent7",
+      "status": "planned"
+    },
+    "docking_candidate_ranker": {
+      "owner": "agent7",
+      "status": "planned"
+    }
   }
 }

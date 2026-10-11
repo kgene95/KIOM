@@ -1,0 +1,207 @@
+{
+  "status": "PASS",
+  "targets": [
+    {
+      "target": "AKT1",
+      "compound_match": "Naringenin + Vitexin-4-O-glucoside",
+      "shared_11": true,
+      "mcc": 10488500850796.0,
+      "degree": 151,
+      "literature_score": 3,
+      "literature_basis": "Naringenin–AMPK-AKT/mTOR in DSS colitis; PI3K-AKT UC mechanism",
+      "literature_sources": [
+        "https://pubmed.ncbi.nlm.nih.gov/40978409/",
+        "https://pubmed.ncbi.nlm.nih.gov/37713856/"
+      ],
+      "experimental_evidence": "pathway-level only in supplied CMPE paper",
+      "structure_score": 3,
+      "structure_status": "SUITABLE",
+      "pdb": [
+        "3O96",
+        "6CCY"
+      ],
+      "structure_note": "human kinase structures with bound inhibitors",
+      "integrated_score": 100.0
+    },
+    {
+      "target": "MMP9",
+      "compound_match": "Naringenin + Vitexin-4-O-glucoside",
+      "shared_11": true,
+      "mcc": 10413412379736.0,
+      "degree": 93,
+      "literature_score": 3,
+      "literature_basis": "Naringin/naringenin linked to MMP9 suppression; inflammatory/ECM relevance",
+      "literature_sources": [
+        "https://pubmed.ncbi.nlm.nih.gov/19810018/",
+        "https://www.rcsb.org/structure/1GKC"
+      ],
+      "experimental_evidence": "inflammatory/ECM marker context; target-specific CMPE measurement not explicit",
+      "structure_score": 3,
+      "structure_status": "SUITABLE_WITH_DOMAIN_QC",
+      "pdb": [
+        "1GKC",
+        "8K5W"
+      ],
+      "structure_note": "catalytic/proMMP9 structures; select catalytic domain and zinc-site protocol",
+      "integrated_score": 92.07
+    },
+    {
+      "target": "PPARG",
+      "compound_match": "Naringenin + Vitexin-4-O-glucoside",
+      "shared_11": true,
+      "mcc": 9661569044916.0,
+      "degree": 82,
+      "literature_score": 3,
+      "literature_basis": "PPAR-gamma functional colitis evidence for naringin and vitexin-related anti-inflammatory signaling",
+      "literature_sources": [
+        "https://pubmed.ncbi.nlm.nih.gov/34504431/",
+        "https://pubmed.ncbi.nlm.nih.gov/35795861/",
+        "https://www.rcsb.org/structure/6C1I"
+      ],
+      "experimental_evidence": "not directly measured in supplied CMPE paper",
+      "structure_score": 3,
+      "structure_status": "SUITABLE",
+      "pdb": [
+        "6C1I",
+        "7AWC"
+      ],
+      "structure_note": "human ligand-binding-domain structures",
+      "integrated_score": 88.1
+    },
+    {
+      "target": "JAK2",
+      "compound_match": "Naringenin + Vitexin-4-O-glucoside",
+      "shared_11": true,
+      "mcc": 3760765138478.0,
+      "degree": 49,
+      "literature_score": 2,
+      "literature_basis": "JAK/STAT is a UC mechanism; kinase pocket structure available",
+      "literature_sources": [
+        "https://pubmed.ncbi.nlm.nih.gov/37713856/",
+        "https://www.rcsb.org/structure/4C62"
+      ],
+      "experimental_evidence": "not directly measured in supplied CMPE paper",
+      "structure_score": 3,
+      "structure_status": "SUITABLE",
+      "pdb": [
+        "4C62"
+      ],
+      "structure_note": "human kinase domain with inhibitor",
+      "integrated_score": 57.37
+    },
+    {
+      "target": "ESR1",
+      "compound_match": "Naringenin + Vitexin-4-O-glucoside",
+      "shared_11": true,
+      "mcc": 10402331025063.0,
+      "degree": 94,
+      "literature_score": 0,
+      "literature_basis": "no target-specific literature audit recorded",
+      "literature_sources": [],
+      "experimental_evidence": "not directly measured in supplied CMPE paper",
+      "structure_score": 0,
+      "structure_status": "CHECK_REQUIRED",
+      "pdb": [],
+      "structure_note": "no structure audit recorded",
+      "integrated_score": 52.16
+    },
+    {
+      "target": "JAK3",
+      "compound_match": "Naringenin + Vitexin-4-O-glucoside",
+      "shared_11": true,
+      "mcc": 90840.0,
+      "degree": 11,
+      "literature_score": 2,
+      "literature_basis": "JAK/STAT inflammatory mechanism; literature support is pathway-level",
+      "literature_sources": [
+        "https://pubmed.ncbi.nlm.nih.gov/37713856/"
+      ],
+      "experimental_evidence": "not directly measured in supplied CMPE paper",
+      "structure_score": 2,
+      "structure_status": "CHECK_REQUIRED",
+      "pdb": [],
+      "structure_note": "verify human kinase-domain structure and ligand pocket before docking",
+      "integrated_score": 33.12
+    },
+    {
+      "target": "KIT",
+      "compound_match": "Naringenin + Vitexin-4-O-glucoside",
+      "shared_11": true,
+      "mcc": 4549736142.0,
+      "degree": 37,
+      "literature_score": 0,
+      "literature_basis": "no target-specific literature audit recorded",
+      "literature_sources": [],
+      "experimental_evidence": "not directly measured in supplied CMPE paper",
+      "structure_score": 0,
+      "structure_status": "CHECK_REQUIRED",
+      "pdb": [],
+      "structure_note": "no structure audit recorded",
+      "integrated_score": 9.92
+    },
+    {
+      "target": "FKBP1A",
+      "compound_match": "Naringenin + Vitexin-4-O-glucoside",
+      "shared_11": true,
+      "mcc": 1228.0,
+      "degree": 24,
+      "literature_score": 0,
+      "literature_basis": "no target-specific literature audit recorded",
+      "literature_sources": [],
+      "experimental_evidence": "not directly measured in supplied CMPE paper",
+      "structure_score": 0,
+      "structure_status": "CHECK_REQUIRED",
+      "pdb": [],
+      "structure_note": "no structure audit recorded",
+      "integrated_score": 8.18
+    },
+    {
+      "target": "PDE4D",
+      "compound_match": "Naringenin + Vitexin-4-O-glucoside",
+      "shared_11": true,
+      "mcc": 614.0,
+      "degree": 14,
+      "literature_score": 0,
+      "literature_basis": "no target-specific literature audit recorded",
+      "literature_sources": [],
+      "experimental_evidence": "not directly measured in supplied CMPE paper",
+      "structure_score": 0,
+      "structure_status": "CHECK_REQUIRED",
+      "pdb": [],
+      "structure_note": "no structure audit recorded",
+      "integrated_score": 6.85
+    },
+    {
+      "target": "PDE4B",
+      "compound_match": "Naringenin + Vitexin-4-O-glucoside",
+      "shared_11": true,
+      "mcc": 132.0,
+      "degree": 9,
+      "literature_score": 0,
+      "literature_basis": "no target-specific literature audit recorded",
+      "literature_sources": [],
+      "experimental_evidence": "not directly measured in supplied CMPE paper",
+      "structure_score": 0,
+      "structure_status": "CHECK_REQUIRED",
+      "pdb": [],
+      "structure_note": "no structure audit recorded",
+      "integrated_score": 6.19
+    },
+    {
+      "target": "CTSF",
+      "compound_match": "Naringenin + Vitexin-4-O-glucoside",
+      "shared_11": true,
+      "mcc": 720.0,
+      "degree": 6,
+      "literature_score": 0,
+      "literature_basis": "no target-specific literature audit recorded",
+      "literature_sources": [],
+      "experimental_evidence": "not directly measured in supplied CMPE paper",
+      "structure_score": 0,
+      "structure_status": "CHECK_REQUIRED",
+      "pdb": [],
+      "structure_note": "no structure audit recorded",
+      "integrated_score": 5.79
+    }
+  ]
+}

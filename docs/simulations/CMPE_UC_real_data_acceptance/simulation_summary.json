@@ -1,0 +1,32 @@
+{
+  "status": "PASS",
+  "wrong_pharmmapper": "IDENTITY_MISMATCH",
+  "wrong_sea": "IDENTITY_MISMATCH",
+  "corrected_inputs_routed": 4,
+  "string_nodes": 374,
+  "string_edges": 4205,
+  "cytoscape": {
+    "status": "COMPLETED",
+    "run": "CMPE_UC_real_data_acceptance",
+    "branch": "primary",
+    "input_sha256": "92d4fe95534d25655a3203067ac133d7046488ecc618cfc43a1f5c7803e07daa",
+    "cytoscape_network_suid": 49040,
+    "node_count": 374,
+    "edge_count": 4205,
+    "run_utc": "2026-10-11T06:34:10.584274+00:00",
+    "mcode_result": "PASS",
+    "publication_ready": false
+  },
+  "mcc_rows": 374,
+  "candidate_recommendation": "PASS",
+  "candidate_count": 4,
+  "artifacts": [
+    "D:\\GPT-CODECX\\KIOM_NP_Projects\\NP_Runs\\simulations\\CMPE_UC_real_data_acceptance\\analysis\\string_calculation.json",
+    "D:\\GPT-CODECX\\KIOM_NP_Projects\\NP_Runs\\simulations\\CMPE_UC_real_data_acceptance\\analysis\\enrichment_calculation.json",
+    "D:\\GPT-CODECX\\KIOM_NP_Projects\\NP_Runs\\simulations\\CMPE_UC_real_data_acceptance\\candidate_validation\\docking_candidate_ranked.json",
+    "D:\\GPT-CODECX\\KIOM_NP_Projects\\NP_Runs\\simulations\\CMPE_UC_real_data_acceptance\\cytoscape\\primary\\degree_rank.csv",
+    "D:\\GPT-CODECX\\KIOM_NP_Projects\\NP_Runs\\simulations\\CMPE_UC_real_data_acceptance\\cytoscape\\primary\\mcc_rank.csv",
+    "D:\\GPT-CODECX\\KIOM_NP_Projects\\NP_Runs\\simulations\\CMPE_UC_real_data_acceptance\\cytoscape\\primary\\mcode_response.json",
+    "D:\\GPT-CODECX\\KIOM_NP_Projects\\NP_Runs\\simulations\\CMPE_UC_real_data_acceptance\\event_log.jsonl"
+  ]
+}

@@ -22,7 +22,11 @@ def dispatch_registered_worker(run: Path, task: dict[str, Any], registry_path: P
     if spec.get("requires_approval") and not approved:
         return {"status": "WAITING_USER", "reason": "worker 승인 필요"}
     scripts = registry_path.parents[1] / "skills" / "run-network-pharmacology" / "scripts"
+    app_providers = registry_path.parents[1] / "apps" / "kiom_np_workbench"
+    runtime_deps = registry_path.parents[1] / ".runtime_deps"
     sys.path.insert(0, str(scripts))
+    sys.path.insert(0, str(app_providers))
+    sys.path.insert(0, str(runtime_deps))
     sys.path.insert(0, str(registry_path.parent))
     module = importlib.import_module(spec["module"])
     function = getattr(module, spec["function"])

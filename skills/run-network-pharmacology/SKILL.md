@@ -13,6 +13,18 @@ description: "Run reproducible, source-traceable network pharmacology for compou
 
 활성 NP 실행 중 총괄은 [PROGRESS_REPORTING.md](../../PROGRESS_REPORTING.md)의 한국어 채팅 보고 규칙을 따른다. run 생성, 병렬 계획, Agent 1~5 또는 worker의 시작·완료, 승인·외부 대기, 오류 복구, 독립 QC, 완료·예산 중지 시 보고한다. 하나의 provider 또는 worker가 막혀도 의존성이 없는 branch는 계속 실행하고, 필수 gate만 보류한다. 변화 없는 polling은 반복 보고하지 않는다.
 
+### NP 목표 확인과 실행 전 추천
+
+인터뷰·기획이 끝나면 총괄은 `입력·외부자료 검증 → 표적/PPI/enrichment → Cytoscape 네트워크·그림 → 도킹 후보 확정 → Methods/Results 초안 → 완료 패키지`라는 최종 목표, 범위, 산출물과 완료 기준을 사용자에게 제시하고 확인받는다. 확인된 목표는 run 계약과 checkpoint에 기록한다. 새로운 분석·재분석·외부 제출·파일 교체·후보 확정처럼 결과를 바꾸는 요청은 현재 evidence 상태, 총괄의 의견·추천 방향, 대안과 예상 영향을 먼저 제시하고 확인받은 뒤 실행한다. 조회·진단·검수·재현 테스트는 바로 수행할 수 있다.
+
+### NP 사용자 응답 규칙
+
+질문·의견에는 현재 NP 상태와 핵심 답을 먼저 짧고 명확하게 제시하고, 상태 보고에는 원인·해결책·담당 worker·다음 행동을 함께 포함한다. 필요할 때만 다음 worker 또는 분석 방향을 제안한다. 사용자가 이해가 안 되거나 상세 설명을 요청하면 입력 자료, 의존성, QC gate를 쉬운 말과 단계별 순서로 설명한다. 사용자 의견에 자동으로 동의하지 말고 근거, 불확실성, 총괄의 추천을 구분한다. 이미 기록된 run 상태와 답변은 다시 묻지 않는다.
+
+### Cytoscape 터미널·GUI 운영
+
+네트워크 계산과 반복 처리는 Controller가 터미널·cyREST로 실행한다. 이 경로는 토큰 사용량을 낮추고 입력·버전·파라미터·로그·artifact를 고정해 재현성과 야간 자동 실행을 보장한다. GUI는 Cytoscape 네트워크의 레이아웃, 라벨, 그림 품질을 시각 검수할 때만 사용한다. GUI와 Controller가 같은 세션을 동시에 조작하지 않으며, GUI가 닫혀도 cyREST 경로에서 checkpoint를 재개할 수 있어야 한다.
+
 ### NP 사전 점검
 
 실행 전 [PREFLIGHT_CHECKLIST.md](../../PREFLIGHT_CHECKLIST.md)를 사용해 전체 NP workflow와 의존성을 파악한다. 필요한 Skill·plugin·Gmail connector·SEA·PharmMapper 브라우저 세션·로컬 프로그램·이메일·권한·사용자 승인을 먼저 확인하고, 사용자가 직접 해야 할 준비를 최우선순위로 한 번에 고지한다. `PREFLIGHT_READY` 전에는 장시간 제출·수집·분석을 시작하지 않는다.
@@ -21,12 +33,23 @@ description: "Run reproducible, source-traceable network pharmacology for compou
 
 - **초기 통합 승인:** 화합물명·질환명·생물종 입력 후 기존 자료를 검증하고 한 번의 한국어 승인 화면에서 재사용·보완·SEA·PharmMapper 신규 제출·PharmMapper 이메일 사용을 확인한다. 승인되면 Agent 2는 검증된 공식 제출 경로를 즉시 실행한다. SEA는 공식 위젯이 허용하는 일반 Altcha 확인과 제출을 브라우저 자동화로 수행하고 task ID를 검증한다. 이메일·비밀번호·토큰은 기록하지 않는다. [initial-access-approval.md](references/initial-access-approval.md)와 [multi-agent-orchestration.md](references/multi-agent-orchestration.md)를 따른다.
 
-- **검증된 외부 제출 자동 실행:** Agent 1은 CID·SMILES·구조 원본 SHA-256으로 compound_tag를 만든다. 최초 승인에서 SEA·PharmMapper 신규 제출이 허용되면 Agent 2는 공식 경로로 직접 제출한다. SEA는 공식 웹 양식에 검증 SMILES를 입력하고 Altcha 확인과 Submit을 실행해 task ID·결과 URL·구조 SHA를 기록한다. PharmMapper는 사용자가 대시보드 현재 세션 입력란에 한 번 넣은 이메일과 검증 SDF/MOL2를 공식 양식으로 전송하고 job ID·응답 SHA·구조 SHA만 기록한다. 이메일 주소는 저장하지 않는다. 네트워크 실패만 최대 3회 재시도하고, 실제 폼/응답 확인이 실패했을 때만 NEEDS_EXTERNAL_SUBMISSION으로 남긴다.
+- **검증된 외부 제출 자동 실행:** Agent 1은 CID·SMILES·구조 원본 SHA-256으로 compound_tag를 만든다. 최초 승인에서 SEA·PharmMapper 신규 제출이 허용되면 Agent 2는 공식 경로로 직접 제출한다. SEA는 공식 웹 양식에 검증 SMILES를 입력하고 Altcha 확인과 Submit을 실행해 task ID·결과 URL·구조 SHA를 기록한다. PharmMapper는 검증된 SDF/MOL2를 공식 양식으로 전송하고 **제출 응답에서 발급된 Job ID를 즉시 기록한다.** PharmMapper 결과 확인은 이메일 수신을 전제로 하지 않는다. 제출 후 공식 **Check Job** 화면에서 Job ID로 상태를 조회하고, 완료 상태가 확인되면 해당 Job의 공식 다운로드를 받아 raw 파일·다운로드 시각·SHA-256을 보존한다. 네트워크 실패만 최대 3회 재시도하고, 실제 폼/응답 확인이 실패했을 때만 NEEDS_EXTERNAL_SUBMISSION으로 남긴다.
+
+### PharmMapper Job ID·Check Job 규칙
+
+PharmMapper는 제출 직후 발급되는 Job ID를 작업의 기본 추적 키로 사용한다. 총괄과 Agent 2는 다음 순서를 반드시 따른다.
+
+1. 제출 응답에서 Job ID, 제출 시각, 화합물 CID, 입력 구조 SHA-256, Job Description을 즉시 job ledger에 기록한다.
+2. 이메일 수신이나 Gmail 알림을 기다리지 않는다. 이메일은 선택적 보조 알림일 뿐이며, 메일 미수신을 작업 중단 사유로 삼지 않는다.
+3. PharmMapper의 공식 **Check Job** 페이지에서 기록된 Job ID를 조회한다. 조회 결과가 `RUNNING/PENDING`이면 다음 조회 시각과 재개 조건을 저장하고 다른 독립 작업을 계속한다.
+4. `COMPLETED` 또는 다운로드 가능 상태가 되면 같은 Job ID의 공식 결과를 다운로드한다. 결과 파일의 Job ID·CID·구조 identity·원본 SHA-256을 검증한 뒤에만 downstream 분석을 깨운다.
+5. Job ID가 없거나 응답과 결과의 CID/구조가 다르면 `BLOCKED` 또는 `INVALIDATED`로 기록하고, 새 Job을 임의로 만들거나 다른 화합물 결과를 재사용하지 않는다.
+6. Check Job 조회는 서비스가 허용하는 범위에서 제한된 간격과 횟수로 수행한다. 상태 변화가 없을 때 반복 채팅 보고를 하지 않으며, 완료·실패·예기치 않은 중단·사용자 행동 필요 때만 알린다.
 
 - **최우선 기존 자료 검증:** 화합물·질환·생물종 접수 직후 원본/메타데이터 검사 → 사용자 [반영 및 재분석] 또는 [부족한 자료 보완/새로 분석/제외] 선택 → 승인된 차등 실행. 입력 SHA 동일 시 재실행 금지. 신규 프로젝트 감시는 [np_multi_run_monitor.py](scripts/np_multi_run_monitor.py), 검토 화면은 [np_local_dashboard.py](scripts/np_local_dashboard.py), Cytoscape는 [np_cytoscape_worker.py](scripts/np_cytoscape_worker.py)로 처리. 실제 SEA·PharmMapper 신규 제출 자동화는 검증되기 전 완료로 주장하지 않는다.
 
 - **한국어 출력 필수:** 사용자 질문에 대한 답변, 진행상황, 질문, 승인 요청, 오류·완료 안내는 입력 언어와 무관하게 모두 한국어로 작성한다. 공식 DB/식별자 및 파일명만 원어 허용. 모든 총괄 및 세부 1~5 에이전트에 적용한다.
-- **역할 구조:** 총괄 0, NP/구조 1, SEA·PharmMapper 2, STRING·Cytoscape·GO/KEGG 3, 독립 QC/재실행 4, 실험 Methods/Results 원고 근거 검토 5. 3번은 검증된 선행 데이터가 생기는 즉시 예비 분석을 시작하고 새 데이터가 오면 4번이 영향 평가 후 재실행시킨다. [multi-agent-orchestration.md](references/multi-agent-orchestration.md)와 [np_agent_queue.py](scripts/np_agent_queue.py)를 사용한다.
+- **역할 구조:** 총괄 0, NP/구조 1, SEA·PharmMapper 2, STRING·Cytoscape·GO/KEGG 3, 독립 QC/재실행 4, Methods/Results 근거·초안 5, 계획 밖 외부자료 이벤트 6, 도킹 후보·handoff 7. 3번은 검증된 선행 데이터가 생기는 즉시 예비 분석을 시작하고 새 데이터가 오면 4번이 영향 평가 후 재실행시킨다. 6번은 외부자료를 검수·재맵핑·라우팅하고 7번은 Cytoscape와 QC가 통과한 frozen branch에서만 도킹 후보를 확정한다. [multi-agent-orchestration.md](references/multi-agent-orchestration.md)와 [np_agent_queue.py](scripts/np_agent_queue.py)를 사용한다.
 
 - For new projects with compound(s) and disease intake, use the overall controller and role-specific Agent 1 (NP collection and analysis), Agent 2 (SEA/PharmMapper structure submission and result retrieval), and Agent 3 (independent QC), as described in [multi-agent-orchestration.md](references/multi-agent-orchestration.md). Handoff by verified local structure manifests and job ledgers; email is optional authorized notification, NOT a presumed submission route.
 
@@ -37,7 +60,7 @@ description: "Run reproducible, source-traceable network pharmacology for compou
 
 ## Start here: lightweight start, model escalation, and execution handoff
 
-- Before any external submission, long-running retrieval, or final status report, read [execution-controller.md](references/execution-controller.md) and maintain a persistent execution state. Use its retry, email polling, dependency and completion gates.
+- Before any external submission, long-running retrieval, or final status report, read [execution-controller.md](references/execution-controller.md) and maintain a persistent execution state. Use its retry, provider-status polling, dependency and completion gates. For PharmMapper, provider-status polling means Check Job by Job ID; do not substitute Gmail polling.
 - Mandatory pre-submission gate: scan the authorized workspace for matching historical raw data, verify identity/provenance/integrity, notify the user and obtain explicit reuse-versus-recollection approval before using existing data or submitting replacement jobs. Follow [execution-controller.md](references/execution-controller.md); never overwrite historical raw files.
 
 
@@ -94,7 +117,7 @@ Recommend stronger reasoning at these points:
 
 ## Scientific workflow
 
-`compound identity -> compound targets -> disease targets -> species/stable-ID normalization -> mapping QC -> overlap -> branch separation -> PPI -> hub analysis -> GO/KEGG/Reactome -> sensitivity/robustness when indicated -> evidence integration -> docking-candidate recommendation -> SCI figure when requested -> final NP report -> STOP`
+`project intake (extract/paper scope) -> constituent child runs in parallel -> compound identity -> compound targets -> disease targets -> species/stable-ID normalization -> mapping QC -> overlap -> branch separation -> PPI -> hub analysis -> GO/KEGG/Reactome -> sensitivity/robustness when indicated -> evidence integration -> Cytoscape/SCI figure when requested -> docking-candidate recommendation -> approved Methods/Results draft -> project-level multi-constituent integration -> final NP report -> STOP`
 
 For de novo work, collect broadly first, preserve source-native scores and evidence, perform identity/species/mapping QC, diagnose the broad overlap and network, and narrow one source-specific rule at a time only when the pool is too large or biologically diffuse. For reproduction, the published Methods override de novo defaults.
 
@@ -109,8 +132,7 @@ Use the baseline registry below for small-molecule/extract constituent-disease a
 3. Preserve every source artifact exactly as retrieved in a source archive when possible, including CSV, TSV, ZIP, JSON, or raw text/API responses. Never overwrite the original with a normalized table. Create normalized analysis CSVs as separate derived files.
 4. For every attempted source, record the exact query, source URL, job ID when applicable, collection/access date, database/tool version or release, species, source-native score/rank, evidence type, source record ID, raw archive path, normalized output path, and SHA-256 hashes for preserved artifacts where practical. If a required URL, date, or job identifier cannot be verified, record `UNVERIFIED` rather than inferring it.
 5. For each baseline source—SEA, PharmMapper, SwissTargetPrediction, Super-PRED, STITCH, GeneCards, OMIM, and TTD—write an explicit retrieval status of exactly one of `retrieved`, `not retrieved`, `unavailable`, `proxy`, or `broad_exploratory`; never omit a source row silently. Record login, CAPTCHA, rate limit, inaccessible endpoint, unsupported input, or no-result response with its exact reason. Do not substitute another source or treat absence as negative evidence.
-6. Before submitting to a source that requires an email address for job completion (including PharmMapper), determine that requirement from the source's submission form. If email is required, ask the user whether to use the run-specific secure `contact_email`, provide another address, or omit that source; do not submit until the user authorizes the choice. Never hard-code a personal address in this reusable Skill, raw exports, figures, or manuscript-facing outputs. Record only that the email-notification requirement was met and redact contact information from any shareable copy.
-   After an authorized email-backed job is submitted, check the connected Gmail account for the provider's completion notice using the job ID and provider name. When the notice is received, retrieve the official result from its linked job page immediately, preserve the raw export and completion timestamp, and continue normalization/QC without waiting for another user message. If Gmail is unavailable, unconnected, delayed, or lacks a matching notice, record that status and check the provider's official job-status page; do not invent completion or use a nonofficial mirror.
+6. For PharmMapper, treat the provider-issued Job ID and official Check Job page as the authoritative completion route. Do not require a completion email, do not wait on Gmail, and do not classify a missing email as a failed submission. If the site separately requires an email for submission, obtain the user's approval for that field, never store the address, and proceed to Check Job immediately after recording the Job ID. Retrieve results only from the official Job page/download route and preserve the raw export, completion timestamp, Job ID, input identity, and SHA-256.
 7. Normalize retained records to reviewed human UniProt accessions and HGNC-approved symbols. Retain input IDs, aliases, mapping route, one-to-many mappings, unmapped records, species exclusions, and pre/post-mapping counts. Complete this QC before calculating overlap or submitting STRING.
 8. Build the functional PPI from the QC-passed overlap using STRING. Preserve its mapping report and edge export and record release, organism, score threshold, submitted/mapped/excluded counts, nodes, and edges.
 9. Retrieve OmniPath separately as a signaling/regulatory annotation. Keep this evidence overlay distinct from the STRING functional PPI; it must not silently add or remove genes from the overlap or PPI.
@@ -136,6 +158,8 @@ Do not choose targets or docking candidates until the source-panel ledger, mappi
 ## Run gates
 
 ### Start
+
+Before a real NP run, execute a fast offline simulation using the same queue tail, worker registry, dependencies and artifact contracts as the planned run. The simulation must reach the confirmed final goal on the normal path, then inject at least one external-data event, identity/format error, corrected re-upload, worker failure or restart, and verify quarantine, remapping, handoff, retry and downstream continuation. Record the simulation result and discovered fixes. If a real run later fails to reach the final goal, patch the contract and rerun the affected simulation from the failure checkpoint through the final artifact before resuming the real run.
 
 Run `scripts/environment_check.py` when local/desktop execution, Cytoscape automation, or bulk deterministic processing may be used. Record only capabilities actually detected; a missing GUI-control path does not block terminal/cyREST automation when those capabilities are available.
 
@@ -193,6 +217,8 @@ At handoff, ask the user to select one package profile: (1) `results_only` for f
 After NP analysis, the optional pre-Cytoscape decision and any requested `REVIEW_DRAFT` are complete, deliver the docking-candidate recommendation and show a short manuscript-readiness summary. Explicitly ask whether to draft the NP Methods, NP Results, and NP figure legend. Do not write those manuscript sections before the user approves. If approved, write them from the frozen outputs without waiting for docking results; keep docking findings out of the NP Results. Then provide the docking handoff and stop. If the user requests independent verification, provide the auditor handoff from the same frozen branch without rerunning or mutating NP.
 
 ## Autonomous completion rule
+
+For an extract or other multi-constituent paper, completion is evaluated twice: each constituent child run must pass its own artifact/QC gate, and the parent project must produce an integrated manifest, shared-versus-specific hub table, and paper-level figure/methods links. Never report the paper as complete from one constituent run or from two unrelated run folders.
 
 When the user authorizes a workflow, execute the skill's complete authorized scope through its defined completion gate without waiting for a separate confirmation at every intermediate step. Continue deterministic processing, QC, record updates, figure/document preparation, and reproducibility packaging until the skill's work is complete. Ask the user only when a genuinely consequential scientific judgment could change the conclusion, indispensable information or access is missing, an irreversible/destructive or external action requires authorization, or a critical error cannot be safely resolved. Do not ask merely because another defined step remains.
 

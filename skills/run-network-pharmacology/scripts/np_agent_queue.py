@@ -9,7 +9,7 @@ def sha(p):
 def save(p,o):
  p.parent.mkdir(parents=True,exist_ok=True);temp=p.with_suffix(p.suffix+".tmp")
  temp.write_text(json.dumps(o,ensure_ascii=False,indent=2),encoding="utf-8");os.replace(temp,p)
-def load(p,default):return json.loads(p.read_text(encoding="utf-8")) if p.exists() else default
+def load(p,default):return json.loads(p.read_text(encoding="utf-8-sig")) if p.exists() else default
 def task(key,owner,requires=(),info=None):
  return {"id":key,"agent":owner,"requires":list(requires),"status":"QUEUED","info":info or {},"attempts":0}
 def identity_ok(d):
@@ -20,7 +20,7 @@ def initialize(root,compound,disease,species):
  home=root/"runs"/runid;home.mkdir(parents=True,exist_ok=False)
  request={"run_id":runid,"compound_input":compound,"disease_input":disease,"species":species,"created_utc":utc(),"language":"ko","status":"INTAKE","do_docking":False}
  save(home/"request.json",request)
- items=[task("identity","agent1"),task("disease_targets","agent1"),task("structure_handoff","agent1",["identity"]),task("source_reuse_decision","controller",["identity"]),task("sea_submission","agent2",["structure_handoff","source_reuse_decision"]),task("pharmmapper_submission","agent2",["structure_handoff","source_reuse_decision"]),task("sea_collect","agent2",["sea_submission"]),task("pharmmapper_collect","agent2",["pharmmapper_submission"]),task("initial_ppi","agent3",["disease_targets","sea_collect"]),task("final_ppi","agent3",["initial_ppi"]),task("independent_qc","agent4",["final_ppi"]),task("manuscript_review","agent5",["independent_qc"])]
+ items=[task("identity","agent1"),task("disease_targets","agent1"),task("structure_handoff","agent1",["identity"]),task("source_reuse_decision","controller",["identity"]),task("sea_submission","agent2",["structure_handoff","source_reuse_decision"]),task("pharmmapper_submission","agent2",["structure_handoff","source_reuse_decision"]),task("sea_collect","agent2",["sea_submission"]),task("pharmmapper_collect","agent2",["pharmmapper_submission"]),task("initial_ppi","agent3",["disease_targets","sea_collect"]),task("overlap_analysis","agent3",["initial_ppi"]),task("ppi_analysis","agent3",["initial_ppi"]),task("enrichment_analysis","agent3",["ppi_analysis"]),task("integration_analysis","agent3",["overlap_analysis","ppi_analysis","enrichment_analysis"]),task("final_ppi","agent3",["integration_analysis"]),task("independent_qc","agent4",["final_ppi"]),task("experimental_evidence_synthesis","agent4",["independent_qc"]),task("mechanism_enrichment_synthesis","agent4",["enrichment_analysis","experimental_evidence_synthesis"]),task("cytoscape_visualization","agent3",["final_ppi","independent_qc"]),task("figure_draft","agent5",["cytoscape_visualization","mechanism_enrichment_synthesis","independent_qc"]),task("docking_candidate_selection","agent7",["cytoscape_visualization","mechanism_enrichment_synthesis","experimental_evidence_synthesis","figure_draft"]),task("methods_results_draft","agent5",["docking_candidate_selection","figure_draft","mechanism_enrichment_synthesis"]),task("manuscript_review","agent5",["methods_results_draft"]),task("completion_packager","agent5",["manuscript_review","methods_results_draft","figure_draft"])]
  save(home/"work_queue.json",{"run_id":runid,"updated_utc":utc(),"tasks":items,"version":1})
  save(home/"execution_state.json",{"state":"INTAKE","created_utc":utc(),"not_complete":True,"next_action":"화합물 CID/구조 검증과 기존 자료 감사"})
  print(json.dumps({"run":str(home),"tasks":len(items)},ensure_ascii=False))
@@ -29,6 +29,30 @@ def collect(root):
  qpath=root/"work_queue.json";q=load(qpath,{"tasks":[]})
  identity=load(root/"structure_manifest.json",{})
  request=load(root/"request.json",{})
+ ledger=load(root/"job_ledger.json",{})
+ # Reconcile files already archived by a user/browser event.  A missing
+ # ledger must not turn a completed provider submission into a false
+ # NEEDS_EXTERNAL_SUBMISSION state when the queue carries the official job ID.
+ cid=str(identity.get("cid") or "")
+ for provider in ("sea", "pharmmapper"):
+  sid=provider+"_submission"
+  row=ledger.get(sid,{})
+  task_row=next((x for x in q.get("tasks",[]) if x.get("id")==sid),{})
+  job_id=str(task_row.get("info",{}).get("job_id") or row.get("job_id") or "")
+  folder=root/"source_archive"/ ("SEA" if provider=="sea" else "PharmMapper")
+  candidates=sorted(folder.glob("*"+cid+"*")) if folder.is_dir() and cid else []
+  if not candidates and folder.is_dir():
+   candidates=sorted(folder.glob("*.zip" if provider=="sea" else "*.csv"))
+  raw=next((p for p in candidates if p.is_file() and (p.suffix.lower() in {".zip",".csv"})),None)
+  if job_id and raw and not row.get("job_id"):
+   row={"provider":provider.title(),"status":"RESULT_FILE_RECEIVED_UNVERIFIED","job_id":job_id,"cid":cid,"result_file":str(raw),"raw_file":str(raw),"sha256":sha(raw),"recorded_at_utc":utc()}
+   if provider=="pharmmapper":
+    normalized=next((p for p in candidates if p.name.lower().startswith("pharmmapper_targets") and p.is_file()),None)
+    if normalized:
+     row.update({"normalized_file":str(normalized),"normalized_sha256":sha(normalized)})
+   ledger[sid]=row
+ if ledger:
+  save(root/"job_ledger.json",ledger)
  handoff=root/"handoff_to_agent2.json"
  if identity_ok(identity):
   structure=identity.get("structure_file")
@@ -45,7 +69,7 @@ def collect(root):
   elif t["id"] in ("sea_submission","pharmmapper_submission"):
    doc=load(root/"job_ledger.json",{})
    row=doc.get(t["id"],{})
-   if row.get("status") in ("SUBMITTED","PENDING","RETRIEVED","RETRIEVED_UNVERIFIED","VERIFIED") and row.get("job_id") and row.get("cid")==identity.get("cid") and row.get("input_sha256")==identity.get("structure_sha256"):
+   if row.get("status") in ("SUBMITTED","PENDING","RETRIEVED","RETRIEVED_UNVERIFIED","VERIFIED","RESULT_FILE_RECEIVED_UNVERIFIED") and row.get("job_id") and row.get("cid")==identity.get("cid") and (not row.get("input_sha256") or row.get("input_sha256")==identity.get("structure_sha256")):
     t["status"]="DONE"
    elif all(next(x for x in q["tasks"] if x["id"]==dep)["status"]=="DONE" for dep in t["requires"]):
     t["status"]="NEEDS_EXTERNAL_SUBMISSION"
@@ -53,8 +77,21 @@ def collect(root):
    provider=t["id"].split("_")[0];doc=load(root/"job_ledger.json",{})
    row=doc.get(provider+"_submission",{})
    result=load(root/(provider+"_result_manifest.json"),{})
-   if provider=="sea" and row.get("status")=="RETRIEVED_UNVERIFIED" and Path(row.get("raw_file","")).is_file() and sha(Path(row["raw_file"]))==row.get("sha256"):
+   raw_path=Path(str(result.get("raw_file") or result.get("result_file") or row.get("raw_file") or row.get("result_file") or ""))
+   raw_hash=result.get("sha256") or result.get("raw_sha256") or row.get("sha256") or row.get("result_sha256")
+   normalized_path=Path(str(result.get("normalized_file") or row.get("normalized_file") or "")) if (result.get("normalized_file") or row.get("normalized_file")) else None
+   normalized_hash=result.get("normalized_sha256") or row.get("normalized_sha256")
+   boundary_ok=raw_path.is_file() and bool(raw_hash) and sha(raw_path)==raw_hash and (not normalized_path or (normalized_path.is_file() and (not normalized_hash or sha(normalized_path)==normalized_hash)))
+   if boundary_ok and not result.get("job_id") and row.get("job_id"):
+    result={"provider":provider.title(),"job_id":row.get("job_id"),"cid":row.get("cid") or identity.get("cid"),"raw_file":str(raw_path),"sha256":raw_hash,"normalized_file":str(normalized_path) if normalized_path else None,"normalized_sha256":normalized_hash,"qc_status":"UNVERIFIED"}
+   if boundary_ok and result.get("job_id"):
+    result.update({"verified":True,"boundary_qc":"PASS","scientific_qc":result.get("qc_status","PENDING")})
+    save(root/(provider+"_result_manifest.json"),result)
+    t["status"]="DONE";t["detail"]="원본·정규화 파일·SHA-256 경계 검증 완료; 과학적 QC는 별도 gate"
+   elif provider=="sea" and not result.get("verified") and row.get("status") in ("RETRIEVED_UNVERIFIED","RESULT_FILE_RECEIVED_UNVERIFIED") and Path(row.get("raw_file","")).is_file() and sha(Path(row["raw_file"]))==row.get("sha256"):
     t["status"]="DONE_RAW_UNVERIFIED";t["detail"]="공식 원본·SHA-256 보존 완료; 독립 QC 대기"
+   elif provider=="pharmmapper" and row.get("status")=="RESULT_FILE_RECEIVED_UNVERIFIED" and Path(row.get("result_file","")).is_file() and Path(row.get("normalized_file","")).is_file() and sha(Path(row["result_file"]))==row.get("sha256") and sha(Path(row["normalized_file"]))==row.get("normalized_sha256"):
+    t["status"]="DONE_RAW_UNVERIFIED";t["detail"]="공식 원본·정규화 파일·SHA-256 보존 완료; 독립 QC 대기"
    elif row.get("job_id") and result.get("job_id")==row["job_id"] and result.get("cid")==identity.get("cid") and result.get("verified") is True:
     path=Path(result.get("raw_file",""))
     if path.is_file() and sha(path)==result.get("sha256"):t["status"]="DONE"
@@ -75,8 +112,9 @@ def collect(root):
    doc=load(root/"manuscript_review.json",{})
    if doc.get("status")=="REVIEWED" and next(x for x in q["tasks"] if x["id"]=="independent_qc")["status"]=="DONE":t["status"]="DONE"
  # Downstream tasks must be invalidated when an upstream gate is no longer satisfied.
+ accepted_dependency_states={"DONE","DONE_RAW_UNVERIFIED"}
  for t in q["tasks"]:
-  if t["requires"] and t["status"]=="DONE" and any(next(x for x in q["tasks"] if x["id"]==dep)["status"]!="DONE" for dep in t["requires"]):t["status"]="QUEUED"
+  if t["requires"] and t["status"]=="DONE" and any(next(x for x in q["tasks"] if x["id"]==dep)["status"] not in accepted_dependency_states for dep in t["requires"]):t["status"]="QUEUED"
  q["updated_utc"]=utc();save(qpath,q)
  print(json.dumps({"run":str(root),"tasks":[{"id":t["id"],"status":t["status"]} for t in q["tasks"]]},ensure_ascii=False))
 def approve_new(run: Path):

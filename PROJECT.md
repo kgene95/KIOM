@@ -20,6 +20,7 @@ KIOM 연구와 소프트웨어 작업을 재현 가능하고 검증 가능한 �
 - `PROJECT_STATE.md`: 현재 상태와 다음 행동
 - `00_shared/MEMORY/DECISIONS.md`: 설계 결정
 - `adapters/`: 분야별 연결
+- `<PROJECT_NAME>.md`: 프로젝트별 입력·용어·예외·보고서 계약. 범용 문서에 프로젝트 고유 내용을 넣지 않는다.
 
 ## 저장소 경계
 

@@ -361,6 +361,14 @@ def role_status_panel(project):
         queue=m.read(run/"work_queue.json")
         tasks=list(queue.get("tasks",[]))
         progress=m.read(run/"analysis_progress.json")
+        heartbeat=m.read(run/"controller_heartbeat.json")
+        if heartbeat:
+            heartbeat_at=heartbeat.get("heartbeat_at_utc","") or heartbeat.get("updated_at_utc","") or heartbeat.get("updated_utc","")
+            heartbeat_detail=" · ".join(x for x in [heartbeat.get("next_action","") or heartbeat.get("last_error",""), "heartbeat "+heartbeat_at if heartbeat_at else ""] if x)
+            tasks.append({"agent":"controller","id":"controller_heartbeat","status":heartbeat.get("controller_status","NOT_STARTED"),"detail":heartbeat_detail or "총괄 감시 상태 기록됨"})
+        alert=m.read(run/"controller_alert.json")
+        if alert:
+            tasks.append({"agent":"controller","id":"controller_alert","status":"FAILED" if alert.get("severity")=="HIGH" else "RETRY_WAIT","detail":alert.get("message","")})
         if progress:
             tasks.append({"agent":"controller","id":"analysis_progress","status":progress.get("status","NOT_STARTED"),"detail":progress.get("next_action","")})
         if not tasks:
@@ -391,8 +399,8 @@ def role_status_panel(project):
     events=events[-12:]
     event_rows=''.join('<tr><td>'+h(run_id)+'</td><td>'+h(item.get("at_utc", ""))+'</td><td>'+h(item.get("event", ""))+'</td><td>'+h(item.get("task_id", item.get("status", "")))+'</td></tr>' for run_id,item in events)
     event_block='<p class="muted">아직 구조화 이벤트가 없습니다.</p>' if not event_rows else '<table><tr><th>실행</th><th>시각</th><th>이벤트</th><th>작업·상태</th></tr>'+event_rows+'</table>'
-    live='<label class="muted"><input type="checkbox" id="harness-live"> 10초마다 자동 새로고침</label><script>(function(){const k="kiom-harness-live";const x=document.getElementById("harness-live");x.checked=localStorage.getItem(k)==="1";x.onchange=()=>localStorage.setItem(k,x.checked?"1":"0");if(x.checked)setTimeout(()=>location.reload(),10000)})();</script>'
-    return '<section class="progress-overview"><details open><summary><strong>전체 진행 상황</strong> · '+h(summary)+'</summary><p class="muted">총괄·세부 에이전트·worker의 저장된 상태를 표시합니다. 오류·보류 항목은 상세·재작업 링크에서 다시 열 수 있습니다.</p>'+live+'<details><summary>상세 작업 표 보기</summary>'+table+'</details><details><summary>최근 실행 이벤트 보기</summary>'+event_block+'</details></details></section>'
+    live='<label class="muted"><input type="checkbox" id="harness-live"> 자동 갱신(10초) · 총괄 heartbeat와 워커 이벤트를 계속 확인합니다.</label><script>(function(){const k="kiom-harness-live";const x=document.getElementById("harness-live");x.checked=localStorage.getItem(k)!=="0";x.onchange=()=>localStorage.setItem(k,x.checked?"1":"0");if(x.checked)setTimeout(()=>location.reload(),10000)})();</script>'
+    return '<section class="progress-overview"><details open><summary><strong>전체 진행 상황</strong> · '+h(summary)+'</summary><p class="muted">이 화면은 컨트롤러가 기록한 heartbeat·워커 상태·재시도·경고·최근 이벤트를 읽기 전용으로 표시합니다. 실행과 재시도는 컨트롤러가 담당합니다.</p>'+live+'<details open><summary>상세 작업 표 보기</summary>'+table+'</details><details open><summary>최근 실행 이벤트 보기</summary>'+event_block+'</details></details></section>'
 
 def sea_result_state(run):
     row=m.read(Path(run)/"job_ledger.json").get("sea_submission", {})
@@ -427,9 +435,9 @@ def external_submission_panel(project):
         elif sea_ledger.get("status")=="NEEDS_ATTENTION_DOWNLOAD_FAILED": sea+='<p class="warn">SEA 결과 원본 자동 회수 실패 — 원본·SHA-256 없이 완료 처리하지 않습니다.</p>'+form("/retrieve_sea",'<input type="hidden" name="run" value="'+h(run_id)+'">',"SEA 결과 원본 자동 회수 재시도")
         else: sea+='<p><a href="https://sea.bkslab.org/" target="_blank" rel="noopener">SEA 공식 제출 화면 열기</a></p>'+sea_copy_control("SEA SMILES",smiles)+sea_copy_control("PubChem CID",cid)+sea_copy_control("작업 태그",tag)+'<p class="warn">사람 확인(CAPTCHA)은 사용자가 사이트에서 직접 완료해야 합니다. 제출 후 발급된 작업 ID를 아래에 한 번 기록하면 재제출 없이 재개합니다.</p>'+form("/record_external_job",'<input type="hidden" name="run" value="'+h(run_id)+'"><input type="hidden" name="provider" value="sea"><label>SEA 공식 작업 ID <input name="job_id" required placeholder="provider job ID"></label><label>결과 URL(있을 때) <input name="result_url" type="url" placeholder="https://..."></label>',"SEA 작업 ID 기록 후 재개")
         pm='<h4>PharmMapper</h4>'
-        if pharm.get("status")=="SUBMITTED": pm+='<p class="ok">PharmMapper 제출 확인 · 작업 ID '+h(pharm.get("job_id"))+" · 결과 대기</p>"
-        elif pharm.get("status")=="SUBMITTED_RESPONSE_REVIEW_REQUIRED": pm+='<p class="warn">PharmMapper 제출 기록은 보존되어 있습니다. 공식 응답 또는 완료 메일에서 작업 ID를 확인해 아래에 한 번 기록하세요. 재제출하지 않습니다.</p>'+form("/record_external_job",'<input type="hidden" name="run" value="'+h(run_id)+'"><input type="hidden" name="provider" value="pharmmapper"><label>PharmMapper 공식 작업 ID <input name="job_id" required placeholder="12자리 작업 ID"></label><label>결과 URL(있을 때) <input name="result_url" type="url" placeholder="https://..."></label>',"PharmMapper 작업 ID 기록 후 재개")
-        elif pharm.get("status")=="SUBMISSION_NOT_CONFIRMED": pm+='<p class="warn">PharmMapper 공식 작업 ID와 접수 메일이 없어 제출을 확인하지 못했습니다. 자동 재전송은 하지 않습니다. 공식 제출 화면에서 정상 접수한 뒤 작업 ID를 기록하세요.</p>'+form("/record_external_job",'<input type="hidden" name="run" value="'+h(run_id)+'"><input type="hidden" name="provider" value="pharmmapper"><label>PharmMapper 공식 작업 ID <input name="job_id" required placeholder="12자리 작업 ID"></label><label>결과 URL(있을 때) <input name="result_url" type="url" placeholder="https://..."></label>',"PharmMapper 접수 확인 후 재개")
+        if pharm.get("status")=="SUBMITTED": pm+='<p class="ok">PharmMapper 제출 확인 · 작업 ID '+h(pharm.get("job_id"))+" · Check Job에서 상태 조회</p>"
+        elif pharm.get("status")=="SUBMITTED_RESPONSE_REVIEW_REQUIRED": pm+='<p class="warn">PharmMapper 제출 기록은 보존되어 있습니다. 공식 제출 응답에서 작업 ID를 확인해 아래에 한 번 기록하세요. 완료 메일을 기다리지 않습니다. 재제출하지 않습니다.</p>'+form("/record_external_job",'<input type="hidden" name="run" value="'+h(run_id)+'"><input type="hidden" name="provider" value="pharmmapper"><label>PharmMapper 공식 작업 ID <input name="job_id" required placeholder="12자리 작업 ID"></label><label>결과 URL(있을 때) <input name="result_url" type="url" placeholder="https://..."></label>',"PharmMapper 작업 ID 기록 후 재개")
+        elif pharm.get("status")=="SUBMISSION_NOT_CONFIRMED": pm+='<p class="warn">PharmMapper 공식 작업 ID가 없어 제출을 확인하지 못했습니다. 메일 미수신은 실패 조건이 아닙니다. 자동 재전송은 하지 않습니다. 공식 제출 화면의 응답에서 작업 ID를 확인한 뒤 기록하세요.</p>'+form("/record_external_job",'<input type="hidden" name="run" value="'+h(run_id)+'"><input type="hidden" name="provider" value="pharmmapper"><label>PharmMapper 공식 작업 ID <input name="job_id" required placeholder="12자리 작업 ID"></label><label>결과 URL(있을 때) <input name="result_url" type="url" placeholder="https://..."></label>',"PharmMapper 접수 확인 후 재개")
         else:
             fields='<input type="hidden" name="run" value="'+h(run_id)+'"><label>프로젝트 공용 PharmMapper 제출·결과 수신 이메일 (현재 세션 전용) <input type="email" name="pharmmapper_email" autocomplete="email" required placeholder="name@example.org"></label><p class="muted">최초 한 번만 입력하며 파일·로그·보고서에는 저장하지 않습니다.</p>'
             pm+=form("/submit_pharmmapper",fields,"PharmMapper 공식 제출")
@@ -453,7 +461,17 @@ def project_page(project_id, open_run_id="", notice=""):
     saved_runs=len(project.get("run_ids", []))
     content='<p><a href="/">프로젝트 목록</a></p>'
     if notice: content+='<section><p class="ok">'+h(notice)+'</p></section>'
-    content+='<section><h3>'+h(project.get("name"))+'</h3><p class="muted">상태: '+h(project.get("status","DRAFT"))+' · 저장된 화합물 실행 '+str(saved_runs)+'건</p></section>'
+    content+='<section><h3>'+h(project.get("name"))+'</h3><p class="muted">상태: '+h(project.get("status","DRAFT"))+' · 저장된 화합물 실행 '+str(saved_runs)+'건</p>'
+    if project.get("status") == "PROJECT_INTEGRATED":
+        project_dir = project_path(project_id)
+        links=[]
+        for artifact in project.get("integration_artifacts", []):
+            target = project_dir / artifact
+            if target.is_file():
+                links.append('<li><a href="/artifact?project='+quote(project_id, safe="")+'&file='+quote(artifact, safe="")+'">'+h(artifact)+'</a></li>')
+        content+='<p class="ok"><strong>CMPE 논문 단위 통합 완료</strong></p><p class="muted">두 성분 child run을 하나의 추출물 연구로 통합했습니다.</p>'
+        if links: content+='<ul>'+''.join(links)+'</ul>'
+    content+='</section>'
     content+=role_status_panel(project)
     if saved_runs:
         zero_pending=[]; cards=[]; all_completed=True
@@ -493,6 +511,16 @@ def project_page(project_id, open_run_id="", notice=""):
 
 def index():
     bits=['<p class="muted">새 프로젝트를 만들면 즉시 중간 저장됩니다. 이후 화합물·질환·CID·기존 자료 검토는 해당 프로젝트에 연결됩니다.</p>']
+    live_runs=[]
+    for run_dir in (WORKSPACE/"runs").glob("*"):
+        heartbeat=m.read(run_dir/"controller_heartbeat.json")
+        if heartbeat.get("status") == "RUNNING":
+            live_runs.append((run_dir, heartbeat))
+    if live_runs:
+        rows=[]
+        for run_dir, heartbeat in sorted(live_runs, key=lambda item: item[1].get("updated_utc", ""), reverse=True):
+            rows.append('<tr><td>'+h(run_dir.name)+'</td><td>'+h(heartbeat.get("controller_status", "UNKNOWN"))+'</td><td>'+h(heartbeat.get("updated_utc", ""))+'</td><td>'+h(heartbeat.get("next_action", ""))+'</td><td><a href="/next?run='+quote(run_dir.name, safe="")+'">실행 화면 열기</a></td></tr>')
+        bits.append('<section><h3>현재 총괄 감시 중인 실행</h3><p class="muted">프로젝트 연결 여부와 관계없이 실제 controller heartbeat가 있는 run을 표시합니다. 10초 자동 갱신은 실행 화면에서 기본 활성화됩니다.</p><table><tr><th>run</th><th>총괄 상태</th><th>최근 heartbeat</th><th>다음 작업</th><th>화면</th></tr>'+''.join(rows)+'</table></section>')
     bits.append('<section><h3>새 프로젝트</h3>'+form("/create_project", '<label>프로젝트명 <input name="project_name" placeholder="예: UC 두 화합물 분석"></label>', "새 프로젝트 만들기")+'</section>')
     bits.append('<h3>프로젝트 목록</h3>')
     projects=list_projects()
@@ -523,6 +551,17 @@ class Handler(BaseHTTPRequestHandler):
         elif parsed_url.path=="/project":
             project_id=parse_qs(parsed_url.query).get("project", [""])[0]
             content=project_page(project_id).encode()
+        elif parsed_url.path=="/artifact":
+            query=parse_qs(parsed_url.query)
+            project_id=query.get("project", [""])[0]
+            filename=query.get("file", [""])[0]
+            project=read_project(project_id)
+            project_dir=project_path(project_id) if project else None
+            target=(project_dir / filename).resolve() if project_dir and filename else None
+            if not project or not target or project_dir.resolve() not in target.parents or not target.is_file():
+                self.send_error(404); return
+            content=target.read_bytes()
+            self.send_response(200); self.send_header("Content-Type", "text/plain; charset=utf-8"); self.send_header("Content-Length", str(len(content))); self.send_header("Content-Disposition", "inline; filename="+target.name); self.end_headers(); self.wfile.write(content); return
         elif parsed_url.path=="/decision":
             query=parse_qs(parsed_url.query)
             project_id=query.get("project", [""])[0]
