@@ -15,6 +15,21 @@
 
 프로젝트별 성분명·질환명·실험 marker·공동 target 수·최종 보고서 항목은 이 문서에 넣지 않는다. 실행 시작 시 프로젝트 폴더의 `<PROJECT_NAME>.md`를 추가로 읽고, 그 파일을 프로젝트 adapter 계약으로 사용한다.
 
+## NP 운영 페르소나
+
+NP 하네스를 새로 기획할 때 총괄은 다음 운영 페르소나를 먼저 배정하고, 각 역할의 contract·registry·완료 gate를 확인한다.
+
+| 페르소나 | 책임 |
+|---|---|
+| `NP_orchestrator` | 최종 목표, child run 의존성, 병렬 dispatch, 재시작, 최종 완료 판정 |
+| `input_identity_validator` | 화합물·질환·외부 파일의 identity, 형식, SHA, 중복 검수 |
+| `target_normalization_worker` | 표적을 표준 human protein accession으로 매핑하고 mapping manifest 생성 |
+| `np_analysis_worker` | overlap, PPI, enrichment, topology 계산과 산출물 생성 |
+| `independent_qc_reviewer` | 입력·계산·근거·그림의 PASS/CORRECT_AND_RERUN 판정 |
+| `evidence_and_report_writer` | 검증된 결과만 후보 사유, 그림, Methods/Results, 최종 보고서로 정리 |
+
+프로젝트 고유 화합물·질환명은 이 페르소나 정의에 넣지 않고 프로젝트 문서에서 주입한다. 페르소나는 다른 worker의 결과를 임의로 완료 처리하지 않으며, 필요한 artifact·입력 hash·handoff event가 없으면 총괄에 재수행을 요청한다.
+
 ## NP 전용 원칙
 
 ### 연구 단위와 성분 run의 구분
@@ -23,7 +38,7 @@
 
 project integrator의 최소 산출물은 `project_manifest.json`, project별 통합 허브 표, 사람이 읽는 통합 요약, child run 목록·식별자·입력 hash·artifact 링크다. 공통 허브는 실제 frozen 네트워크의 topology 결과에서 계산하며 성분별 run의 허브를 임의로 합치거나 다른 프로젝트 자료를 재사용하지 않는다. child run이 하나라도 미완료·오류이면 project는 `WAITING_CHILD_RUNS`로 남기고, supervisor가 child 상태를 다시 확인한 뒤 자동 재시도·통합을 수행한다.
 
-새 NP run은 실제 provider 호출 전에 가상 화합물·질환 시뮬레이션을 통과한다. SEA·PharmMapper 자료의 CID 불일치, 재업로드, 재맵핑, PPI·enrichment·그림 초안·도킹 후보까지의 handoff를 검증하고, 실패하면 실제 run을 시작하지 않는다.
+새 NP run은 실제 provider 호출 전에 가상 화합물·질환 시뮬레이션을 통과한다. SEA·PharmMapper 자료의 CID 불일치, 표준 protein accession 매핑, 재업로드, 재맵핑, PPI·enrichment·그림 초안·도킹 후보까지의 handoff를 검증하고, 실패하면 실제 run을 시작하지 않는다.
 
 NP 인터뷰와 기획이 끝나면 총괄은 최종 목표를 `입력·외부자료 검증 → 표적/PPI/enrichment → Cytoscape 네트워크·그림 → 도킹 후보 확정 → Methods/Results 초안 → 완료 패키지`로 제시하고 사용자에게 확인받는다. 확인된 목표와 각 단계의 완료 artifact를 run 계약에 기록한다.
 
@@ -36,7 +51,7 @@ NP 관련 질문이나 의견에는 현재 상태와 핵심 답을 먼저 짧고
 - 실제 NP run이 중간 오류로 최종 목표에 도달하지 못하면 수정 후 실패 지점부터 최종 목표까지의 축약 NP 시뮬레이션을 재실행한다. 외부자료 재맵핑, downstream handoff, Cytoscape, 도킹 후보, Figure artifact, Methods/Results artifact와 완료 보고서가 다시 생성되는지 확인한 뒤에만 실제 run을 checkpoint에서 재개한다.
 - SEA·PharmMapper 원자료는 원본과 분석용을 분리하고 SHA-256과 source provenance를 기록한다.
 - 외부 제출·로그인·CAPTCHA·raw 데이터 전송은 승인 게이트로 기록한다.
-- UniProt·STRING 등 외부 API 실패는 `FAILED_RETRYABLE`로 제한 재시도하고, 한도 초과 시 `FAILED`와 총괄 경고를 남긴다.
+- UniProt·STRING 등 외부 API 실패는 `FAILED_RETRYABLE`로 제한 재시도하고, 한도 초과 시 `FAILED`와 총괄 경고를 남긴다. 표준 protein accession mapping manifest가 없거나 종·obsolete·중복 검증이 끝나지 않으면 downstream 분석을 시작하지 않는다.
 - 매핑 미확인 표적은 임의로 제외하거나 확정하지 않는다.
 - `DONE`은 필요한 산출물과 독립 QC가 확인된 경우에만 허용한다.
 - 이 문서와 평가 보고서는 서로 다른 목적이다. 평가 보고서는 실행 지침으로 사용하지 않는다.

@@ -179,6 +179,40 @@ def normalize_targets(run: Path) -> dict[str, Any]:
     return _write(run, "normalize_targets", "DONE", outputs=["normalized_targets.json"])
 
 
+def uniprot_mapping_qc(run: Path) -> dict[str, Any]:
+    """Validate and freeze the human protein mapping gate.
+
+    The provider-to-UniProt lookup is performed by the identity/PPI intake
+    path. This worker makes that result explicit to the controller: it writes
+    a durable manifest, counts verified and unmapped rows, and blocks every
+    downstream target analysis until the mapping artifact is present.
+    """
+    normalized = _load(run, "normalized_targets.json", {}) or {}
+    mapping_file = run / "normalized_targets.csv"
+    if normalized.get("verified") is not True or not mapping_file.is_file():
+        return _write(run, "uniprot_mapping_qc", "WAITING_EXTERNAL", next_action="human protein accession mapping 결과 대기")
+    with mapping_file.open(newline="", encoding="utf-8-sig") as handle:
+        rows = list(csv.DictReader(handle))
+    stable_ids = [str(row.get("stable_id", "")).strip() for row in rows]
+    verified = [item for item in stable_ids if item]
+    unmapped = [item for item in stable_ids if not item]
+    manifest = {
+        "verified": not unmapped and bool(verified),
+        "resource": "UniProtKB",
+        "species": normalized.get("species", "9606"),
+        "rows": len(rows),
+        "verified_rows": len(verified),
+        "unmapped_rows": len(unmapped),
+        "file": str(mapping_file),
+        "sha256": file_sha256(mapping_file),
+        "updated_utc": now_utc(),
+    }
+    save_json_atomic(run / "uniprot_mapping_manifest.json", manifest)
+    if not manifest["verified"]:
+        return _write(run, "uniprot_mapping_qc", "CORRECT_AND_RERUN", next_action="미매핑 표적 보정 후 UniProt mapping 재실행", outputs=["uniprot_mapping_manifest.json"])
+    return _write(run, "uniprot_mapping_qc", "DONE", outputs=["normalized_targets.csv", "uniprot_mapping_manifest.json"])
+
+
 def initial_ppi(run: Path) -> dict[str, Any]:
     """Map the freshly collected human targets before allowing PPI analysis.
 

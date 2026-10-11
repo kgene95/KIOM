@@ -65,6 +65,13 @@
       "network": false,
       "requires_approval": false
     },
+    "uniprot_mapping_qc": {
+      "module": "np_workers",
+      "function": "uniprot_mapping_qc",
+      "resource": "UniProt-and-run-folder",
+      "network": false,
+      "requires_approval": false
+    },
     "overlap_analysis": {
       "module": "np_workers",
       "function": "overlap_analysis",
@@ -228,7 +235,8 @@
         "compound_identity",
         "disease_target_collection",
         "structure_qc",
-        "source_audit"
+        "source_audit",
+        "uniprot_mapping_qc"
       ]
     },
     "agent2": {
@@ -337,6 +345,10 @@
     "normalize_targets": {
       "owner": "agent3",
       "status": "planned"
+    },
+    "uniprot_mapping_qc": {
+      "owner": "agent1",
+      "status": "implemented"
     },
     "overlap_analysis": {
       "owner": "agent3",

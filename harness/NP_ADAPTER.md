@@ -23,7 +23,7 @@ adapter는 시뮬레이션에서 사용할 입력·오류 주입·기대 상태�
 | intake / identity | compound identity, CID, SMILES, disease ontology, species |
 | source audit | 기존 SEA·PharmMapper·질환 자료 감사와 재사용 승인 |
 | external provider | SEA·PharmMapper 제출·공식 job status·원본 다운로드 |
-| normalize | UniProt/HGNC/species/mapping QC |
+| normalize | 표준 protein accession/HGNC/species/mapping QC (`uniprot_mapping_qc`) |
 | analysis | overlap, STRING, PPI, topology, GO/KEGG, OmniPath |
 | independent validation | Agent 4 PASS 또는 CORRECT_AND_RERUN |
 | visualization | 검증된 PPI를 Cytoscape로 재현하고 네트워크·허브 artifact 생성 |
@@ -31,6 +31,8 @@ adapter는 시뮬레이션에서 사용할 입력·오류 주입·기대 상태�
 | manuscript handoff | frozen manifest 기반 Methods/Results와 figure legend 초안 |
 
 실행 큐의 후반부는 `manuscript_review → cytoscape_visualization → docking_candidate_selection → methods_results_draft → completion_packager` 순서로 고정한다. 문서에만 있는 단계를 완료로 간주하지 않으며, 각 단계의 registry·dispatcher·artifact contract가 모두 있어야 한다.
+
+`uniprot_mapping_qc`는 외부 표적 자료를 downstream 분석에 전달하기 전의 필수 gate다. `compound_targets.csv`와 질환 표적을 입력으로 받아 표준 protein accession, human species, mapping status, 중복·obsolete·ambiguous 여부를 확인하고 `normalized_targets.csv`, `uniprot_mapping_manifest.json`, 필요 시 `uniprot_unmapped.csv`를 생성한다. manifest가 PASS가 아니면 overlap·STRING·Cytoscape worker를 dispatch하지 않는다. 외부 결과나 입력 hash가 바뀌면 이 worker와 영향을 받는 downstream task를 함께 재실행한다.
 
 ## 연결된 외부 자산
 

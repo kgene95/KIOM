@@ -4,6 +4,19 @@
 
 Agent는 책임 영역을 조정하고, worker는 한 가지 검증 가능한 작업을 수행한다. `worker_registry.json`에서 `status`가 `implemented`인 항목만 dispatcher가 호출할 수 있다.
 
+## 운영 페르소나와 역할 연결
+
+| 운영 페르소나 | NP 연결 역할 | 완료 책임 |
+|---|---|---|
+| `NP_orchestrator` | Controller | 최종 목표·의존성·재시작·완료 gate |
+| `input_identity_validator` | Agent 1·Agent 6 | 원자료 identity·형식·SHA·외부 이벤트 검수 |
+| `target_normalization_worker` | `uniprot_mapping_qc` | 표준 human protein accession mapping manifest |
+| `np_analysis_worker` | Agent 3 | overlap·PPI·enrichment·topology artifact |
+| `independent_qc_reviewer` | Agent 4 | PASS 또는 `CORRECT_AND_RERUN` |
+| `evidence_and_report_writer` | Agent 5·Agent 7 | 후보 사유·그림·Methods/Results·보고서 |
+
+페르소나는 말투가 아니라 실행 권한과 산출물 계약이다. worker가 다른 역할의 완료를 추정하지 않으며, 총괄은 manifest·hash·event log를 확인한 뒤 다음 역할을 호출한다.
+
 ## 총괄 영역
 
 | 역할 | 책임 | 실행 방식 |
@@ -19,6 +32,7 @@ Agent는 책임 영역을 조정하고, worker는 한 가지 검증 가능한 �
 | `compound_identity` | identity manifest, 구조 SHA | planned |
 | `disease_target_collection` | 질환 표적 manifest | planned |
 | `structure_qc` | 구조 QC manifest | planned |
+| `uniprot_mapping_qc` | human protein accession mapping, species QC, mapping manifest | implemented |
 | `source_audit` | 재사용·재수집 판단 manifest | planned |
 
 ## Agent 2: 외부 provider
@@ -111,6 +125,10 @@ worker 시뮬레이션은 정상 순서만 확인하지 않는다. 각 worker의
 
 `external_data_intake`는 Agent 0에 속한 경계 worker다. 업로드 원본을 `source_archive/ExternalIntake/`에 보존하고 `external_validation_manifest.json`에 SHA·provider·CID·검수 상태를 기록한다. 성공하면 담당 provider worker에 `worker_notifications.jsonl`로 전달한다. `sea_collect`와 `pharmmapper_collect`는 알림을 소비해 `*_intake_handoff.json`을 만들고, 원본을 표준 `compound_targets.csv`로 변환한 뒤 stable-ID mapping worker를 재실행한다. 한 worker가 실패해도 총괄은 알림 누락·재실행 여부를 확인하고, 필요한 경우 같은 worker를 bounded retry한다.
 
+### UniProt 정규화 handoff
+
+`uniprot_mapping_qc`는 외부 provider 결과와 질환 표적 결과를 STRING·PPI 단계로 넘기기 전에 호출되는 필수 경계 worker다. 입력 표기의 gene symbol, protein name, accession을 표준 protein accession으로 매핑하고, human taxonomy, reviewed 여부, obsolete·ambiguous accession, 중복을 검사한다. 원래 표기와 매핑 결과를 모두 보존하며 `mapping_corrections.csv`, `normalized_targets.csv`, `uniprot_mapping_manifest.json`을 생성한다. 매핑 실패가 있으면 해당 행만 격리하고 총괄에 `CORRECT_AND_RERUN`을 알리며, 모든 downstream target이 검증되기 전에는 STRING·Cytoscape·enrichment를 `DONE`으로 승격하지 않는다. 성공한 mapping manifest와 입력 hash는 다음 worker handoff에 포함한다.
+
 ## Agent 6: 계획 밖 이벤트 라우터
 
 | worker | 역할 | 산출물 |
@@ -121,7 +139,9 @@ Agent 6은 원래 분석 worker의 일을 대신하지 않는다. 자료를 검�
 
 ## 후반부 자동 통합 파이프라인(개정)
 
-총괄 controller는 enrichment 결과가 생성되었다고 바로 Figure·도킹·원고를 호출하지 않는다. 다음 artifact handoff를 순서와 의존성으로 확인한다.
+총괄 controller는 enrichment 결과가 생성되었다고 바로 Figure·도킹·원고를 호출하지 않는다. 표준 protein accession 정규화 gate와 다음 artifact handoff를 순서와 의존성으로 확인한다.
+
+0. `uniprot_mapping_qc` (Agent 1): provider·질환 표적을 표준 human protein accession으로 정규화하고 종·obsolete·중복·매핑 실패를 검증한다. `uniprot_mapping_manifest.json`이 PASS일 때만 overlap, STRING, Cytoscape를 깨운다.
 
 1. `experimental_evidence_synthesis` (Agent 4): 동물·세포 실험 결과를 evidence schema로 정규화하고 방향·모델·출처를 기록한다.
 2. `mechanism_enrichment_synthesis` (Agent 4): STRING GO/KEGG와 실험 evidence를 교차검증하고, 각 범주 상위 7개 term과 제외 이유를 기록한다.
