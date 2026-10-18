@@ -26,4 +26,4 @@ Skill/plugin은 테스트와 검증 manifest를 통과하기 전까지 `AVAILABL
 
 ## 현재 평가 대상
 
-NP 과학 규칙은 `run-network-pharmacology`, 메모리와 handoff는 `research-project-memory`, 실행 제어는 `harness`가 소유한다. Agents SDK·OpenAI plugin format·Awesome Copilot·Anthropic Skills·Superpowers는 통합 전 reference-only로 평가한다.
+NP 과학 규칙은 `run-network-pharmacology`, 실행 상태와 handoff는 `harness` 및 workflow별 manifest/checkpoint가 소유한다. Agents SDK·OpenAI plugin format·Awesome Copilot·Anthropic Skills·Superpowers는 통합 전 reference-only로 평가한다.
