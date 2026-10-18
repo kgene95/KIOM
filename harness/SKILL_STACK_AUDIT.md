@@ -15,7 +15,6 @@
 ## 감사 대상
 
 - `skills/run-network-pharmacology/`: 과학 분석 규칙
-- `skills/research-project-memory/`: 프로젝트 상태와 cross-environment handoff
 - `harness/`: 실행·상태·예산·게이트
 - `agents/AGENTS.md`: 역할과 파일 계약
 - 기존 `scripts/`: 결정적 계산과 상태 감지
@@ -36,7 +35,7 @@
 
 ## NP 적용 결과
 
-현재 NP의 과학 소유자는 `run-network-pharmacology`이고, 상태·handoff 소유자는 `research-project-memory`와 `harness`다. `np_agent_queue.py`와 `np_multi_run_monitor.py`는 결정적 보조 도구이며 총괄을 대신하지 않는다. `superpowers`는 NP 과학 결과의 실행 소유자가 아니라, 복잡한 하네스·에이전트·웹앱 변경에서 기획, 구현, 디버깅, 테스트와 완료 검증을 보조하는 조건부 개발 lifecycle plugin으로 사용한다. 단순·결정적 작업에는 호출하지 않는다. OpenAI Agents SDK, Awesome Copilot, Anthropic Skills는 설계 참고 또는 별도 adapter 후보로 취급한다.
+현재 NP의 과학 소유자는 `run-network-pharmacology`이고, 상태·handoff 소유자는 `harness`와 workflow별 manifest/checkpoint다. `np_agent_queue.py`와 `np_multi_run_monitor.py`는 결정적 보조 도구이며 총괄을 대신하지 않는다. `superpowers`는 NP 과학 결과의 실행 소유자가 아니라, 복잡한 하네스·에이전트·웹앱 변경에서 기획, 구현, 디버깅, 테스트와 완료 검증을 보조하는 조건부 개발 lifecycle plugin으로 사용한다. 단순·결정적 작업에는 호출하지 않는다. OpenAI Agents SDK, Awesome Copilot, Anthropic Skills는 설계 참고 또는 별도 adapter 후보로 취급한다.
 
 ## 갱신 절차
 
