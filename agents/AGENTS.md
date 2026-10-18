@@ -24,7 +24,7 @@
 
 ## Cross-device 공통 규칙
 
-이 파일은 로컬 PC, Codex, ChatGPT Work, GitHub checkout 사이에서 동일한 작업 계약으로 취급한다. 환경이 바뀌면 `research-project-memory`의 `AI_CONTEXT.md`, `PROJECT_STATE.md`, `DECISIONS.md`, `HANDOFF.md`를 먼저 읽고, 숨은 대화 기억을 근거로 삼지 않는다. GitHub의 skills/scripts와 OneDrive의 raw 파일은 각각의 canonical 위치와 SHA를 기록한다. 환경별 실행기 차이는 `environment`, `connector_status`, `verification_status`로 명시한다.
+이 파일은 로컬 PC, Codex, ChatGPT Work 사이에서 동일한 작업 계약으로 취급한다. 환경이 바뀌면 현재 프로젝트의 manifest/checkpoint와 run 상태 파일을 먼저 읽고, 숨은 대화 기억을 근거로 삼지 않는다. 환경별 실행기 차이는 `environment`, `connector_status`, `verification_status`로 명시한다.
 
 ## 총괄 Agent 0
 
