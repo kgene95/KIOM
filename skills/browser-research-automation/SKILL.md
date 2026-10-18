@@ -114,7 +114,7 @@ Good uses include:
 - inspecting Cytoscape/ChimeraX-adjacent browser interfaces;
 - verifying manuscript submission forms without submitting unless authorized.
 
-When browser work changes project state, hand the resulting facts, files, and unresolved issues to `research-project-memory`. Do not create a parallel project-memory system inside this skill.
+When browser work changes project state, record the resulting facts, files, and unresolved issues in the active workflow manifest/checkpoint when one exists. Do not create a parallel project-memory system inside this skill.
 
 ## Privacy and security
 
